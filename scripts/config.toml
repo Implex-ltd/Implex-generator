@@ -1,0 +1,18 @@
+[discord]
+invite = "mmSW7nSe"
+version = 208319
+
+[hcaptcha]
+lang = "fr"
+version = "180e565"
+submitTime = 6
+hswAddress = "http://127.0.0.1:4000"
+SolverAddress = "http://127.0.0.1:1337"
+
+[spoof]
+cfbm = false
+profilePath = "../../assets/fingerprints/login.json"
+
+[performances]
+goroutines = 50
+debug = false
