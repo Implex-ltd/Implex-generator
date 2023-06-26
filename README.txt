@@ -17,3 +17,7 @@ The code is probably very ugly because the more time went by, the more functions
 
 reach out me at 0xF7A4C6@proton.me - https://t.me/Vichy1337 for paid job.
 If you wanna tip me there is my $LTC: ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcgc
+
+---
+https://discord.gg/b7EwhxGJZY
+https://t.me/implex_ltd
