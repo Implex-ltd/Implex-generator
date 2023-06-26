@@ -6,7 +6,9 @@
 
 
 I am probably too lazy to write something about it right now.
-I reached +2200 tokens / minutes with it.
+I reached +2200 tokens / minutes with it. 
+
+https://www.youtube.com/watch?v=z6Ea-SRY-qs&ab_channel=Armv7l
 
 I haven't coded for more than 6 months and I did this project only to have fun and learn, that's mainly why I'm posting it.
 I know some bums will want to skid it and resell it, but I don't care. I hope that people who want to progress will learn from this project, you're on the right track.
