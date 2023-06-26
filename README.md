@@ -5,5 +5,5 @@
  /___/_/_/_/ .__/_/\__/_\_\ 㞔
          /_/
 
-Release at least 50 stars, join https://discord.gg/mDzDyUWehH to stay tuned.               
+Release at least 50 stars, join https://discord.gg/yQgj8t6FmN to stay tuned.               
 ```
