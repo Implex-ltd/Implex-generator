@@ -21,3 +21,5 @@ If you wanna tip me there is my $LTC: ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcg
 ---
 https://discord.gg/b7EwhxGJZY
 https://t.me/implex_ltd
+
+ps: i don't give a SHIT if you got error or wanna use it, i help for paid or just don't waste my time.
