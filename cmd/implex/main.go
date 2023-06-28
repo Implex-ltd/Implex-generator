@@ -73,11 +73,6 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 	Unlocked++
 	utils.AppendFile("output/unlocked.txt", resp.Token)
 	console.Log(fmt.Sprintf("[unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
-
-	api.SendMessage(&discord.SendMessageConfig{
-		Content:   "unlock @everyone",
-		ChannelID: "1117376945341075456",
-	})
 }
 
 func worker(fp *fpclient.Fingerprint) {

@@ -4,7 +4,7 @@ version = 208319
 
 [hcaptcha]
 lang = "fr"
-version = "180e565"
+version = "0727cda"
 submitTime = 6
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1337"

@@ -1,38 +1,31 @@
-OS := $(shell echo %OS%)
-ifeq ($(OS),Darwin)
-    CLEAR := clear
-else
-    CLEAR := cls
-endif
-
 .PHONY: all clean build install implex ai engine
 
 all:
-	@$(CLEAR)
+	cls||clear
 	@echo "Specify a target: implex, ai, engine, install, clean, build"
 
 clean:
-	@$(CLEAR)
+	cls||clear
 	cd ../cmd/ai && rm -rf __pycache__ datas/logs datas/temp_cache/ imgs/*
 
 build:
-	@$(CLEAR)
+	cls||clear
 	cd ../cmd/implex && go build -o ../../scripts/
 
 install:
-	@$(CLEAR)
+	cls||clear
 	pip install -r requirements.txt || pip3 install -r requirements.txt
 	cd ../cmd/implex && go get .
 	cd ../cmd/engine && npm i
 
 implex:
-	@$(CLEAR)
+	cls||clear
 	cd ../cmd/implex && go run .
 
 ai:
-	@$(CLEAR)
+	cls||clear
 	cd ../cmd/ai && uvicorn main:app --reload --port 1337
 
 engine:
-	@$(CLEAR)
+	cls||clear
 	cd ../cmd/engine && node main.js
