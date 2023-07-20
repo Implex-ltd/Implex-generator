@@ -15,7 +15,7 @@ I know some bums will want to skid it and resell it, but I don't care. I hope th
 
 The code is probably very ugly because the more time went by, the more functions I added without paying much attention.
 
-reach out me at Implex-ltd@proton.me - https://t.me/Vichy1337 for paid job.
+reach out me at 0xF7A4C6@proton.me - https://t.me/Vichy1337 for paid job.
 If you wanna tip me there is my $LTC: ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcgc
 
 ---
