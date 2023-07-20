@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	h "github.com/0xF7A4C6/implex/internal/hcaptcha"
+	h "github.com/Implex-ltd/implex/internal/hcaptcha"
 )
 
 func TestGetMotion(t *testing.T) {

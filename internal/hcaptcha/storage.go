@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/0xF7A4C6/implex/internal/utils"
+	"github.com/Implex-ltd/implex/internal/utils"
 )
 
 var (
@@ -27,7 +27,7 @@ func LoadAnswer() {
 }
 
 func DownloadAnswer() error {
-	resp, err := http.Get("https://raw.githubusercontent.com/0xF7A4C6/fuckcaptcha/master/questions.txt?token=xxxx")
+	resp, err := http.Get("https://raw.githubusercontent.com/Implex-ltd/fuckcaptcha/master/questions.txt?token=xxxx")
 
 	if err != nil {
 		return err

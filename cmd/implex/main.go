@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xF7A4C6/implex/internal/console"
-	"github.com/0xF7A4C6/implex/internal/discord"
-	"github.com/0xF7A4C6/implex/internal/hcaptcha"
-	"github.com/0xF7A4C6/implex/internal/utils"
-	"github.com/0xF7A4C6/implex/pkg/cleanhttp"
-	"github.com/0xF7A4C6/implex/pkg/fpclient"
 	"github.com/BurntSushi/toml"
+	"github.com/Implex-ltd/cleanhttp/cleanhttp"
+	"github.com/Implex-ltd/fingerprint-client/fpclient"
+	"github.com/Implex-ltd/implex/internal/console"
+	"github.com/Implex-ltd/implex/internal/discord"
+	"github.com/Implex-ltd/implex/internal/hcaptcha"
+	"github.com/Implex-ltd/implex/internal/utils"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -87,14 +87,14 @@ func worker(fp *fpclient.Fingerprint) {
 	}
 
 	hc := hcaptcha.NewHcaptchaClient(&hcaptcha.HcaptchaConfig{
-		Sitekey:            "4c672d35-0701-42b2-88c3-78380b0db560",
-		Domain:             "discord.com",
-		Version:            Config.Hcaptcha.Version,
-		Lang:               Config.Hcaptcha.Lang,
-		HttpClient:         http,
-		SubmitDelay:        time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
-		HswAddress:         Config.Hcaptcha.HswAddress,
-		SolverAddress:      Config.Hcaptcha.SolverAddress,
+		Sitekey:       "4c672d35-0701-42b2-88c3-78380b0db560",
+		Domain:        "discord.com",
+		Version:       Config.Hcaptcha.Version,
+		Lang:          Config.Hcaptcha.Lang,
+		HttpClient:    http,
+		SubmitDelay:   time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
+		HswAddress:    Config.Hcaptcha.HswAddress,
+		SolverAddress: Config.Hcaptcha.SolverAddress,
 	})
 
 	key, err := hc.SolveImage()

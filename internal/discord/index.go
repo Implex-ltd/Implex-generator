@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/0xF7A4C6/implex/pkg/cleanhttp"
-	"github.com/0xF7A4C6/implex/pkg/cloudflare"
+	"github.com/Implex-ltd/cleanhttp/cleanhttp"
+	"github.com/Implex-ltd/cloudflare-reverse/cloudflarereverse"
 	http "github.com/bogdanfinn/fhttp"
 )
 
@@ -46,7 +46,7 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 	cookies := []*http.Cookie{}
 
 	if c.Config.GetCloudflareCookes {
-		cfbm, err := cloudflare.GetCfbm(c.HttpClient.Config.BrowserFp, c.HttpClient.Config.Proxy) // c.Config.Proxy - make it proxyless because they are detecting proxies...
+		cfbm, err := cloudflarereverse.GetCfbm(c.HttpClient.Config.BrowserFp, c.HttpClient.Config.Proxy) // c.Config.Proxy - make it proxyless because they are detecting proxies...
 		if err != nil {
 			return nil, fmt.Errorf("error getting Cloudflare cookies: %w", err)
 		}

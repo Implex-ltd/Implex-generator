@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/0xF7A4C6/implex/internal/console"
-	"github.com/0xF7A4C6/implex/internal/utils"
-	"github.com/0xF7A4C6/implex/pkg/itertools"
+	"github.com/Implex-ltd/implex/internal/console"
+	"github.com/Implex-ltd/implex/internal/utils"
+	"github.com/Implex-ltd/implex/pkg/itertools"
 )
 
 var (

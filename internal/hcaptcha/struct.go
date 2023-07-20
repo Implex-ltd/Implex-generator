@@ -3,7 +3,7 @@ package hcaptcha
 import (
 	"time"
 
-	"github.com/0xF7A4C6/implex/pkg/cleanhttp"
+	"github.com/Implex-ltd/cleanhttp/cleanhttp"
 )
 
 type Box struct {

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xF7A4C6/implex/internal/utils"
-	"github.com/0xF7A4C6/implex/pkg/cleanhttp"
+	"github.com/Implex-ltd/cleanhttp/cleanhttp"
+	"github.com/Implex-ltd/implex/internal/utils"
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {

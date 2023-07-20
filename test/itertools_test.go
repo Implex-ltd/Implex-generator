@@ -2,8 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/0xF7A4C6/implex/pkg/itertools"
 	"testing"
+
+	"github.com/Implex-ltd/implex/pkg/itertools"
 )
 
 func TestNewIterator(t *testing.T) {

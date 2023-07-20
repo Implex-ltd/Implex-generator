@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/0xF7A4C6/implex/internal/utils"
+	"github.com/Implex-ltd/implex/internal/utils"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
