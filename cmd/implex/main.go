@@ -70,10 +70,12 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		return
 	}
 
-	/*api.SendMessage(&discord.SendMessageConfig{
-		Content: "@everyone unbeatable",
-		ChannelID: "1138866316070105160",
-	})*/
+	if Config.Performances.Debug {
+		api.SendMessage(&discord.SendMessageConfig{
+			Content:   "@everyone unbeatable",
+			ChannelID: "1138866316070105160",
+		})
+	}
 
 	Unlocked++
 	utils.AppendFile("output/unlocked.txt", resp.Token)

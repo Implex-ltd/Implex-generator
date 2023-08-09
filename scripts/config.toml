@@ -15,4 +15,4 @@ profilePath = "../../assets/fingerprints/login.json"
 
 [performances]
 goroutines = 50
-debug = false
+debug = true

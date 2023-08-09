@@ -1,6 +1,7 @@
 package itertools
 
 import (
+	"errors"
 	"math/rand"
 	"sync"
 	"time"
@@ -15,8 +16,14 @@ func NewIterator(items []string) *Iterator {
 	}
 }
 
-func (i *Iterator) RandomiseIndex() {
+func (i *Iterator) RandomiseIndex() error {
+	if len(i.List) <2 {
+		return errors.New("there is not enought items in iterator")
+	}
+
 	i.I = rand.Intn(len(i.List)-1) + 1
+	
+	return nil
 }
 
 func (i *Iterator) IsLocked(Element string) bool {

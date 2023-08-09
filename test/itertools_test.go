@@ -42,7 +42,9 @@ func TestNewIterator(t *testing.T) {
 				fmt.Println(got.Next())
 			}
 
-			got.RandomiseIndex()
+			if err := got.RandomiseIndex(); err != nil {
+				panic(err)
+			}
 
 			fmt.Println("index (new):", got.I)
 			for i := 0; i < 5; i++ {

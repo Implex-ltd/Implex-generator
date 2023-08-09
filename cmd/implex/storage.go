@@ -32,7 +32,10 @@ func LoadFiles() error {
 	}
 
 	ProxyList = itertools.NewIterator(proxies)
-	ProxyList.RandomiseIndex()
+	
+	if err := ProxyList.RandomiseIndex(); err != nil {
+		panic("please put at least 2 proxies")
+	}
 
 	console.Log(fmt.Sprintf("[+] Loaded %d proxies...", len(proxies)))
 
@@ -42,7 +45,9 @@ func LoadFiles() error {
 	}
 
 	UsernameList = itertools.NewIterator(usernames)
-	UsernameList.RandomiseIndex()
+	if err := UsernameList.RandomiseIndex(); err != nil {
+		panic("please put at least 2 usernames")
+	}
 
 	console.Log(fmt.Sprintf("[+] Loaded %d usernames...", len(usernames)))
 
@@ -52,7 +57,9 @@ func LoadFiles() error {
 	}
 
 	BioList = itertools.NewIterator(bio)
-	BioList.RandomiseIndex()
+	if err := BioList.RandomiseIndex(); err != nil {
+		panic("please put at least 2 bios")
+	}
 
 	console.Log(fmt.Sprintf("[+] Loaded %d bio...", len(bio)))
 
@@ -62,7 +69,9 @@ func LoadFiles() error {
 	}
 
 	AvatarList = itertools.NewIterator(pfp)
-	AvatarList.RandomiseIndex()
+	if err := AvatarList.RandomiseIndex(); err != nil {
+		panic("please put at least 2 avatars")
+	}
 
 	console.Log(fmt.Sprintf("[+] Loaded %d pfp...", len(pfp)))
 	fmt.Println("")

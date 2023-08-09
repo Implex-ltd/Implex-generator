@@ -34,3 +34,7 @@ test/*.png
 classified
 _*
 assets
+
+# dont need to edit anymore
+config.json
+*.json
