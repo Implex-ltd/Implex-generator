@@ -28,7 +28,7 @@ To use the generator, follow these steps:
 1. [Download](#installation) Follow steps.
 
 ## Requirements
-Before installing and using the Binary Dropper, ensure that the following requirements are met:
+Before installing and using the generator, ensure that the following requirements are met:
 - Operating System: Windows 10/11, Linux
 - Golang 1.20
 - Python 3.10.0
@@ -58,6 +58,13 @@ If the problem persists, feel free to open an issue on the GitHub repository for
 
 ## Update models
 You feel free to update models when they are adding challenge using [hcaptcha-model-factory](https://github.com/captcha-challenger/hcaptcha-model-factory)
+
+## Packages
+This library is using our custom packages that you can include into your project such as
+
+- [cloudflare-reverse](https://github.com/Implex-ltd/cloudflare-reverse) __cf_bm cookie
+- [fingerprint-client](https://github.com/Implex-ltd/fingerprint-client) Fingerprint evasion library for HTTP clients and webdrivers.
+- [cleanhttp](https://github.com/Implex-ltd/cleanhttp) Human like HTTP Library powered by fpclient and tls_client.
 
 ## Donation / Support us
 
