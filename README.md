@@ -25,8 +25,7 @@ Blazing fast, built in golang ! Up to 2200 account / minutes.
 
 ## Usage
 To use the generator, follow these steps:
-1. [Download](#installation) and install the scanner on the source system.
-2. Run the scan using free CIDR.
+1. [Download](#installation) Follow steps.
 
 ## Requirements
 Before installing and using the Binary Dropper, ensure that the following requirements are met:
@@ -56,6 +55,9 @@ If you encounter any issues while using this tool, try the following troubleshoo
 4. Check config.
 
 If the problem persists, feel free to open an issue on the GitHub repository for support.
+
+## Update models
+You feel free to update models when they are adding challenge using [hcaptcha-model-factory](https://github.com/captcha-challenger/hcaptcha-model-factory)
 
 ## Donation / Support us
 
