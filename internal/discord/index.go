@@ -128,6 +128,7 @@ func (c *Client) Register(config *RegisterConfig) (*RegisterResponse, error) {
 		Fingerprint: c.xfingerprint,
 		Username:    config.Username,
 		CaptchaKey:  config.CaptchaKey,
+		UniqueUsernameRegistration: true,
 	}
 
 	if config.InviteCode != "" {

@@ -302,7 +302,7 @@ func GenerateMotionCheck(answers map[string]string, w, h int64) string {
 	p3 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(1000, 3000)), RandomNumber(3, 10))
 	p5 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(1000, 3000)), RandomNumber(10, 20))
 
-	PlotPoints(path)
+	//PlotPoints(path)
 
 	t := time.Duration(RandomNumber(100, 200)) * time.Millisecond
 
@@ -337,11 +337,11 @@ func GenerateMotionCheck(answers map[string]string, w, h int64) string {
 				CookieEnabled:       true,
 				AppCodeName:         "Mozilla",
 				AppName:             "Netscape",
-				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 				Platform:            "Win32",
 				Product:             "Gecko",
 				ProductSub:          "20030107",
-				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 				Vendor:              "Google Inc.",
 				VendorSub:           "",
 				Language:            "fr-FR",
@@ -356,11 +356,11 @@ func GenerateMotionCheck(answers map[string]string, w, h int64) string {
 					Brands: []Brand{
 						{
 							Brand:   "Chromium",
-							Version: "114",
+							Version: "115",
 						},
 						{
 							Brand:   "Google Chrome",
-							Version: "114",
+							Version: "115",
 						},
 						{
 							Brand:   "Not:A-Brand",
@@ -447,11 +447,11 @@ func GenerateMotionGet(w, h int64) string {
 				CookieEnabled:       true,
 				AppCodeName:         "Mozilla",
 				AppName:             "Netscape",
-				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 				Platform:            "Win32",
 				Product:             "Gecko",
 				ProductSub:          "20030107",
-				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 				Vendor:              "Google Inc.",
 				VendorSub:           "",
 				Language:            "fr-FR",
@@ -466,11 +466,11 @@ func GenerateMotionGet(w, h int64) string {
 					Brands: []Brand{
 						{
 							Brand:   "Chromium",
-							Version: "114",
+							Version: "115",
 						},
 						{
 							Brand:   "Google Chrome",
-							Version: "114",
+							Version: "115",
 						},
 						{
 							Brand:   "Not:A-Brand",

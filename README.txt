@@ -18,8 +18,17 @@ The code is probably very ugly because the more time went by, the more functions
 reach out me at 0xF7A4C6@proton.me - https://t.me/Vichy1337 for paid job.
 If you wanna tip me there is my $LTC: ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcgc
 
+# Update Logs
+    - New models
+    - Pomelo usernames
+    - Chrome version
+    - bug fix/small changes
+
+# Todo:
+    - Fix engine flags (tokens doesn't join)
+
 ---
-https://discord.gg/b7EwhxGJZY
+https://discord.gg/exU5xahvnE
 https://t.me/implex_ltd
 
 ps: i help for paid or just don't waste my time.

@@ -1,0 +1,36 @@
+.idea
+.vscode
+.fleet
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+go.work
+__pycache__
+chromedriver
+
+# Custom
+.DS_Store
+assets/.tmp
+node_modules
+engine/chromedriver
+engine/package.json
+imgs
+logs
+temp_cache
+
+# temp shit
+*.tmp.*
+.tmp/*
+tmp
+
+*.bat
+test/*.png
+classified
+_*
+assets

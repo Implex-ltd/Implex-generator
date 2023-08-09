@@ -1,10 +1,10 @@
 [discord]
-invite = "mmSW7nSe"
-version = 208319
+invite = "A6dH6ns5"
+version = 218224
 
 [hcaptcha]
 lang = "fr"
-version = "0727cda"
+version = "e7de24e"
 submitTime = 6
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1337"

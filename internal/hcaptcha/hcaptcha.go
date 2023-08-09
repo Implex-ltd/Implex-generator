@@ -24,7 +24,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
-		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=0", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
+		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=1", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
 		Header: h,
 	})
 	if err != nil {
@@ -56,6 +56,7 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 		`motionData`: GenerateMotionGet(w, hh),
 		`n`:          c.GetHsw(config.C.Req, w, hh),
 		`c`:          fmt.Sprintf(`{"type":"%s","req":"%s"}`, config.C.Type, config.C.Req),
+		`pst`: "false",
 	} {
 		payload.Set(name, value)
 	}

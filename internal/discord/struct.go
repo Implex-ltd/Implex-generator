@@ -29,10 +29,11 @@ type RegisterConfig struct {
 }
 
 type RegisterPayload struct {
-	Consent     bool   `json:"consent"`
-	Fingerprint string `json:"fingerprint"`
-	Username    string `json:"username"`
-	CaptchaKey  string `json:"captcha_key"`
+	Consent                    bool   `json:"consent"`
+	Fingerprint                string `json:"fingerprint"`
+	Username                   string `json:"global_name"`
+	CaptchaKey                 string `json:"captcha_key"`
+	UniqueUsernameRegistration bool   `json:"unique_username_registration"`
 
 	// invite code page
 	Invite        string `json:"invite"`

@@ -11,13 +11,13 @@ func HeaderCheckSiteConfig() http.Header {
 		`content-type`:       {`text/plain`},
 		`origin`:             {`https://newassets.hcaptcha.com`},
 		`referer`:            {`https://newassets.hcaptcha.com/`},
-		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`},
+		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"`},
 		`sec-ch-ua-mobile`:   {`?0`},
 		`sec-ch-ua-platform`: {`"Windows"`},
 		`sec-fetch-dest`:     {`empty`},
 		`sec-fetch-mode`:     {`cors`},
 		`sec-fetch-site`:     {`same-site`},
-		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36`},
+		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36`},
 
 		http.HeaderOrderKey: {
 			`authority`,
@@ -46,13 +46,13 @@ func HeaderGetCaptcha() http.Header {
 		`content-type`:       {`application/x-www-form-urlencoded`},
 		`origin`:             {`https://newassets.hcaptcha.com`},
 		`referer`:            {`https://newassets.hcaptcha.com/`},
-		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`},
+		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"`},
 		`sec-ch-ua-mobile`:   {`?0`},
 		`sec-ch-ua-platform`: {`"Windows"`},
 		`sec-fetch-dest`:     {`empty`},
 		`sec-fetch-mode`:     {`cors`},
 		`sec-fetch-site`:     {`same-site`},
-		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36`},
+		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36`},
 
 		http.HeaderOrderKey: {
 			`authority`,
@@ -81,13 +81,13 @@ func (c *Client) HeaderCheckCaptcha() http.Header {
 		`cookie`:             {c.Config.HttpClient.FormatCookies()},
 		`origin`:             {`https://newassets.hcaptcha.com`},
 		`referer`:            {`https://newassets.hcaptcha.com/`},
-		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`},
+		`sec-ch-ua`:          {`"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"`},
 		`sec-ch-ua-mobile`:   {`?0`},
 		`sec-ch-ua-platform`: {`"Windows"`},
 		`sec-fetch-dest`:     {`empty`},
 		`sec-fetch-mode`:     {`cors`},
 		`sec-fetch-site`:     {`same-site`},
-		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36`},
+		`user-agent`:         {`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36`},
 
 		http.HeaderOrderKey: {
 			`authority`,

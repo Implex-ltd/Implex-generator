@@ -17,6 +17,7 @@ install:
 	pip install -r requirements.txt || pip3 install -r requirements.txt
 	cd ../cmd/implex && go get .
 	cd ../cmd/engine && npm i
+	cd ../cmd/ai && mkdir imgs
 
 implex:
 	cls||clear
