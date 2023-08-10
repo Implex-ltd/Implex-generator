@@ -687,5 +687,12 @@ label_alias:
   helicopter:
     zh: [ "动物" ]
     en: [ "helicopter" ]
+  crumpled_paper_ball:
+    zh: [ "动物" ]
+    en: [ "crumpled paper ball" ]
+  flower:
+    zh: [ "动物" ]
+    en: [ "flower" ]
+
 
 

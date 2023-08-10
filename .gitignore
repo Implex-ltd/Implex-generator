@@ -38,3 +38,11 @@ assets
 # dont need to edit anymore
 config.json
 *.json
+assets/input/proxies.txt
+assets/fingerprints/safari.json
+assets/fingerprints/macos.json
+assets/fingerprints/login.json
+assets/fingerprints/chrome.json
+assets/input/proxies.txt
+assets/output/unlocked.txt
+cmd/engine/config.json
