@@ -1,8 +1,8 @@
-.PHONY: all clean build install implex ai engine
+.PHONY: all clean build install implex ai engine scrape
 
 all:
 	cls||clear
-	@echo "Specify a target: implex, ai, engine, install, clean, build"
+	@echo "Specify a target: implex, ai, engine, install, clean, build, scrape"
 
 clean:
 	cls||clear
@@ -30,3 +30,7 @@ ai:
 engine:
 	cls||clear
 	cd ../cmd/engine && node main.js
+
+scrape:
+	cls||clear
+	cd ../cmd/implex && go run . scrape

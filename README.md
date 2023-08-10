@@ -59,6 +59,11 @@ If the problem persists, feel free to open an issue on the GitHub repository for
 ## Update models
 You feel free to update models when they are adding challenge using [hcaptcha-model-factory](https://github.com/captcha-challenger/hcaptcha-model-factory)
 
+**New**: Use custom scrapper and scrape up to ~1k/s
+
+1. Scrape image using `make scrape`, dataset will be into `assets/scrapped`
+2. Use `script/remover.py` to remove invalid JPEG files such as 0 bytes images (avoid problems during training)
+
 ## Packages
 This library is using our custom packages that you can include into your project such as
 

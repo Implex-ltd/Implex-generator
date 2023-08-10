@@ -6,17 +6,19 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+
+	"github.com/Implex-ltd/implex/internal/console"
 )
 
 var (
-	basePath = "../../assets"
+	BasePath = "../../assets"
 	charset  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 func ReadFile(filePath string) ([]string, error) {
 	var lines []string
 
-	file, err := os.Open(fmt.Sprintf("%s/%s", basePath, filePath))
+	file, err := os.Open(fmt.Sprintf("%s/%s", BasePath, filePath))
 	if err != nil {
 		return lines, err
 	}
@@ -35,7 +37,7 @@ func ReadFile(filePath string) ([]string, error) {
 }
 
 func AppendFile(filePath string, line string) error {
-	f, err := os.OpenFile(fmt.Sprintf("%s/%s", basePath, filePath), os.O_APPEND|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(fmt.Sprintf("%s/%s", BasePath, filePath), os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,7 @@ func AppendFile(filePath string, line string) error {
 func GetAllFilesInDirectory(dirPath string) ([]string, error) {
 	var files []string
 
-	fileInfos, err := ioutil.ReadDir(fmt.Sprintf("%s/%s", basePath, dirPath))
+	fileInfos, err := ioutil.ReadDir(fmt.Sprintf("%s/%s", BasePath, dirPath))
 	if err != nil {
 		return nil, err
 	}
@@ -74,4 +76,16 @@ func RandomString(length int) string {
 	}
 
 	return string(result)
+}
+
+func CreateFolderIfNotExist(dirPath string) error {
+	_, err := os.Stat(fmt.Sprintf("%s/%s", BasePath, dirPath))
+	if os.IsNotExist(err) {
+		console.Log(fmt.Sprintf("new folder: %s", dirPath))
+		err := os.MkdirAll(fmt.Sprintf("%s/%s", BasePath, dirPath), os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

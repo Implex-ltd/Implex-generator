@@ -693,6 +693,12 @@ label_alias:
   flower:
     zh: [ "动物" ]
     en: [ "flower" ]
-
-
-
+  laptop:
+    zh: [ "动物" ]
+    en: [ "laptop" ]
+  goose:
+    zh: [ "动物" ]
+    en: [ "goose" ]
+  tree:
+    zh: [ "动物" ]
+    en: [ "tree" ]

@@ -34,7 +34,11 @@ func (c *Client) GetHsw(req string, w, h int64) string {
 		if b == "nop" {
 			continue
 		}
-
+		
+		if b == "No available clients" {
+			continue
+		}
+		
 		return b
 	}
 }

@@ -23,6 +23,7 @@ type HcaptchaConfig struct {
 	SubmitDelay   time.Duration
 	HswAddress    string
 	SolverAddress string
+	Scrape        bool
 }
 
 type Client struct {

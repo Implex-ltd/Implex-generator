@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
@@ -54,6 +55,12 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		return
 	}
 
+	go api.JoinGuild(&discord.JoinConfig{
+		InviteCode: Config.Discord.Invite,
+		GuildID:    "1138866315440967862",
+		ChannelID:  "1138866316070105160",
+	})
+
 	if err := api.SetProfil(&discord.EditProfilConfig{
 		Bio: BioList.Next(),
 	}); err != nil {
@@ -70,12 +77,12 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		return
 	}
 
-	if Config.Performances.Debug {
+	/*if Config.Performances.Debug {
 		api.SendMessage(&discord.SendMessageConfig{
 			Content:   "@everyone unbeatable",
 			ChannelID: "1138866316070105160",
 		})
-	}
+	}*/
 
 	Unlocked++
 	utils.AppendFile("output/unlocked.txt", resp.Token)
@@ -102,6 +109,7 @@ func worker(fp *fpclient.Fingerprint) {
 		SubmitDelay:   time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
 		HswAddress:    Config.Hcaptcha.HswAddress,
 		SolverAddress: Config.Hcaptcha.SolverAddress,
+		Scrape:        false,
 	})
 
 	key, err := hc.SolveImage()
@@ -118,6 +126,41 @@ func worker(fp *fpclient.Fingerprint) {
 	go job(key, proxy, http)
 }
 
+func scrapeWorker(fp *fpclient.Fingerprint) {
+	proxy := strings.Replace(ProxyList.Next(), "REPLACE_ME", utils.RandomString(10), -1)
+
+	http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
+		BrowserFp: fp,
+		Proxy:     "http://" + proxy,
+	})
+	if err != nil {
+		return
+	}
+
+	hc := hcaptcha.NewHcaptchaClient(&hcaptcha.HcaptchaConfig{
+		Sitekey:       "4c672d35-0701-42b2-88c3-78380b0db560",
+		Domain:        "discord.com",
+		Version:       Config.Hcaptcha.Version,
+		Lang:          Config.Hcaptcha.Lang,
+		HttpClient:    http,
+		SubmitDelay:   time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
+		HswAddress:    Config.Hcaptcha.HswAddress,
+		SolverAddress: Config.Hcaptcha.SolverAddress,
+		Scrape:        true,
+	})
+
+	_, err = hc.SolveImage()
+	if err != nil {
+		if Config.Performances.Debug {
+			fmt.Println(err, proxy)
+		}
+		Error++
+		return
+	}
+
+	Solved++
+}
+
 func main() {
 	console.PrintLogo()
 
@@ -131,6 +174,7 @@ func main() {
 	}
 
 	go ConsoleTitle()
+
 	c := goccm.New(Config.Performances.Goroutines)
 
 	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
@@ -140,12 +184,31 @@ func main() {
 		panic(err)
 	}
 
-	for {
-		c.Wait()
+	fmt.Println(os.Args)
 
-		go func() {
-			defer c.Done()
-			worker(fp)
-		}()
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "scrape":
+			console.PrintLogo()
+			console.Log("[*] Init scraper")
+
+			for {
+				c.Wait()
+
+				go func() {
+					defer c.Done()
+					scrapeWorker(fp)
+				}()
+			}
+		}
+	} else {
+		for {
+			c.Wait()
+
+			go func() {
+				defer c.Done()
+				worker(fp)
+			}()
+		}
 	}
 }

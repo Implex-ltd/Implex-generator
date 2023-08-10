@@ -75,6 +75,9 @@ function getRandomScreenHeight() {
     return Math.floor(Math.random() * (1600 - 240 + 1) + 240); // 240px - 1600px
 }
 
+let i = 0
+let spoof = true
+
 app.get('/n', async (req, res) => {
     const client = clientx[clientIndex];
     clientIndex = (clientIndex + 1) % clientx.length;
@@ -83,87 +86,92 @@ app.get('/n', async (req, res) => {
         try {
             console.log(clientIndex, req.query.req)
 
-            // spoof driver canvas
-            await client.evaluate((language, latitude, longitude, width, height) => {
-                const originalFunction = HTMLCanvasElement.prototype.toDataURL;
-                HTMLCanvasElement.prototype.toDataURL = function (type) {
-                    if (type === 'image/png') {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const width = Math.floor(Math.random() * 100) + 200;
-                        const height = Math.floor(Math.random() * 30) + 20;
+            if (spoof) {
+                // spoof driver canvas each 5 HSW to avoid CPU GO BRRR
+                if (i % 2) {
+                    await client.evaluate((language, latitude, longitude, width, height) => {
+                        const originalFunction = HTMLCanvasElement.prototype.toDataURL;
+                        HTMLCanvasElement.prototype.toDataURL = function (type) {
+                            if (type === 'image/png') {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                const width = Math.floor(Math.random() * 100) + 200;
+                                const height = Math.floor(Math.random() * 30) + 20;
 
-                        canvas.width = width;
-                        canvas.height = height;
+                                canvas.width = width;
+                                canvas.height = height;
 
-                        const isColor = Math.random() < 0.5;
-                        if (isColor) {
-                            const r = Math.floor(Math.random() * 256);
-                            const g = Math.floor(Math.random() * 256);
-                            const b = Math.floor(Math.random() * 256);
-                            ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-                            ctx.fillRect(0, 0, width, height);
-                        } else {
-                            const patternCanvas = document.createElement('canvas');
-                            const patternCtx = patternCanvas.getContext('2d');
-                            patternCanvas.width = 10;
-                            patternCanvas.height = 10;
-                            patternCtx.fillStyle = '#000000';
-                            patternCtx.fillRect(0, 0, 10, 10);
-                            patternCtx.fillStyle = '#FFFFFF';
-                            patternCtx.fillRect(0, 0, 5, 5);
-                            patternCtx.fillRect(5, 5, 5, 5);
-                            ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
-                            ctx.fillRect(0, 0, width, height);
-                        }
+                                const isColor = Math.random() < 0.5;
+                                if (isColor) {
+                                    const r = Math.floor(Math.random() * 256);
+                                    const g = Math.floor(Math.random() * 256);
+                                    const b = Math.floor(Math.random() * 256);
+                                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                                    ctx.fillRect(0, 0, width, height);
+                                } else {
+                                    const patternCanvas = document.createElement('canvas');
+                                    const patternCtx = patternCanvas.getContext('2d');
+                                    patternCanvas.width = 10;
+                                    patternCanvas.height = 10;
+                                    patternCtx.fillStyle = '#000000';
+                                    patternCtx.fillRect(0, 0, 10, 10);
+                                    patternCtx.fillStyle = '#FFFFFF';
+                                    patternCtx.fillRect(0, 0, 5, 5);
+                                    patternCtx.fillRect(5, 5, 5, 5);
+                                    ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
+                                    ctx.fillRect(0, 0, width, height);
+                                }
 
-                        return canvas.toDataURL('image/png');
-                    }
-                    return originalFunction.apply(this, arguments);
-                };
+                                return canvas.toDataURL('image/png');
+                            }
+                            return originalFunction.apply(this, arguments);
+                        };
 
-                // lang
-                document.documentElement.setAttribute('lang', language);
+                        // lang
+                        /*document.documentElement.setAttribute('lang', language);
 
-                window.innerWidth = width;
-                window.innerHeight = height;
-                window.width = width
-                window.height = height
+                        window.innerWidth = width;
+                        window.innerHeight = height;
+                        window.width = width
+                        window.height = height
+                        
+                        // geo
+                        navigator.geolocation.getCurrentPosition = (successCallback) => {
+                            const position = {
+                                coords: {
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                },
+                            };
+                            successCallback(position);
+                        };
 
-                // geo
-                navigator.geolocation.getCurrentPosition = (successCallback) => {
-                    const position = {
-                        coords: {
-                            latitude: latitude,
-                            longitude: longitude,
-                        },
-                    };
-                    successCallback(position);
-                };
+                        // rects
+                        const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+                        Element.prototype.getBoundingClientRect = function () {
+                            const rect = originalGetBoundingClientRect.call(this);
 
-                // rects
-                const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
-                Element.prototype.getBoundingClientRect = function () {
-                    const rect = originalGetBoundingClientRect.call(this);
+                            rect.x += 100;
+                            rect.y += 50;
 
-                    rect.x += 100;
-                    rect.y += 50;
+                            const maxCoordinate = 1000;
+                            if (rect.x > maxCoordinate || rect.y > maxCoordinate || rect.width > maxCoordinate || rect.height > maxCoordinate) {
+                                rect.x = 0;
+                                rect.y = 0;
+                                rect.width = 0;
+                                rect.height = 0;
+                            }
 
-                    const maxCoordinate = 1000;
-                    if (rect.x > maxCoordinate || rect.y > maxCoordinate || rect.width > maxCoordinate || rect.height > maxCoordinate) {
-                        rect.x = 0;
-                        rect.y = 0;
-                        rect.width = 0;
-                        rect.height = 0;
-                    }
-
-                    return rect;
-                };
+                            return rect;
+                        };*/
 
 
-            }, getRandomLanguage(), getRandomLatitude(), getRandomLongitude(), getRandomScreenWidth(), getRandomScreenHeight())
+                    }, getRandomLanguage(), getRandomLatitude(), getRandomLongitude(), getRandomScreenWidth(), getRandomScreenHeight())
+                }
+            }
 
             let n = await client.evaluate(`hsw("${req.query.req}")`);
+            i++
             res.send(n);
         } catch (err) {
             console.log(err)
@@ -194,6 +202,29 @@ async function startBrowser(client) {
         const memCount = ['6', '8', '16'];
         const randomMem = memCount[Math.floor(Math.random() * memCount.length)];
 
+        /*
+            os:
+            mac, win, lin
+
+            audioContext:
+            mode: noise, off
+
+            canvas:
+            mode: noise, block, off
+
+            webRTC:
+            mode: alerted, disabled, real
+
+            webGL:
+            mode: noise, off
+
+            clientRects:
+            mode: noise, off
+
+            webGLMetadata:
+            mode: mask, off
+            */
+
         const profile_id = await G.create({
             name: 'profile_win',
             os: 'win',
@@ -201,18 +232,33 @@ async function startBrowser(client) {
                 language: 'fr-FR', // dont change
                 resolution: `${getRandomScreenWidth()}x${getRandomScreenHeight()}`,
                 platform: 'Win32',
-                userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                hardwareConcurrency: randomMem,
-                deviceMemory: randomMem,
-                maxTouchPoints: 0,
+                userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0 Safari/537.36",
+                //hardwareConcurrency: randomMem,
+               // deviceMemory: randomMem,
+                //maxTouchPoints: 0,
             },
             proxyEnabled: false,
-            proxy: { mode: 'none' },
-            audioContext: { mode: 'noise' },
-            canvas: { mode: 'noise' },
-            webRTC: { mode: 'disabled', enabled: false, customize: false, fillBasedOnIp: false },
-            webGL: { mode: 'noise' },
-            clientRects: { mode: 'noise' },
+            proxy: {
+                mode: 'none'
+            },
+            /*audioContext: {
+                mode: 'noise'
+            },
+            canvas: {
+                mode: 'noise'
+            },
+            webRTC: {
+                mode: 'disabled'
+            },
+            webGL: {
+                mode: 'noise'
+            },
+            clientRects: {
+                mode: 'noise'
+            },
+            webGLMetadata: {
+                mode: 'mask'
+            }*/
             //fonts: { "families": ["string"], "enableMasking": true, "enableDomRect": true }
         });
 
@@ -237,6 +283,7 @@ async function startBrowser(client) {
         }
 
         const browser = await connect({ browserWSEndpoint: wsUrl.toString(), ignoreHTTPSErrors: true });
+
         const page = await browser.newPage();
         await page.emulateTimezone('Europe/London')
 

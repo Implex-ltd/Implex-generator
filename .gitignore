@@ -46,3 +46,5 @@ assets/fingerprints/chrome.json
 assets/input/proxies.txt
 assets/output/unlocked.txt
 cmd/engine/config.json
+
+assets/scrapped

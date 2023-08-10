@@ -3,14 +3,23 @@ package hcaptcha
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
+	"crypto/md5"
+	"encoding/hex"
+
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
 	"github.com/Implex-ltd/implex/internal/utils"
+)
+
+var (
+	scrape int
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {
@@ -19,12 +28,55 @@ func NewHcaptchaClient(config *HcaptchaConfig) *Client {
 	}
 }
 
+func (c *Client) DownloadFile(url string, filePath string) error {
+	h := HeaderCheckSiteConfig()
+
+	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
+		Method: "GET",
+		Url:    url,
+		Header: h,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return errors.New("cant get img")
+	}
+
+	defer resp.Body.Close()
+
+	buff, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	x := md5.Sum(buff)
+	hash := hex.EncodeToString(x[:])
+
+	file, err := os.Create(fmt.Sprintf("%s/%s/%s.png", utils.BasePath, filePath, hash))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(buff)
+	if err != nil {
+		return err
+	}
+
+	scrape++
+	go fmt.Println("scraped:", scrape)
+	return nil
+}
+
 func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 	h := HeaderCheckSiteConfig()
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
-		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=1", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
+		Url:    fmt.Sprintf("https://api2.hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=0", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
 		Header: h,
 	})
 	if err != nil {
@@ -47,6 +99,19 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 }
 
 func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*ImgCaptcha, error) {
+	var pow string
+	var err error
+
+	if c.Config.Scrape {
+		pow, err = HSLHashProof(config.C.Req)
+		if err != nil {
+			return nil, err
+		}
+		config.C.Type = "hsl"
+	} else {
+		pow = c.GetHsw(config.C.Req, w, hh)
+	}
+
 	payload := url.Values{}
 	for name, value := range map[string]string{
 		`v`:          c.Config.Version,
@@ -54,9 +119,8 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 		`host`:       c.Config.Domain,
 		`hl`:         c.Config.Lang,
 		`motionData`: GenerateMotionGet(w, hh),
-		`n`:          c.GetHsw(config.C.Req, w, hh),
+		`n`:          pow,
 		`c`:          fmt.Sprintf(`{"type":"%s","req":"%s"}`, config.C.Type, config.C.Req),
-		`pst`: "false",
 	} {
 		payload.Set(name, value)
 	}
@@ -158,6 +222,21 @@ func (c *Client) SolveImage() (string, error) {
 	imgCap, err := c.getImgCaptcha(id, config, w, h)
 	if err != nil {
 		return "", err
+	}
+
+	if c.Config.Scrape && imgCap.RequestType == "image_label_binary" {
+		if len(imgCap.Tasklist) <= 0 {
+			return "", fmt.Errorf("no images found")
+		}
+
+		for _, t := range imgCap.Tasklist {
+			path := strings.ReplaceAll(imgCap.RequesterQuestion.En, " ", "_")
+			utils.CreateFolderIfNotExist(fmt.Sprintf("scrapped/%s", path))
+
+			go c.DownloadFile(t.DatapointURI, fmt.Sprintf("scrapped/%s", path))
+		}
+
+		return "", nil
 	}
 
 	resp, err := c.checkImgCaptcha(imgCap, w, h)

@@ -5,8 +5,9 @@ from pydantic import BaseModel
 from typing import List
 
 workers = 0
-save = True
+save = False
 challenger = solver.new_challenger()
+invalids = []
 
 hashlist = {
     'xx': [
@@ -113,7 +114,6 @@ def solve(payload: Payload):
     try:
         return bytedance(payload)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/solvechoice")

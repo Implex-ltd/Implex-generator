@@ -4,8 +4,8 @@ version = 218224
 
 [hcaptcha]
 lang = "fr"
-version = "e7de24e"
-submitTime = 6
+version = "d442197"
+submitTime = 4
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1337"
 
@@ -14,5 +14,5 @@ cfbm = false
 profilePath = "../../assets/fingerprints/login.json"
 
 [performances]
-goroutines = 50
+goroutines = 150
 debug = true
