@@ -16,14 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Download hash.csv
-        run: |
-          curl -o hash.csv https://raw.githubusercontent.com/Implex-ltd/Implex-generator/main/cmd/ai/hash.csv
-      
-      - name: Download objects.yaml
-        run: |
-          curl -o objects.yaml https://raw.githubusercontent.com/Implex-ltd/Implex-generator/main/cmd/ai/datas/objects.yaml
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -35,23 +27,34 @@ jobs:
 
       - name: Upload ONNX to Release
         id: upload_assets
-        uses: actions/upload-release-asset@v1
+        uses: svenstaro/upload-release-action@v2
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: cmd/ai/datas/models
-          asset_name: ONNX Files
-          asset_pattern: "*.onnx"
+          file: cmd/ai/datas/models/*.onnx
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
 
       - name: Upload hash.csv to Release
         id: upload_hash_csv
-        uses: actions/upload-release-asset@v1
+        uses: svenstaro/upload-release-action@v2
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: hash.csv
+          asset_path: 
+          file: cmd/ai/hash.csv
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
 
       - name: Upload objects.yaml to Release
         id: upload_objects_yaml
-        uses: actions/upload-release-asset@v1
+        uses: svenstaro/upload-release-action@v2
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: objects.yaml
+          file: cmd/ai/datas/objects.yaml
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
