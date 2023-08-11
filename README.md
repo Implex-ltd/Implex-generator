@@ -61,6 +61,24 @@ You feel free to update models when they are adding challenge using [hcaptcha-mo
 
 **New**: Use custom scrapper and scrape up to ~1k/s
 
+## Dataset Builder
+
+You will find a datasetBuilder folder into `scripts/datasetBuilder`.
+
+### Folders
+
+1. Create `output` folder, `input/scrapper`, `input/unlabeled`
+2. Use `scripts/Makefile` using `make scrape`, folder will appear in `assets/scrapped`
+3. Moove scrapped folders into `scripts/datasetBuilder/input/scrapper`
+4. If you want to see your model accuracy add scrapped images to `scripts/datasetBuilder/input/unlabeled`
+
+### Options
+
+1. `-c` remove invalid jpeg files.
+2. `-p` labelise onnx models and sort imgs from unlabeled folder (bad/yes) (better to see accuracy on all images types).
+3. `-l` labelise onnx models and sort imgs from scraper folder (bad/yes) (better to sort and train better model).
+4. `-s` sort parsed unlabeled dataset (make your dataset better by removing pictures that are set to yes into multiple folder).
+
 1. Scrape image using `make scrape`, dataset will be into `assets/scrapped`
 2. Use `script/remover.py` to remove invalid JPEG files such as 0 bytes images (avoid problems during training)
 

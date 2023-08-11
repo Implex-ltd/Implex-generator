@@ -3,6 +3,7 @@ const GoLogin = import('gologin');
 const { connect } = puppeteer;
 const config = require('./config.json');
 const express = require('express');
+const createCursor = require('ghost-cursor').createCursor
 
 const app = express();
 
@@ -75,7 +76,6 @@ function getRandomScreenHeight() {
     return Math.floor(Math.random() * (1600 - 240 + 1) + 240); // 240px - 1600px
 }
 
-let i = 0
 let spoof = true
 
 app.get('/n', async (req, res) => {
@@ -88,8 +88,7 @@ app.get('/n', async (req, res) => {
 
             if (spoof) {
                 // spoof driver canvas each 5 HSW to avoid CPU GO BRRR
-                if (i % 2) {
-                    await client.evaluate((language, latitude, longitude, width, height) => {
+               await client.evaluate((language, latitude, longitude, width, height) => {
                         const originalFunction = HTMLCanvasElement.prototype.toDataURL;
                         HTMLCanvasElement.prototype.toDataURL = function (type) {
                             if (type === 'image/png') {
@@ -128,50 +127,50 @@ app.get('/n', async (req, res) => {
                         };
 
                         // lang
-                        /*document.documentElement.setAttribute('lang', language);
-
-                        window.innerWidth = width;
-                        window.innerHeight = height;
-                        window.width = width
-                        window.height = height
-                        
-                        // geo
-                        navigator.geolocation.getCurrentPosition = (successCallback) => {
-                            const position = {
-                                coords: {
-                                    latitude: latitude,
-                                    longitude: longitude,
-                                },
-                            };
-                            successCallback(position);
-                        };
-
-                        // rects
-                        const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
-                        Element.prototype.getBoundingClientRect = function () {
-                            const rect = originalGetBoundingClientRect.call(this);
-
-                            rect.x += 100;
-                            rect.y += 50;
-
-                            const maxCoordinate = 1000;
-                            if (rect.x > maxCoordinate || rect.y > maxCoordinate || rect.width > maxCoordinate || rect.height > maxCoordinate) {
-                                rect.x = 0;
-                                rect.y = 0;
-                                rect.width = 0;
-                                rect.height = 0;
-                            }
-
-                            return rect;
-                        };*/
+                         document.documentElement.setAttribute('lang', language);
+ 
+                         window.innerWidth = width;
+                         window.innerHeight = height;
+                         window.width = width
+                         window.height = height
+                         
+                         // geo
+                         navigator.geolocation.getCurrentPosition = (successCallback) => {
+                             const position = {
+                                 coords: {
+                                     latitude: latitude,
+                                     longitude: longitude,
+                                 },
+                             };
+                             successCallback(position);
+                         };
+ 
+                         // rects
+                         const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+                         Element.prototype.getBoundingClientRect = function () {
+                             const rect = originalGetBoundingClientRect.call(this);
+ 
+                             rect.x += 100;
+                             rect.y += 50;
+ 
+                             const maxCoordinate = 1000;
+                             if (rect.x > maxCoordinate || rect.y > maxCoordinate || rect.width > maxCoordinate || rect.height > maxCoordinate) {
+                                 rect.x = 0;
+                                 rect.y = 0;
+                                 rect.width = 0;
+                                 rect.height = 0;
+                             }
+ 
+                             return rect;
+                         };
 
 
                     }, getRandomLanguage(), getRandomLatitude(), getRandomLongitude(), getRandomScreenWidth(), getRandomScreenHeight())
-                }
+                
             }
+            //let n = await client.evaluate((token) => { return hsw(token) }, req.query.req);
+            let n = await client.evaluate(`1;\nhsw("${req.query.req}")`);
 
-            let n = await client.evaluate(`hsw("${req.query.req}")`);
-            i++
             res.send(n);
         } catch (err) {
             console.log(err)
@@ -230,18 +229,18 @@ async function startBrowser(client) {
             os: 'win',
             navigator: {
                 language: 'fr-FR', // dont change
-                resolution: `${getRandomScreenWidth()}x${getRandomScreenHeight()}`,
+                resolution: '1920x1080',//`${getRandomScreenWidth()}x${getRandomScreenHeight()}`,
                 platform: 'Win32',
                 userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0 Safari/537.36",
-                //hardwareConcurrency: randomMem,
-               // deviceMemory: randomMem,
-                //maxTouchPoints: 0,
+                hardwareConcurrency: randomMem,
+                deviceMemory: randomMem,
+                maxTouchPoints: 0,
             },
             proxyEnabled: false,
             proxy: {
                 mode: 'none'
             },
-            /*audioContext: {
+            audioContext: {
                 mode: 'noise'
             },
             canvas: {
@@ -258,8 +257,8 @@ async function startBrowser(client) {
             },
             webGLMetadata: {
                 mode: 'mask'
-            }*/
-            //fonts: { "families": ["string"], "enableMasking": true, "enableDomRect": true }
+            },
+            fonts: { "families": ["string"], "enableMasking": true, "enableDomRect": true }
         });
 
         console.log('+ New profile:', profile_id);
@@ -284,8 +283,11 @@ async function startBrowser(client) {
 
         const browser = await connect({ browserWSEndpoint: wsUrl.toString(), ignoreHTTPSErrors: true });
 
-        const page = await browser.newPage();
+        const pages = await browser.pages();
+        const page = pages[0];
         await page.emulateTimezone('Europe/London')
+        await page.setViewport({ width: 1920, height: 1080 });
+        const cursor = createCursor(page)
 
         // Fuck the rate limit XD
         await page.setRequestInterception(true);
@@ -323,7 +325,9 @@ async function startBrowser(client) {
         console.log('* Waiting for hcaptcha frame');
         await delay(1500)
 
+
         await page.waitForXPath(`//iframe[contains(@title,'Widget contenant une case à cocher pour le défi de sécurité hCaptcha')]`, { timeout: 10000 })
+        //await cursor.click(`//iframe[contains(@title,'Widget contenant une case à cocher pour le défi de sécurité hCaptcha')]`)
         await (await page.$x(`//iframe[contains(@title,'Widget contenant une case à cocher pour le défi de sécurité hCaptcha')]`))[0].click()
 
         console.log('+ Hcaptcha challenge ok, looking for iframe');
@@ -355,6 +359,7 @@ async function startBrowser(client) {
         if (hswExists && challengeFrame) {
             console.log('+ Browser successfully hooked');
             clientx.push(challengeFrame);
+            await page.mouse.move(Math.random() * 100, Math.random() * 100);
         }
 
         setInterval(async () => {

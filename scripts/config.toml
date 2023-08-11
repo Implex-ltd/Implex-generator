@@ -14,5 +14,5 @@ cfbm = false
 profilePath = "../../assets/fingerprints/login.json"
 
 [performances]
-goroutines = 150
+goroutines = 50
 debug = true
