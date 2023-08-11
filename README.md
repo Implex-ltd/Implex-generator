@@ -13,7 +13,7 @@
 	- [Wiki](https://github.com/Implex-ltd/Implex-generator/wiki)
 	- [Packages](#packages)
 	- [Donation](#donation)
-	- [See PoC on Youtube](#see-poc-on-youtube)
+	- [See PoC on Youtube](https://www.youtube.com/watch?v=z6Ea-SRY-qs&ab_channel=Armv7l)
 
 ## Introduction
 Implex's Generator is a Discord token generator aimed at creating accounts en masse. It incorporates a technology that enables solving CAPTCHA challenges using the power of artificial intelligence, along with technologies designed to mitigate Hcaptcha fingerprinting.
@@ -42,7 +42,3 @@ This library is using our custom packages that you can include into your project
 	"discord_group": "https://discord.gg/exU5xahvnE"
 }
 ```
-
-## See PoC on Youtube
-
-[![Preview](https://img.youtube.com/vi/z6Ea-SRY-qs/0.jpg)](https://www.youtube.com/watch?v=z6Ea-SRY-qs&ab_channel=Armv7l)
