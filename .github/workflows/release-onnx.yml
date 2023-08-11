@@ -13,13 +13,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
       
-      - name: Upload onnx to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Download hash.csv
+        run: |
+          curl -o hash.csv https://raw.githubusercontent.com/Implex-ltd/Implex-generator/main/cmd/ai/hash.csv
+      
+      - name: Download objects.yaml
+        run: |
+          curl -o objects.yaml https://raw.githubusercontent.com/Implex-ltd/Implex-generator/main/cmd/ai/datas/objects.yaml
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: cmd/ai/datas/models/*.onnx
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload ONNX to Release
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: cmd/ai/datas/models
+          asset_name: ONNX Files
+          asset_pattern: "*.onnx"
+
+      - name: Upload hash.csv to Release
+        id: upload_hash_csv
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: hash.csv
+
+      - name: Upload objects.yaml to Release
+        id: upload_objects_yaml
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: objects.yaml
