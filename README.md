@@ -31,10 +31,16 @@ This library is using our custom packages that you can include into your project
 
 ## Donation
 
-```
-LTC: ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcgc
-Contact: 0xF7A4C6@proton.me | https://t.me/Vichy1337
-Follow: https://discord.gg/exU5xahvnE | https://t.me/implex_ltd
+```json
+{
+	"ltc": "ltc1qkh766d6hnhwu4twvdvuvcnz348etvur5vcqcgc",
+	"paid_jobs": {
+		"email": "0xF7A4C6@proton.me",
+		"telegram": "https://t.me/Vichy1337"
+	},
+	"telegram_group": "https://t.me/implex_ltd",
+	"discord_group": "https://discord.gg/exU5xahvnE"
+}
 ```
 
 ## See PoC on Youtube
