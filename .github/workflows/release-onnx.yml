@@ -14,7 +14,6 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Find and collect ONNX files
-      id: find-onnx
       run: |
         find . -name "*.onnx" > onnx_files.txt
         echo "cmd/ai/hash.csv" >> onnx_files.txt
@@ -27,7 +26,19 @@ jobs:
       uses: actions/create-release@v1
       with:
         tag_name: ${{ github.sha }}
-        files: onnx_files.txt
-        name: Lastest Onnx models
+        release_name: ONNX Files
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload ONNX files as release assets
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: |
+          onnx_files.txt
+        asset_name: onnx_files.txt
+        asset_content_type: text/plain
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
