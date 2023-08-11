@@ -1,0 +1,31 @@
+name: Release ONNX Files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Find and collect ONNX files
+      id: find-onnx
+      run: |
+        find . -name "*.onnx" > onnx_files.txt
+
+    - name: Add hash.csv to the list
+      run: echo "cmd/ai/hash.csv" >> onnx_files.txt
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      with:
+        files: onnx_files.txt
+        name: Lastest Onnx models   # Set your custom release name here
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
