@@ -15,6 +15,8 @@
 	- [Usage](#usage)
 	- [Requirements](#requirements)
 	- [Installation](#installation)
+	- [Update models](#update-models)
+	- [Dataset Builder](#dataset-builder)
 	- [Troubleshooting](#troubleshooting)
 	- [See PoC on Youtube](#see-poc-on-youtube)
 
@@ -46,16 +48,6 @@ Before installing and using the generator, ensure that the following requirement
 8. Run the AI solver: `make ai`.
 9. Run the generator: `make implex`.
 
-## Troubleshooting
-If you encounter any issues while using this tool, try the following troubleshooting steps:
-
-1. Update golang, python, nodejs.
-2. Make sur to install everything.
-3. Use right proxies.
-4. Check config.
-
-If the problem persists, feel free to open an issue on the GitHub repository for support.
-
 ## Update models
 You feel free to update models when they are adding challenge using [hcaptcha-model-factory](https://github.com/captcha-challenger/hcaptcha-model-factory)
 
@@ -81,6 +73,16 @@ You will find a datasetBuilder folder into `scripts/datasetBuilder`.
 
 1. Scrape image using `make scrape`, dataset will be into `assets/scrapped`
 2. Use `script/remover.py` to remove invalid JPEG files such as 0 bytes images (avoid problems during training)
+
+## Troubleshooting
+If you encounter any issues while using this tool, try the following troubleshooting steps:
+
+1. Update golang, python, nodejs.
+2. Make sur to install everything.
+3. Use right proxies.
+4. Check config.
+
+If the problem persists, feel free to open an issue on the GitHub repository for support.
 
 ## Packages
 This library is using our custom packages that you can include into your project such as
