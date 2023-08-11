@@ -174,7 +174,7 @@ app.get('/n', async (req, res) => {
             res.send(n);
         } catch (err) {
             console.log(err)
-            res.send(err);
+            res.status(500).json({ error: 'cant run hsw' })
             let index = clientx.indexOf(client);
             if (index > -1) {
                 clientx.splice(index, 1);
