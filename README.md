@@ -20,6 +20,8 @@ Implex's Generator is a Discord token generator aimed at creating accounts en ma
 
 Blazing fast, built in golang ! Up to 2200 account / minutes.
 
+To Install follow [wiki here](https://github.com/Implex-ltd/Implex-generator/wiki)
+
 ## Packages
 This library is using our custom packages that you can include into your project such as
 
