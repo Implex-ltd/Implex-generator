@@ -17,15 +17,17 @@ jobs:
       id: find-onnx
       run: |
         find . -name "*.onnx" > onnx_files.txt
+        echo "cmd/ai/hash.csv" >> onnx_files.txt
 
-    - name: Add hash.csv to the list
-      run: echo "cmd/ai/hash.csv" >> onnx_files.txt
+    - name: Set up Git
+      run: git config --local user.email "action@github.com" && git config --local user.name "GitHub Action"
 
-    - name: Create release
-      id: create-release
+    - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       with:
+        tag_name: ${{ github.sha }}
         files: onnx_files.txt
-        name: Lastest Onnx models   # Set your custom release name here
+        name: Lastest Onnx models
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
