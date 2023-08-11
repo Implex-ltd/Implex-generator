@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Report an issue or bug related to project documentation
+title: '[Bug] Issue Title Here'
+labels: 'bug'
+assignees: ''
+
+---
+
 ### Issue Title:
 [Short description of the issue]
 
