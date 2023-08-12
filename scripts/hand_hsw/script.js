@@ -1,5 +1,6 @@
 /**
  * Inject to browser
+ * Go to discord.com -> trigger hcaptcha (click on checkbox) -> F12 -> console -> select hcaptcha iframe where `hsw` is defined and put this file (be sure that server.js is online)
  */
 
 const se = new WebSocket("ws:/127.0.0.1:3200");
