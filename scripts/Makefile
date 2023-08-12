@@ -29,7 +29,11 @@ ai:
 
 engine:
 	cls||clear
-	cd ../cmd/engine && node main.js
+	cd ../cmd/engine && go run . engine
+
+debug:
+	cls||clear
+	cd ../cmd/engine && go run . debug
 
 scrape:
 	cls||clear
