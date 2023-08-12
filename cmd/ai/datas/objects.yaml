@@ -24,10 +24,15 @@ label_alias:
   elephant_made_of_clouds:
     zh: [ "由云制成的大象" ]
     en: [ "elephant made of clouds" ]
+  elephants_drawn_with_leaves:
+    zh: [ "动物" ]
+    en: [ "elephants drawn with leaves" ]
   parrot:
     zh: [ "鹦鹉" ]
     en: [ "parrot" ]
-
+  musical_instrument:
+    zh: [ "鹦鹉" ]
+    en: [ "musical instrument" ]
   lion_with_mane_on_its_neck:
     zh: [ "一只脖子上有鬃毛的狮子", "雄狮" ]
     en: [ "lion with mane on its neck", "male lion" ]
@@ -72,7 +77,9 @@ label_alias:
   dog_wearing_sunglasses:
     zh: [ "戴墨镜的狗" ]
     en: [ "dog wearing sunglasses" ]
-
+  dog:
+      zh: [ "动物" ]
+      en: [ "dog" ]
   kitten:
     zh: [ "小猫", "一只小猫" ]
     en: [ "kitten", "baby cat" ]
@@ -129,7 +136,9 @@ label_alias:
   dead_and_dried_plant_in_the_pot:
     zh: [ "花盆中枯死和干燥植物" ]
     en: [ "dead and dried plant in the pot" ]
-
+  plant:
+    zh: [ "动物" ]
+    en: [ "plant" ]
   toy_rabbit:
     zh: [ "玩具兔子" ]
     en: [ "toy rabbit" ]
@@ -160,6 +169,9 @@ label_alias:
   toy_house:
     zh: [ "玩具屋" ]
     en: [ "toy house" ]
+  toy:
+    zh: [ "玩具" ]
+    en: [ "toy" ]
   duck_in_the_water:
     zh: [ "水中鸭子", "水中鸭子的图像" ]
     en: [ "duck in the water" ]
@@ -211,9 +223,15 @@ label_alias:
   hot_food:
     zh: [ "热食" ] # await
     en: [ "hot food" ]
+  food:
+    zh: [ "动物" ]
+    en: [ "food" ]
   cold_drink:
     zh: [ "冷饮", "冰杯" ]
     en: [ "cold drink", "glass with ice" ]
+  something_you_can_drink:
+    zh: [ "动物" ]
+    en: [ "something you can drink" ]
   jellyfish:
     zh: [ "水母" ]
     en: [ "jellyfish" ]
@@ -250,6 +268,9 @@ label_alias:
   orange_fruit:
     zh: [ "橙色水果" ]
     en: [ "orange fruit" ]
+  fruit:
+    zh: [ "动物" ]
+    en: [ "fruit" ]
   drawing_of_a_haunted_house:
     zh: [ "鬼屋的图画", "鬼屋图画" ]
     en: [ "drawing of a haunted house" ]
@@ -259,6 +280,9 @@ label_alias:
   flying_bat:
     zh: [ "飞行蝙蝠", "一只飞翔的蝙蝠" ] # await
     en: [ "flying bat" ]
+  bat:
+    zh: [ "动物" ]
+    en: [ "bat" ]
   rabbit_blur: # rabbit
     zh: [ "兔子" ]
     en: [ "rabbit" ]
@@ -384,6 +408,9 @@ label_alias:
   tall_building:
     zh: [ "高层建筑" ]
     en: [ "tall building" ]
+  building:
+    zh: [ "动物" ]
+    en: [ "building" ]
   piano:
     zh: [ "钢琴" ]
     en: [ "piano" ]
@@ -702,3 +729,21 @@ label_alias:
   tree:
     zh: [ "动物" ]
     en: [ "tree" ]
+  raccoon:
+    zh: [ "动物" ]
+    en: [ "raccoon" ]
+  cow:
+    zh: [ "动物" ]
+    en: [ "cow" ]
+  something_you_can_eat:
+    zh: [ "动物" ]
+    en: [ "something you can eat" ]
+  giraffe:
+    zh: [ "动物" ]
+    en: [ "giraffe" ]
+  animal_wearing_glasses:
+    zh: [ "动物" ]
+    en: [ "animal wearing glasses" ]
+  hedgehog:
+    zh: [ "动物" ]
+    en: [ "hedgehog" ]
