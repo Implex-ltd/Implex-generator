@@ -20,6 +20,8 @@ import (
 
 var (
 	scrape int
+
+	hsl = false
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {
@@ -76,7 +78,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
-		Url:    fmt.Sprintf("https://api2.hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=0", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
+		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=0", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
 		Header: h,
 	})
 	if err != nil {
@@ -102,14 +104,14 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 	var pow string
 	var err error
 
-	if c.Config.Scrape {
+	if c.Config.Scrape || hsl {
 		pow, err = HSLHashProof(config.C.Req)
 		if err != nil {
 			return nil, err
 		}
 		config.C.Type = "hsl"
 	} else {
-		pow = c.GetHsw(config.C.Req, w, hh)
+		pow = c.GetHsw(config.C.Req)
 	}
 
 	payload := url.Values{}
@@ -153,10 +155,21 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseCheckCaptcha, error) {
 	st := time.Now()
 	var payload []byte
+	var pow string
 
 	answers, err := c.SolveImages(captcha)
 	if err != nil {
 		return nil, err
+	}
+
+	if hsl {
+		pow, err = HSLHashProof(captcha.C.Req)
+		if err != nil {
+			return nil, err
+		}
+		captcha.C.Type = "hsl"
+	} else {
+		pow = c.GetHsw(captcha.C.Req)
 	}
 
 	payload, err = json.Marshal(&PayloadCheckImgCaptcha{
@@ -165,7 +178,7 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseChe
 		Serverdomain: c.Config.Domain,
 		JobMode:      captcha.RequestType,
 		MotionData:   GenerateMotionCheck(answers, w, hh),
-		N:            c.GetHsw(captcha.C.Req, w, hh),
+		N:            pow,
 		C:            fmt.Sprintf(`{"type":"%s","req":"%s"}`, captcha.C.Type, captcha.C.Req),
 		Answers:      answers,
 	})
@@ -224,6 +237,10 @@ func (c *Client) SolveImage() (string, error) {
 		return "", err
 	}
 
+	if imgCap.RequestType == "image_label_area_select" {
+		return "", errors.New("invalid request-type: image_label_area_select")
+	}
+
 	if c.Config.Scrape && imgCap.RequestType == "image_label_binary" {
 		if len(imgCap.Tasklist) <= 0 {
 			return "", fmt.Errorf("no images found")
@@ -238,6 +255,8 @@ func (c *Client) SolveImage() (string, error) {
 
 		return "", nil
 	}
+
+	fmt.Println("check cap")
 
 	resp, err := c.checkImgCaptcha(imgCap, w, h)
 	if err != nil {

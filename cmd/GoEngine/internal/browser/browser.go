@@ -10,27 +10,27 @@ import (
 
 var (
 	THREAD_HSW = 100
-	BASE_EXT_PATH = `C:\Users\arm\Desktop\GoEngine\cmd\engine\`
+	ARGS       = []string{
+		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+	}
 )
 
-func NewInstance(spoof bool) (*Instance, error) {
+func NewInstance(spoof, headless bool) (*Instance, error) {
 	pw, err := playwright.Run()
 	if err != nil {
 		return nil, err
 	}
 
 	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-		Headless: playwright.Bool(false),
-		Args: []string{
-			
-		},
+		Headless: playwright.Bool(headless),
+		Args:     ARGS,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		Locale:     playwright.String("fr-FR"),
+		Locale:     playwright.String("en"),
 		TimezoneId: playwright.String("Europe/Paris"),
 		Screen: &playwright.ScreenSize{
 			Width:  playwright.Int(1920),
@@ -60,9 +60,11 @@ func NewInstance(spoof bool) (*Instance, error) {
 	}
 
 	if spoof {
-		page.AddInitScript(playwright.PageAddInitScriptOptions{
+		if err := page.AddInitScript(playwright.PageAddInitScriptOptions{
 			Path: playwright.String("./scripts/spoof.js"),
-		})
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	return &Instance{
@@ -141,7 +143,7 @@ func (I *Instance) TriggerCaptcha() error {
 		return err
 	}
 
-	time.Sleep(time.Second*2)
+	time.Sleep(time.Second * 2)
 
 	if err := bl.Click(playwright.ElementHandleClickOptions{
 		Timeout: playwright.Float(3000),
@@ -158,7 +160,7 @@ func (I *Instance) TriggerCaptcha() error {
 		select {
 		case <-ticker.C:
 			for _, frame := range I.Page.Frames() {
-				r, err := frame.Evaluate(`typeof hsw !== 'undefined'`)
+				r, err := frame.Evaluate(`typeof hsw !== "undefined"`)
 				if err != nil {
 					continue
 				}
@@ -181,7 +183,7 @@ func (I *Instance) Hsw(jwt string) (string, error) {
 		<-I.Manager
 	}()
 
-	answer, err := I.Frame.Evaluate(fmt.Sprintf("const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}',document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};hsw(`%s`)", jwt))
+	answer, err := I.Frame.Evaluate(fmt.Sprintf("hsw(`%s`)", jwt)) // const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}',document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};
 	if err != nil {
 		return "", err
 	}

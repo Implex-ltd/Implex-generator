@@ -34,7 +34,7 @@ func TestClient_Solve(t *testing.T) {
 		Sitekey:     "4c672d35-0701-42b2-88c3-78380b0db560",
 		Domain:      "discord.com",
 		Version:     "672044a",
-		Lang:        "fr",
+		Lang:        "en",
 		HttpClient:  http,
 		SubmitDelay: time.Second * 6,
 		HswAddress:  "http://192.168.1.26:4000",
@@ -81,7 +81,7 @@ func TestClient_Solve(t *testing.T) {
 					ccm.Wait()
 					go func() {
 						defer ccm.Done()
-						tt.c.GetHsw("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmIjowLCJzIjoyLCJ0IjoidyIsImQiOiJ2eWNGRTlOb0w4WE41Wlh6VXVwOTlIbkdWdHh5TzB5VFNhVi9id0RrUCsyL0JJbFEzTFZ1UGJsQWRTN1JIaDFIUG9nZytGeUk4dmZDNzAwczg2SVFKTDZoZmg2VVZDcjg2V2FHU3Rrc3FEU3pTWXJVUTNxSytEWFBrWjRKWGU0bHJseWN5Wnc5SW1kVzFZa0dGcnlxekdEQnhZN1BrNGJTMkNwYkNLZmdwN2ZGVHR0a09kWHl4cVhtR1E9PTM3NmtKeFlFUyt4YjZNYmsiLCJsIjoiaHR0cHM6Ly9uZXdhc3NldHMuaGNhcHRjaGEuY29tL2MvNDRmYTA5YyIsImUiOjE2ODcxNjAyOTYsIm4iOiJoc3ciLCJjIjoxMDAwfQ.mbZyzV8JJrg0gHbyjohyUuWF_KiGc0rVhK4cUUM8aFHR94SH5ILT6kfqvLKXlqKRufwfaY7DyNBP-QYt-r-fqVhjMvejWQDdgcHORwIuSYsz18PhWjEbn9-Dy0SJXBndTjmDNjlTA03ka5cAIadeOX3VSV66pH2uv6JqhELKFcDKXzXn8qVO3GXubcpYy-mP0oyxkxDvRlw7WU1JfS2toMTCfya8s_Qsy6AnWQjQVEGVMeC6p6UklLXP5lQqSdcY3a-CwR9cAIHLTzLZqBGCtrY4XrKtvCH6wWF_qyb8-D6yvBnlIorAabb-mfF1MmhfxcmpxN_WPwg9a1H8iSWWPQ", 1920, 1080)
+						tt.c.GetHsw("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmIjowLCJzIjoyLCJ0IjoidyIsImQiOiJ2eWNGRTlOb0w4WE41Wlh6VXVwOTlIbkdWdHh5TzB5VFNhVi9id0RrUCsyL0JJbFEzTFZ1UGJsQWRTN1JIaDFIUG9nZytGeUk4dmZDNzAwczg2SVFKTDZoZmg2VVZDcjg2V2FHU3Rrc3FEU3pTWXJVUTNxSytEWFBrWjRKWGU0bHJseWN5Wnc5SW1kVzFZa0dGcnlxekdEQnhZN1BrNGJTMkNwYkNLZmdwN2ZGVHR0a09kWHl4cVhtR1E9PTM3NmtKeFlFUyt4YjZNYmsiLCJsIjoiaHR0cHM6Ly9uZXdhc3NldHMuaGNhcHRjaGEuY29tL2MvNDRmYTA5YyIsImUiOjE2ODcxNjAyOTYsIm4iOiJoc3ciLCJjIjoxMDAwfQ.mbZyzV8JJrg0gHbyjohyUuWF_KiGc0rVhK4cUUM8aFHR94SH5ILT6kfqvLKXlqKRufwfaY7DyNBP-QYt-r-fqVhjMvejWQDdgcHORwIuSYsz18PhWjEbn9-Dy0SJXBndTjmDNjlTA03ka5cAIadeOX3VSV66pH2uv6JqhELKFcDKXzXn8qVO3GXubcpYy-mP0oyxkxDvRlw7WU1JfS2toMTCfya8s_Qsy6AnWQjQVEGVMeC6p6UklLXP5lQqSdcY3a-CwR9cAIHLTzLZqBGCtrY4XrKtvCH6wWF_qyb8-D6yvBnlIorAabb-mfF1MmhfxcmpxN_WPwg9a1H8iSWWPQ")
 						i++
 					}()
 				}

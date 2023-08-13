@@ -52,3 +52,7 @@ assets/scrapped
 scripts/datasetBuilder/output
 scripts/datasetBuilder/input/scrapper
 scripts/datasetBuilder/input/unlabeled
+
+*.png
+*.jpg
+*.jpeg

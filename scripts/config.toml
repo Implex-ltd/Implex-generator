@@ -1,18 +1,19 @@
 [discord]
-invite = "A6dH6ns5"
+invite = ""
 version = 218224
 
 [hcaptcha]
-lang = "fr"
+lang = "en"
 version = "d442197"
-submitTime = 4
-hswAddress = "http://127.0.0.1:4000"
+submitTime = 6
+hswAddress = "http://192.168.1.26:4000"
 SolverAddress = "http://127.0.0.1:1337"
+
 
 [spoof]
 cfbm = false
 profilePath = "../../assets/fingerprints/login.json"
 
 [performances]
-goroutines = 50
-debug = true
+goroutines = 200
+debug = false

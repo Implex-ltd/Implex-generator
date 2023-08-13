@@ -49,28 +49,27 @@ type ImgCaptcha struct {
 	ChallengeURI  string `json:"challenge_uri"`
 	Key           string `json:"key"`
 	RequestConfig struct {
-		Version                      int         `json:"version"`
-		ShapeType                    interface{} `json:"shape_type"`
-		MinPoints                    interface{} `json:"min_points"`
-		MaxPoints                    interface{} `json:"max_points"`
-		MinShapesPerImage            interface{} `json:"min_shapes_per_image"`
-		MaxShapesPerImage            interface{} `json:"max_shapes_per_image"`
-		RestrictToCoords             interface{} `json:"restrict_to_coords"`
-		MinimumSelectionAreaPerShape interface{} `json:"minimum_selection_area_per_shape"`
-		MultipleChoiceMaxChoices     int         `json:"multiple_choice_max_choices"`
-		MultipleChoiceMinChoices     int         `json:"multiple_choice_min_choices"`
-		OverlapThreshold             interface{} `json:"overlap_threshold"`
-		AnswerType                   string      `json:"answer_type"`
-		MaxValue                     interface{} `json:"max_value"`
-		MinValue                     interface{} `json:"min_value"`
-		MaxLength                    interface{} `json:"max_length"`
-		MinLength                    interface{} `json:"min_length"`
-		SigFigs                      interface{} `json:"sig_figs"`
-		KeepAnswersOrder             bool        `json:"keep_answers_order"`
+		Version                      int    `json:"version"`
+		ShapeType                    any    `json:"shape_type"`
+		MinPoints                    any    `json:"min_points"`
+		MaxPoints                    any    `json:"max_points"`
+		MinShapesPerImage            any    `json:"min_shapes_per_image"`
+		MaxShapesPerImage            any    `json:"max_shapes_per_image"`
+		RestrictToCoords             any    `json:"restrict_to_coords"`
+		MinimumSelectionAreaPerShape any    `json:"minimum_selection_area_per_shape"`
+		MultipleChoiceMaxChoices     int    `json:"multiple_choice_max_choices"`
+		MultipleChoiceMinChoices     int    `json:"multiple_choice_min_choices"`
+		OverlapThreshold             any    `json:"overlap_threshold"`
+		AnswerType                   string `json:"answer_type"`
+		MaxValue                     any    `json:"max_value"`
+		MinValue                     any    `json:"min_value"`
+		MaxLength                    any    `json:"max_length"`
+		MinLength                    any    `json:"min_length"`
+		SigFigs                      any    `json:"sig_figs"`
+		KeepAnswersOrder             bool   `json:"keep_answers_order"`
 	} `json:"request_config"`
 	RequestType       string `json:"request_type"`
 	RequesterQuestion struct {
-		Fr string `json:"fr"`
 		En string `json:"en"`
 	} `json:"requester_question"`
 	RequesterQuestionExample []string `json:"requester_question_example"`
@@ -79,10 +78,6 @@ type ImgCaptcha struct {
 		TaskKey      string `json:"task_key"`
 	} `json:"tasklist"`
 	BypassMessage string `json:"bypass-message"`
-
-	RequesterRestrictedAnswerSet struct {
-		Data map[string]interface{} `json:"requester_restricted_answer_set"`
-	}
 }
 
 type TxtCaptcha struct {
@@ -94,12 +89,12 @@ type TxtCaptcha struct {
 	Key               string `json:"key"`
 	RequestType       string `json:"request_type"`
 	RequesterQuestion struct {
-		Fr string `json:"fr"`
+		Fr string `json:"en"`
 	} `json:"requester_question"`
 	Tasklist []struct {
 		DatapointHash string `json:"datapoint_hash"`
 		DatapointText struct {
-			Fr string `json:"fr"`
+			Fr string `json:"en"`
 		} `json:"datapoint_text"`
 		TaskKey string `json:"task_key"`
 	} `json:"tasklist"`
@@ -213,6 +208,7 @@ type Nv struct {
 	OnLine                 bool          `json:"onLine"`
 	Webdriver              bool          `json:"webdriver"`
 	Bluetooth              Bluetooth     `json:"bluetooth"`
+	Standalone             bool          `json:"standalone"`
 	Clipboard              Bluetooth     `json:"clipboard"`
 	Credentials            Bluetooth     `json:"credentials"`
 	Keyboard               Bluetooth     `json:"keyboard"`
@@ -330,6 +326,7 @@ type GetNv struct {
 	Languages              []string      `json:"languages"`
 	OnLine                 bool          `json:"onLine"`
 	Webdriver              bool          `json:"webdriver"`
+	Standalone             bool          `json:"standalone"`
 	Bluetooth              Bluetooth     `json:"bluetooth"`
 	Clipboard              Bluetooth     `json:"clipboard"`
 	Credentials            Bluetooth     `json:"credentials"`

@@ -2,12 +2,15 @@ package main
 
 import (
 	"engine/internal/browser"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/playwright-community/playwright-go"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -42,7 +45,7 @@ func initBrowser() {
 		go func() {
 			defer c.Done()
 
-			client, err := browser.NewInstance(true)
+			client, err := browser.NewInstance(true, false)
 			if err != nil {
 				log.Println(err)
 				return
@@ -116,20 +119,72 @@ func engine() {
 	}
 }
 
-func debug() {
-	log.Println("ctrl+c to exit.")
+func crawl(url string, headless bool) {
+	var name string
+	var head string
 
+	if headless {
+		head = "headless"
+	} else {
+		head = "headfull"
+	}
 
-	client, err := browser.NewInstance(true)
+	if strings.Contains(url, "browserleaks") {
+		name = strings.Split(url, "browserleaks.com/")[1]
+	} else {
+		name = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.Split(url, "://")[1], ".", ""), "/", ""), ":", "")
+	}
+
+	client, err := browser.NewInstance(true, headless)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	defer client.CloseInstance()
+	client.Page.Goto(url)
 
-	client.Page.Goto("https://abrahamjuliot.github.io/creepjs/")
+	log.Println("Loaded", url)
+	defer log.Println("Done", url)
+
+	time.Sleep(5 * time.Second)
+	client.Page.Screenshot(playwright.PageScreenshotOptions{
+		FullPage: playwright.Bool(true),
+		Path:     playwright.String(fmt.Sprintf("./img/%s/%s.png", head, name)),
+	})
+
 	select {}
+}
+
+func debug() {
+	log.Println("ctrl+c to exit.")
+
+	gotos := []string{
+		"https://browserleaks.com/webrtc",
+		"https://browserleaks.com/canvas",
+		"https://browserleaks.com/webgl",
+		"https://browserleaks.com/tls",
+		"https://browserleaks.com/javascript",
+		"https://browserleaks.com/fonts",
+		"https://browserleaks.com/ip",
+		"https://bot.sannysoft.com/",
+		"https://abrahamjuliot.github.io/creepjs/",
+	}
+
+	c := goccm.New(len(gotos))
+
+	for _, page := range gotos {
+		c.Wait()
+
+		go func(url string) {
+			defer c.Done()
+			go crawl(url, false)
+			crawl(url, true)
+		}(page)
+	}
+
+	c.WaitAllDone()
+	log.Println("Done.")
 }
 
 func main() {

@@ -29,11 +29,11 @@ ai:
 
 engine:
 	cls||clear
-	cd ../cmd/engine && go run . engine
+	cd ../cmd/GoEngine/cmd/engine && go run . engine
 
 debug:
 	cls||clear
-	cd ../cmd/engine && go run . debug
+	cd ../cmd/GoEngine/cmd/engine && go run . debug
 
 scrape:
 	cls||clear
