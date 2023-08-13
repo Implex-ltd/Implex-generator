@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-func (c *Client) GetHsw(req string, w, h int64) string {
+func (c *Client) GetHsw(req string) string {
 	for {
-		req, err := http.NewRequest("GET", fmt.Sprintf("%s/n?req=%s&width=%d&height=%d", c.Config.HswAddress, req, w, h), nil)
+		req, err := http.NewRequest("GET", fmt.Sprintf("%s/n?req=%s", c.Config.HswAddress, req), nil)
 		if err != nil {
 			time.Sleep(50 * time.Millisecond)
 			continue

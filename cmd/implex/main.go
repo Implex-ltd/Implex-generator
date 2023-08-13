@@ -116,7 +116,7 @@ func worker(fp *fpclient.Fingerprint) {
 	key, err := hc.SolveImage()
 	if err != nil {
 		if Config.Performances.Debug {
-			fmt.Println(err, proxy)
+			fmt.Println(err)
 		}
 		Error++
 		return
@@ -153,7 +153,7 @@ func scrapeWorker(fp *fpclient.Fingerprint) {
 	_, err = hc.SolveImage()
 	if err != nil {
 		if Config.Performances.Debug {
-			fmt.Println(err, proxy)
+			fmt.Println(err)
 		}
 		Error++
 		return
