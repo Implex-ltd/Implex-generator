@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/Implex-ltd/cleanhttp v0.0.0-20230812213649-80e02eef6491
+	github.com/Implex-ltd/cleanhttp v0.0.0-20230813033903-2aec096e7ab3
 	github.com/Implex-ltd/cloudflare-reverse v0.0.0-20230720135926-cce6c18a4c03
-	github.com/Implex-ltd/fingerprint-client v0.0.0-20230715024454-df46a03cf074
+	github.com/Implex-ltd/fingerprint-client v0.0.0-20230813033749-fc63d297c0c3
 	github.com/bogdanfinn/fhttp v0.5.23
 	github.com/gookit/color v1.5.4
 	github.com/gorilla/websocket v1.5.0

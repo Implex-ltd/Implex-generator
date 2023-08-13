@@ -2,7 +2,7 @@ package hcaptcha
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
@@ -23,7 +23,7 @@ func (c *Client) GetHsw(req string) string {
 
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			time.Sleep(50 * time.Millisecond)
 			continue
@@ -34,7 +34,7 @@ func (c *Client) GetHsw(req string) string {
 		if b == "nop" {
 			continue
 		}
-		
+
 		if b == "No available clients" {
 			continue
 		}

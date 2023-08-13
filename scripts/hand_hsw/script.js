@@ -17,7 +17,7 @@ se.onmessage = async (message) => {
   };
 
   try {
-    HTMLCanvasElement.prototype.toDataURL = function (type) {
+    /*HTMLCanvasElement.prototype.toDataURL = function (type) {
       if (type === 'image/png') {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -51,7 +51,7 @@ se.onmessage = async (message) => {
         return canvas.toDataURL('image/png');
       }
       return originalFunction.apply(this, arguments);
-    };
+    };*/
     reply.token = await hsw(payload.solve);
   } catch (err) {
     reply.type = "failed";

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	scrape int
+	Scrape int
 
 	hsl = false
 )
@@ -31,7 +31,7 @@ func NewHcaptchaClient(config *HcaptchaConfig) *Client {
 }
 
 func (c *Client) DownloadFile(url string, filePath string) error {
-	h := HeaderCheckSiteConfig()
+	h := c.HeaderCheckSiteConfig()
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "GET",
@@ -49,7 +49,7 @@ func (c *Client) DownloadFile(url string, filePath string) error {
 
 	defer resp.Body.Close()
 
-	buff, err := ioutil.ReadAll(resp.Body)
+	buff, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -68,13 +68,12 @@ func (c *Client) DownloadFile(url string, filePath string) error {
 		return err
 	}
 
-	scrape++
-	go fmt.Println("scraped:", scrape)
+	Scrape++
 	return nil
 }
 
 func (c *Client) checkSiteConfig() (*SiteConfig, error) {
-	h := HeaderCheckSiteConfig()
+	h := c.HeaderCheckSiteConfig()
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
@@ -87,7 +86,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +99,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 	return &config, nil
 }
 
-func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*ImgCaptcha, error) {
+func (c *Client) getImgCaptcha(config *SiteConfig) (*ImgCaptcha, error) {
 	var pow string
 	var err error
 
@@ -120,9 +119,10 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 		`sitekey`:    c.Config.Sitekey,
 		`host`:       c.Config.Domain,
 		`hl`:         c.Config.Lang,
-		`motionData`: GenerateMotionGet(w, hh),
+		`motionData`: c.GenerateMotionGet(),
 		`n`:          pow,
 		`c`:          fmt.Sprintf(`{"type":"%s","req":"%s"}`, config.C.Type, config.C.Req),
+		`pst`:        `false`,
 	} {
 		payload.Set(name, value)
 	}
@@ -131,7 +131,7 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 		Method: "POST",
 		Url:    fmt.Sprintf("https://hcaptcha.com/getcaptcha/%s", c.Config.Sitekey),
 		Body:   strings.NewReader(payload.Encode()),
-		Header: HeaderGetCaptcha(),
+		Header: c.HeaderGetCaptcha(),
 	})
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *Client) getImgCaptcha(id string, config *SiteConfig, w, hh int64) (*Img
 	return &captcha, nil
 }
 
-func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseCheckCaptcha, error) {
+func (c *Client) checkImgCaptcha(captcha *ImgCaptcha) (*ResponseCheckCaptcha, error) {
 	st := time.Now()
 	var payload []byte
 	var pow string
@@ -160,6 +160,10 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseChe
 	answers, err := c.SolveImages(captcha)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(answers) == 0 {
+		return nil, errors.New("no answers found")
 	}
 
 	if hsl {
@@ -177,7 +181,7 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseChe
 		Sitekey:      c.Config.Sitekey,
 		Serverdomain: c.Config.Domain,
 		JobMode:      captcha.RequestType,
-		MotionData:   GenerateMotionCheck(answers, w, hh),
+		MotionData:   c.GenerateMotionCheck(answers),
 		N:            pow,
 		C:            fmt.Sprintf(`{"type":"%s","req":"%s"}`, captcha.C.Type, captcha.C.Req),
 		Answers:      answers,
@@ -202,7 +206,7 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseChe
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -220,9 +224,6 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha, w, hh int64) (*ResponseChe
 }
 
 func (c *Client) SolveImage() (string, error) {
-	id := utils.RandomString(12)
-	w, h := generateRandomBrowserSize(800, 1600)
-
 	config, err := c.checkSiteConfig()
 	if err != nil {
 		return "", err
@@ -232,9 +233,14 @@ func (c *Client) SolveImage() (string, error) {
 		return "", fmt.Errorf("checkSiteConfig wont pass: %+v", config)
 	}
 
-	imgCap, err := c.getImgCaptcha(id, config, w, h)
+	imgCap, err := c.getImgCaptcha(config)
 	if err != nil {
 		return "", err
+	}
+
+	if len(imgCap.Tasklist) <= 0 {
+		fmt.Println(imgCap)
+		return "", fmt.Errorf("no images found")
 	}
 
 	if imgCap.RequestType == "image_label_area_select" {
@@ -250,15 +256,13 @@ func (c *Client) SolveImage() (string, error) {
 			path := strings.ReplaceAll(imgCap.RequesterQuestion.En, " ", "_")
 			utils.CreateFolderIfNotExist(fmt.Sprintf("scrapped/%s", path))
 
-			go c.DownloadFile(t.DatapointURI, fmt.Sprintf("scrapped/%s", path))
+			c.DownloadFile(t.DatapointURI, fmt.Sprintf("scrapped/%s", path))
 		}
 
 		return "", nil
 	}
 
-	fmt.Println("check cap")
-
-	resp, err := c.checkImgCaptcha(imgCap, w, h)
+	resp, err := c.checkImgCaptcha(imgCap)
 	if err != nil {
 		return "", err
 	}

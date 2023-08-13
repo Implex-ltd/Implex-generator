@@ -13,7 +13,6 @@ type Cfg struct {
 		SendMessage        bool   `toml:"sendMessage"`
 		SendMessageContent string `toml:"sendMessageContent"`
 		TryJoin            bool   `toml:"tryJoin"`
-		JoinOnRegister     bool   `toml:"joinOnRegister"`
 		Humanize           bool   `toml:"humanize"`
 		Version            int    `toml:"version"`
 	} `toml:"discord"`
@@ -39,7 +38,4 @@ type Cfg struct {
 		BrowserHswThreadCount int `toml:"browserHswThreadCount"`
 		BrowserCount          int `toml:"browserCount"`
 	} `toml:"engine"`
-	Extra struct {
-		Theme string `toml:"theme"`
-	} `toml:"extra"`
 }

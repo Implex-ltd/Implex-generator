@@ -1,19 +1,37 @@
 [discord]
-invite = ""
-version = 218224
+invite = "A6dH6ns5"
+inviteGuildID = "1138866316070105160"
+inviteChannelID = "1138866315440967862"
+sendChannelID = ""
+sendMessage = false
+sendMessageContent = "@everyone, implex on top !"
+tryJoin = true
+joinOnRegister = true
+humanize = true
+version = 218604
 
 [hcaptcha]
 lang = "en"
 version = "d442197"
-submitTime = 6
-hswAddress = "http://192.168.1.26:4000"
+submitTime = 4
+hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1337"
+siteKey = "4c672d35-0701-42b2-88c3-78380b0db560"
 
 
 [spoof]
 cfbm = false
-profilePath = "../../assets/fingerprints/login.json"
+profilePath = "../../assets/fingerprints/chrome.json"
+proxyType = "http"
+sessionReplaceMe = "REPLACEME"
 
 [performances]
-goroutines = 200
+goroutines = 150
 debug = false
+
+[engine]
+browserHswThreadCount = 350
+browserCount = 5
+
+[extra]
+theme = "random"

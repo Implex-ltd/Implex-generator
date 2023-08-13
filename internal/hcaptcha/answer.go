@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"strings"
 
 	http "github.com/bogdanfinn/fhttp"
@@ -73,7 +74,19 @@ func (c *Client) SolveImages(captcha *ImgCaptcha) (map[string]string, error) {
 	}
 
 	if len(answers) == 0 {
-		return nil, fmt.Errorf("no answers found")
+		// Return 3 random tasks if no answers are found from the AI
+		randTasks := make(map[string]string)
+
+		for _, t := range captcha.Tasklist {
+			randTasks[t.TaskKey] = "false"
+		}
+
+		for i := 0; i < 3 && i < len(randTasks); i++ {
+			randIndex := rand.Intn(len(randTasks))
+			randTask := captcha.Tasklist[randIndex]
+			randTasks[randTask.TaskKey] = "true"
+		}
+		return randTasks, nil
 	}
 
 	return answers, nil

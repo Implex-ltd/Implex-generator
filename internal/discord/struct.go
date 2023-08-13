@@ -28,16 +28,21 @@ type RegisterConfig struct {
 	CaptchaKey string
 }
 
-type RegisterPayload struct {
+type RegisterSimplePayload struct {
 	Consent                    bool   `json:"consent"`
 	Fingerprint                string `json:"fingerprint"`
-	Username                   string `json:"global_name"`
 	CaptchaKey                 string `json:"captcha_key"`
+	GlobalName                 string `json:"global_name"`
 	UniqueUsernameRegistration bool   `json:"unique_username_registration"`
+}
 
-	// invite code page
-	Invite        string `json:"invite"`
-	GiftCodeSkuID any    `json:"gift_code_sku_id"`
+type RegisterInvitePayload struct {
+	Fingerprint                string `json:"fingerprint"`
+	GlobalName                 string `json:"global_name"`
+	Invite                     string `json:"invite"`
+	Consent                    bool   `json:"consent"`
+	GiftCodeSkuID              any    `json:"gift_code_sku_id"`
+	UniqueUsernameRegistration bool   `json:"unique_username_registration"`
 }
 
 type RegisterResponse struct {
@@ -54,6 +59,14 @@ type AvatarConfig struct {
 	FilePath     string
 	Base64String string
 	IsFromBase64 bool
+}
+
+type EditBirthConfig struct {
+	Date string
+}
+
+type EditBirthPayload struct {
+	DateOfBirth string `json:"date_of_birth"`
 }
 
 type EditProfilConfig struct {

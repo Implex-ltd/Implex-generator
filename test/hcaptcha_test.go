@@ -15,7 +15,7 @@ func TestClient_Solve(t *testing.T) {
 	hcaptcha.LoadAnswer()
 
 	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
-		FilePath: "../assets/fingerprints/safari.json",
+		FilePath: "../assets/fingerprints/chrome.json",
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -34,9 +34,9 @@ func TestClient_Solve(t *testing.T) {
 		Sitekey:     "4c672d35-0701-42b2-88c3-78380b0db560",
 		Domain:      "discord.com",
 		Version:     "672044a",
-		Lang:        "en",
+		Lang:        "g",
 		HttpClient:  http,
-		SubmitDelay: time.Second * 6,
+		SubmitDelay: time.Second * 4,
 		HswAddress:  "http://192.168.1.26:4000",
 	})
 
@@ -49,22 +49,22 @@ func TestClient_Solve(t *testing.T) {
 		threads int
 	}{
 		{
-			name:    "hsw benchmark 5s",
+			name:    "hsw benchmark 5s - 150 threads",
 			c:       c,
 			time:    time.Second * 5,
-			threads: 50,
+			threads: 150,
 		},
 		{
-			name:    "hsw benchmark 10s",
+			name:    "hsw benchmark 5s - 300 threads",
 			c:       c,
-			time:    time.Second * 10,
-			threads: 50,
+			time:    time.Second * 5,
+			threads: 300,
 		},
 		{
-			name:    "hsw benchmark 20s",
+			name:    "hsw benchmark 5s - 600 threads",
 			c:       c,
-			time:    time.Second * 20,
-			threads: 50,
+			time:    time.Second * 5,
+			threads:600,
 		},
 	}
 
@@ -73,7 +73,7 @@ func TestClient_Solve(t *testing.T) {
 			ccm := goccm.New(tt.threads)
 			result := []int{}
 
-			for x := 0; x < 3; x++ {
+			for x := 0; x < 1; x++ {
 				st := time.Now()
 
 				i := 0
@@ -81,7 +81,7 @@ func TestClient_Solve(t *testing.T) {
 					ccm.Wait()
 					go func() {
 						defer ccm.Done()
-						tt.c.GetHsw("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmIjowLCJzIjoyLCJ0IjoidyIsImQiOiJ2eWNGRTlOb0w4WE41Wlh6VXVwOTlIbkdWdHh5TzB5VFNhVi9id0RrUCsyL0JJbFEzTFZ1UGJsQWRTN1JIaDFIUG9nZytGeUk4dmZDNzAwczg2SVFKTDZoZmg2VVZDcjg2V2FHU3Rrc3FEU3pTWXJVUTNxSytEWFBrWjRKWGU0bHJseWN5Wnc5SW1kVzFZa0dGcnlxekdEQnhZN1BrNGJTMkNwYkNLZmdwN2ZGVHR0a09kWHl4cVhtR1E9PTM3NmtKeFlFUyt4YjZNYmsiLCJsIjoiaHR0cHM6Ly9uZXdhc3NldHMuaGNhcHRjaGEuY29tL2MvNDRmYTA5YyIsImUiOjE2ODcxNjAyOTYsIm4iOiJoc3ciLCJjIjoxMDAwfQ.mbZyzV8JJrg0gHbyjohyUuWF_KiGc0rVhK4cUUM8aFHR94SH5ILT6kfqvLKXlqKRufwfaY7DyNBP-QYt-r-fqVhjMvejWQDdgcHORwIuSYsz18PhWjEbn9-Dy0SJXBndTjmDNjlTA03ka5cAIadeOX3VSV66pH2uv6JqhELKFcDKXzXn8qVO3GXubcpYy-mP0oyxkxDvRlw7WU1JfS2toMTCfya8s_Qsy6AnWQjQVEGVMeC6p6UklLXP5lQqSdcY3a-CwR9cAIHLTzLZqBGCtrY4XrKtvCH6wWF_qyb8-D6yvBnlIorAabb-mfF1MmhfxcmpxN_WPwg9a1H8iSWWPQ")
+						 tt.c.GetHsw("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmIjowLCJzIjoyLCJ0IjoidyIsImQiOiJ2V2lEdkhPRzE0SmRTbDl0aVJrOEN1TnM1bnZ0T3N2U1F5TUx0M1lnQUhLYmNYaWtIaU14Sm9EU2hLYmN0dWdxRzBVUDhOK3g1cko2MHdyUWF0b0dKS0c5NFBSV0dFb3FFdmptdGhtWWlMK0hPcDJ5K0pkODJTQ2pBVVlwTTdSSCsybnR4Z24vOHBGNzVyRXg3bFJ6OVUxdFpVTDVPWnpqRElVOUJVV0VJVTZYN3NrUGRCUzFrNTRBSlE9PUYxVUJGWmgyVjRuSUZoMTEiLCJsIjoiaHR0cHM6Ly9uZXdhc3NldHMuaGNhcHRjaGEuY29tL2MvYTkxMjcyYSIsImUiOjE2OTE4OTk1MTMsIm4iOiJoc3ciLCJjIjoxMDAwfQ.NvTZs7tLjsBdTTi4A3z9qqaSZEAgsp04IrzFeavSIAXMAXUqsDlavBACPnQXoxSf78YEa89gJl4-MIlxyasMZTKyR2oplqCdqe9JfzKMB3MqayXx_ZmuppdaWOWeUKf51eiZ8x7CpYM1ePoRkpprDs_WveoR5LnQ-XgMUM2lFBU")
 						i++
 					}()
 				}

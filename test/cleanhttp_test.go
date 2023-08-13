@@ -22,7 +22,7 @@ func Test_parseUserAgent(t *testing.T) {
 		{
 			name: "windows-ua",
 			args: args{
-				userAgentString: "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+				userAgentString: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
 			},
 		},
 		{
@@ -43,7 +43,7 @@ func Test_parseUserAgent(t *testing.T) {
 
 func TestCleanHttp_Do(t *testing.T) {
 	fp, _ := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
-		FilePath: "../assets/login.json",
+		FilePath: "../assets/fingerprints/chrome.json",
 	})
 
 	c, _ := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{

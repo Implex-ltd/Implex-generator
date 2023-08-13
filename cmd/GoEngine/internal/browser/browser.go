@@ -9,13 +9,109 @@ import (
 )
 
 var (
-	THREAD_HSW = 100
 	ARGS       = []string{
 		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+		"--disable-popup-blocking", // "discord ask access to position, lol?, no way!"
+
+		"--no-sandbox",
+		"--no-pings",
+		"--no-zygote",
+		"--mute-audio",
+		"--no-first-run",
+		"--no-default-browser-check",
+		"--disable-software-rasterizer",
+		"--disable-cloud-import",
+		"--disable-gesture-typing",
+		"--disable-setuid-sandbox",
+		"--disable-offer-store-unmasked-wallet-cards",
+		"--disable-offer-upload-credit-cards",
+		"--disable-print-preview",
+		"--disable-voice-input",
+		"--disable-wake-on-wifi",
+		"--disable-cookie-encryption",
+		"--ignore-gpu-blocklist",
+		"--enable-async-dns",
+		"--enable-simple-cache-backend",
+		"--enable-tcp-fast-open",
+		//"--enable-webgl",
+		"--prerender-from-omnibox=disabled",
+		"--enable-web-bluetooth",
+		// cannot be turned on because it will cause Chromium to ignore the certificate error
+		// "--ignore-certificate-errors",
+		// "--ignore-certificate-errors-spki-list",
+		"--disable-site-isolation-trials",
+		"--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,TranslateUI,BlinkGenPropertyTrees", // do not disable UserAgentClientHint
+		"--aggressive-cache-discard",
+		"--disable-extensions",
+		"--disable-blink-features",
+		"--disable-blink-features=AutomationControlled",
+		"--disable-ipc-flooding-protection",
+		"--enable-features=NetworkService,NetworkServiceInProcess,TrustTokens,TrustTokensAlwaysAllowIssuance", // support ServiceWorkers
+		"--disable-component-extensions-with-background-pages",
+		"--disable-default-apps",
+		"--disable-breakpad",
+		"--disable-component-update",
+		"--disable-domain-reliability",
+		"--disable-sync",
+		"--disable-client-side-phishing-detection",
+		"--disable-hang-monitor",
+		"--disable-prompt-on-repost",
+		"--metrics-recording-only",
+		"--safebrowsing-disable-auto-update",
+		"--password-store=basic",
+		"--autoplay-policy=no-user-gesture-required",
+		"--use-mock-keychain",
+		"--force-webrtc-ip-handling-policy=default_public_interface_only",
+		"--disable-session-crashed-bubble",
+		"--disable-crash-reporter",
+		"--disable-dev-shm-usage",
+		"--force-color-profile=srgb",
+		// Cannot be turned on, as it will cause the canvas hashcode to be different from the normal browser
+		// "--disable-accelerated-2d-canvas",
+		"--disable-translate",
+		"--disable-background-networking",
+		"--disable-background-timer-throttling",
+		"--disable-backgrounding-occluded-windows",
+		"--disable-infobars",
+		"--hide-scrollbars",
+		"--disable-renderer-backgrounding",
+		"--font-render-hinting=none",
+		"--disable-logging",
+		"--use-gl=swiftshader", // better cpu usage with --use-gl=desktop rather than --use-gl=swiftshader, still needs more testing.
+
+		// optimze fps
+		"--enable-surface-synchronization",
+		"--run-all-compositor-stages-before-draw",
+		"--disable-threaded-animation",
+		"--disable-threaded-scrolling",
+		"--disable-checker-imaging",
+
+		"--disable-new-content-rendering-timeout",
+		"--disable-image-animation-resync",
+		"--disable-partial-raster",
+
+		"--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4",
+
+		// "--deterministic-mode",                          // Some friends commented that with this parameter mouse movement is stuck, so let"s comment it out
+		// "--disable-web-security",
+		// "--disable-cache",                               // cache
+		// "--disable-application-cache",
+		// "--disable-offline-load-stale-cache",
+		// "--disable-gpu-shader-disk-cache",
+		// "--media-cache-size=0",
+		// "--disk-cache-size=0",
+		// "--enable-experimental-web-platform-features",   // Make Chrome for Linux support Bluetooth. eg: navigator.bluetooth, window.BluetoothUUID
+		// "--disable-gpu",                                 // Cannot be disabled: otherwise webgl will not work
+		// "--disable-speech-api",                          // Cannot be disabled: some websites use speech-api as fingerprint
+		// "--no-startup-window",                           // Cannot be enabled: Chrome won"t open the window and puppeteer thinks it"s not connected
+		// "--disable-webgl",                               // Requires webgl fingerprint
+		// "--disable-webgl2",
+		// "--disable-notifications",                       // Cannot be disabled: notification-api not available, fingerprints will be dirty
+	
 	}
 )
 
-func NewInstance(spoof, headless bool) (*Instance, error) {
+func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	pw, err := playwright.Run()
 	if err != nil {
 		return nil, err
@@ -30,7 +126,7 @@ func NewInstance(spoof, headless bool) (*Instance, error) {
 	}
 
 	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		Locale:     playwright.String("en"),
+		Locale:     playwright.String("fr"),
 		TimezoneId: playwright.String("Europe/Paris"),
 		Screen: &playwright.ScreenSize{
 			Width:  playwright.Int(1920),
@@ -71,7 +167,7 @@ func NewInstance(spoof, headless bool) (*Instance, error) {
 		Pw:      pw,
 		Br:      browser,
 		Page:    page,
-		Manager: make(chan struct{}, THREAD_HSW),
+		Manager: make(chan struct{}, threads),
 	}, nil
 }
 
@@ -143,7 +239,8 @@ func (I *Instance) TriggerCaptcha() error {
 		return err
 	}
 
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 5)
+
 
 	if err := bl.Click(playwright.ElementHandleClickOptions{
 		Timeout: playwright.Float(3000),
@@ -151,10 +248,10 @@ func (I *Instance) TriggerCaptcha() error {
 		return err
 	}
 
+	timeout := time.After(time.Second * 5)
+
 	ticker := time.NewTicker(time.Millisecond * 250)
 	defer ticker.Stop()
-
-	timeout := time.After(time.Second * 5)
 
 	for {
 		select {

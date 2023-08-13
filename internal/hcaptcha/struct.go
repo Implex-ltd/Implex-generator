@@ -27,7 +27,7 @@ type HcaptchaConfig struct {
 }
 
 type Client struct {
-	Config *HcaptchaConfig
+	Config  *HcaptchaConfig
 }
 
 type SiteConfig struct {
@@ -208,7 +208,7 @@ type Nv struct {
 	OnLine                 bool          `json:"onLine"`
 	Webdriver              bool          `json:"webdriver"`
 	Bluetooth              Bluetooth     `json:"bluetooth"`
-	Standalone             bool          `json:"standalone"`
+	// Standalone             bool          `json:"standalone"` // iphone
 	Clipboard              Bluetooth     `json:"clipboard"`
 	Credentials            Bluetooth     `json:"credentials"`
 	Keyboard               Bluetooth     `json:"keyboard"`

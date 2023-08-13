@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Implex-ltd/cleanhttp/cleanhttp"
+	"github.com/Implex-ltd/fingerprint-client/fpclient"
 	h "github.com/Implex-ltd/implex/internal/hcaptcha"
 )
 
@@ -36,12 +38,24 @@ func TestGetMotion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := h.GenerateMotionGet(1920, 1080)
+			fp, _ := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
+				FilePath: "../assets/fingerprints/chrome.json",
+			})
+
+			req, _ := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
+				BrowserFp: fp,
+			})
+
+			c := h.NewHcaptchaClient(&h.HcaptchaConfig{
+				HttpClient: req,
+			})
+
+			m := c.GenerateMotionGet()
 			fmt.Println(m)
 
 			fmt.Println("=======================================================================================")
 
-			m = h.GenerateMotionCheck(tt.args.answers, 1920, 1080)
+			m = c.GenerateMotionCheck(tt.args.answers)
 			fmt.Println(m)
 		})
 	}

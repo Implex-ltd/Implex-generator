@@ -39,6 +39,7 @@ This library is using our custom packages that you can include into your project
 		"telegram": "https://t.me/Vichy1337"
 	},
 	"telegram_group": "https://t.me/implex_ltd",
-	"discord_group": "https://discord.gg/exU5xahvnE"
+	"discord_group": "https://discord.gg/exU5xahvnE",
+	"ps": "dm for BUSSINESS PURPOSE ONLY",
 }
 ```

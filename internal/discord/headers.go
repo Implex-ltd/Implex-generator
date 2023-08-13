@@ -54,20 +54,19 @@ func (c *Client) getHeader(config *HeaderConfig) http.Header {
 	}
 
 	headerName, properties := c.getProperties(config.IsXtrack)
-	base := c.HttpClient.GenerateBaseHeaders()
 
 	return http.Header{
 		`accept`:               {`*/*`},
 		`accept-encoding`:      {`gzip, deflate, br`},
-		`accept-language`:      {base.AcceptLanguage},
+		`accept-language`:      {c.HttpClient.BaseHeader.AcceptLanguage},
 		`authorization`:        {c.Config.Token},
 		`content-type`:         {`application/json`},
-		`cookie`:               {base.Cookies},
+		`cookie`:               {c.HttpClient.BaseHeader.Cookies},
 		`origin`:               {"https://discord.com"},
-		`referer`:              {`https://discord.com/channels/@me`},
-		`sec-ch-ua`:            {base.SecChUa},
-		`sec-ch-ua-mobile`:     {`?0`},
-		`sec-ch-ua-platform`:   {base.SecChUaPlatform},
+		`referer`:              {`https://discord.com`},
+		`sec-ch-ua`:            {c.HttpClient.BaseHeader.SecChUa},
+		`sec-ch-ua-mobile`:     {c.HttpClient.BaseHeader.SecChUaMobile},
+		`sec-ch-ua-platform`:   {c.HttpClient.BaseHeader.SecChUaPlatform},
 		`sec-fetch-dest`:       {`empty`},
 		`sec-fetch-mode`:       {`cors`},
 		`sec-fetch-site`:       {`same-origin`},
@@ -75,7 +74,7 @@ func (c *Client) getHeader(config *HeaderConfig) http.Header {
 		`x-context-properties`: {ctx},
 		`x-debug-options`:      {`bugReporterEnabled`},
 		`x-discord-locale`:     {strings.Split(c.HttpClient.Config.BrowserFp.Navigator.Language, "-")[0]},
-		`x-discord-timezone`:   {`Europe/Paris`}, // todo: add country by ip or header language
+		`x-discord-timezone`:   {`America/New_York`}, // todo: add country by ip or header language
 		headerName:             {properties},
 
 		http.HeaderOrderKey: {
