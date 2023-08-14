@@ -55,7 +55,7 @@ func TestGetMotion(t *testing.T) {
 
 			fmt.Println("=======================================================================================")
 
-			m = c.GenerateMotionCheck(tt.args.answers)
+			m = c.GenerateMotionCheck(nil)
 			fmt.Println(m)
 		})
 	}

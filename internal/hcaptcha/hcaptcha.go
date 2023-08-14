@@ -99,7 +99,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 	return &config, nil
 }
 
-func (c *Client) getImgCaptcha(config *SiteConfig) (*ImgCaptcha, error) {
+func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 	var pow string
 	var err error
 
@@ -144,7 +144,7 @@ func (c *Client) getImgCaptcha(config *SiteConfig) (*ImgCaptcha, error) {
 		return nil, err
 	}
 
-	var captcha ImgCaptcha
+	var captcha Challenge
 	if err := json.Unmarshal(body, &captcha); err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *Client) getImgCaptcha(config *SiteConfig) (*ImgCaptcha, error) {
 	return &captcha, nil
 }
 
-func (c *Client) checkImgCaptcha(captcha *ImgCaptcha) (*ResponseCheckCaptcha, error) {
+func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, error) {
 	st := time.Now()
 	var payload []byte
 	var pow string
@@ -160,10 +160,6 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha) (*ResponseCheckCaptcha, er
 	answers, err := c.SolveImages(captcha)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(answers) == 0 {
-		return nil, errors.New("no answers found")
 	}
 
 	if hsl {
@@ -176,12 +172,12 @@ func (c *Client) checkImgCaptcha(captcha *ImgCaptcha) (*ResponseCheckCaptcha, er
 		pow = c.GetHsw(captcha.C.Req)
 	}
 
-	payload, err = json.Marshal(&PayloadCheckImgCaptcha{
+	payload, err = json.Marshal(&PayloadCheckChallenge{
 		V:            c.Config.Version,
 		Sitekey:      c.Config.Sitekey,
 		Serverdomain: c.Config.Domain,
 		JobMode:      captcha.RequestType,
-		MotionData:   c.GenerateMotionCheck(answers),
+		MotionData:   c.GenerateMotionCheck(map[string]string{"x": "true", "y": "true", "z": "true"}),
 		N:            pow,
 		C:            fmt.Sprintf(`{"type":"%s","req":"%s"}`, captcha.C.Type, captcha.C.Req),
 		Answers:      answers,
@@ -233,7 +229,7 @@ func (c *Client) SolveImage() (string, error) {
 		return "", fmt.Errorf("checkSiteConfig wont pass: %+v", config)
 	}
 
-	imgCap, err := c.getImgCaptcha(config)
+	imgCap, err := c.getChallenge(config)
 	if err != nil {
 		return "", err
 	}
@@ -243,9 +239,9 @@ func (c *Client) SolveImage() (string, error) {
 		return "", fmt.Errorf("no images found")
 	}
 
-	if imgCap.RequestType == "image_label_area_select" {
+	/*if imgCap.RequestType == "image_label_area_select" {
 		return "", errors.New("invalid request-type: image_label_area_select")
-	}
+	}*/
 
 	if c.Config.Scrape && imgCap.RequestType == "image_label_binary" {
 		if len(imgCap.Tasklist) <= 0 {
@@ -262,7 +258,7 @@ func (c *Client) SolveImage() (string, error) {
 		return "", nil
 	}
 
-	resp, err := c.checkImgCaptcha(imgCap)
+	resp, err := c.checkChallenge(imgCap)
 	if err != nil {
 		return "", err
 	}

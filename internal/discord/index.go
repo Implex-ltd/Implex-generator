@@ -50,9 +50,10 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting Cloudflare cookies: %w", err)
 		}
+		fmt.Println(cfbm)
 
 		cfCookie := &http.Cookie{
-			Name:  "__cf_bm",
+			Name:  "cf_clearance",
 			Value: cfbm,
 		}
 		cookies = append(cookies, cfCookie)
@@ -304,13 +305,11 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 		return nil, fmt.Errorf("error marshaling payload: %w", err)
 	}
 
-	header := c.getHeader(&HeaderConfig{})
-
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    fmt.Sprintf("https://discord.com/api/v9/channels/%s/messages", config.ChannelID),
 		Body:   bytes.NewReader(payload),
-		Header: header,
+		Header: c.getHeader(&HeaderConfig{}),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
@@ -328,4 +327,28 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 	}
 
 	return &resp, nil
+}
+
+func (c *Client) IsLocked() (bool, error) {
+	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
+		Method: "POST",
+		Url:    "https://discord.com/api/v9/users/@me/affinities/users",
+		Body:   nil,
+		Header: c.getHeader(&HeaderConfig{}),
+	})
+	if err != nil {
+		return true, fmt.Errorf("error making HTTP request: %w", err)
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return true, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	if strings.Contains("You need to verify your account in order to perform this action.", string(body)) {
+		return true, nil
+	}
+
+	return false, nil
 }

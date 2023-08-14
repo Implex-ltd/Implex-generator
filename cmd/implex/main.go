@@ -62,20 +62,20 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			return
 		}
 
-		if err := api.SetBirth(&discord.EditBirthConfig{
-			Date: "1999-05-01",
-		}); err != nil {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
-			Locked++
-			return
-		}
-
 		if Config.Discord.TryJoin {
 			go api.JoinGuild(&discord.JoinConfig{
 				InviteCode: Config.Discord.Invite,
 				GuildID:    Config.Discord.InviteGuildID,
 				ChannelID:  Config.Discord.InviteChannelID,
 			})
+		}
+
+		if err := api.SetBirth(&discord.EditBirthConfig{
+			Date: "1999-05-01",
+		}); err != nil {
+			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			Locked++
+			return
 		}
 
 		if Config.Discord.Humanize {
@@ -101,6 +101,19 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 				Content:   Config.Discord.SendMessageContent,
 				ChannelID: Config.Discord.SendChannelID,
 			})
+		}
+		
+		locked, err := api.IsLocked()
+		if err != nil {
+			utils.AppendFile("output/unknown.txt", resp.Token)
+			fmt.Println(err)
+			return
+		}
+
+		if locked {
+			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			Locked++
+			return
 		}
 
 		Unlocked++

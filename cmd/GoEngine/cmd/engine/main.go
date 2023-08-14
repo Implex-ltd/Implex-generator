@@ -93,6 +93,12 @@ func solveHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	if len(token) < 61 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Token is invalid",
+		}) 
+	}
+
 	log.Println("recv", token[:61])
 
 	t := time.Now()
@@ -159,7 +165,8 @@ func debug() {
 	log.Println("ctrl+c to exit.")
 
 	gotos := []string{
-		"https://browserleaks.com/webrtc",
+		"https://browserleaks.com/webgl",
+		/*"https://browserleaks.com/webrtc",
 		"https://browserleaks.com/canvas",
 		"https://browserleaks.com/webgl",
 		"https://browserleaks.com/tls",
@@ -167,7 +174,7 @@ func debug() {
 		"https://browserleaks.com/fonts",
 		"https://browserleaks.com/ip",
 		"https://bot.sannysoft.com/",
-		"https://abrahamjuliot.github.io/creepjs/",
+		"https://abrahamjuliot.github.io/creepjs/",*/
 	}
 
 	c := goccm.New(len(gotos))

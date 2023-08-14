@@ -31,7 +31,7 @@ implex: clear
 	cd ../cmd/implex && go run .
 
 ai: clear
-	cd ../cmd/ai && uvicorn main:app --reload --port 1337
+	cd ../cmd/ai && uvicorn main:app --reload --port 1338
 
 engine: clear
 	cd ../cmd/GoEngine/cmd/engine && go run . engine

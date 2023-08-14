@@ -259,8 +259,6 @@ func genBoxToClick(answers map[string]string) []int {
 	return items
 }
 
-
-
 /*
 * Todo: add right mouse moovements side, if box is lower/higher edit path to add right box
  */
