@@ -50,7 +50,6 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting Cloudflare cookies: %w", err)
 		}
-		fmt.Println(cfbm)
 
 		cfCookie := &http.Cookie{
 			Name:  "cf_clearance",

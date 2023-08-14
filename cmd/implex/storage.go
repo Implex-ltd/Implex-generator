@@ -34,6 +34,10 @@ var (
 	version = "1.2"
 	Task    = TASK_MENU
 	TaskSt  time.Time
+
+	Durations          []*time.Duration
+	AvgImgProcDuration []*time.Duration
+	AvgHswProcDuration []*time.Duration
 )
 
 func LoadFiles() error {
@@ -93,6 +97,19 @@ func LoadFiles() error {
 	return nil
 }
 
+func averageDuration(durations []*time.Duration) time.Duration {
+	if len(durations) == 0 {
+		return 0
+	}
+
+	var total time.Duration
+	for _, dur := range durations {
+		total += *dur
+	}
+
+	return time.Duration((total / time.Duration(len(durations))).Seconds())
+}
+
 func ConsoleTitle() {
 	start := time.Now()
 	var Lt int
@@ -103,7 +120,7 @@ func ConsoleTitle() {
 		}
 		Lt = Task
 
-		rate := float64(Unlocked) / float64(Generated) * 100
+		rate := float64(Unlocked) / float64(Unlocked+Locked) * 100 // skip unchecked tokens
 		rateStr := fmt.Sprintf("%.2f", rate)
 
 		uptime := time.Since(start).Round(time.Second)
@@ -115,14 +132,16 @@ func ConsoleTitle() {
 		case TASK_MENU:
 			bar = "Menu"
 		case TASK_GEN:
-			bar = fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, CPM: %d, SolverCPM: %d, Err: %d", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error)
+			bar = fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, CPM: %d, SolverCPM: %d, Err: %d, AvgSolveTime: %ds, AvgImgProcTime: %ds, AvgHswProcTime: %ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
+			console.Log(bar)
 		case TASK_SCRAPE:
 			Scraped = hcaptcha.Scrape
 			bar = fmt.Sprintf("Scrape: %d, ScraperCPM: %d, Err: %d", Scraped, int(float64(Scraped)/float64(minutesPassed(TaskSt))), ScrapeError)
+			console.Log(bar)
 		}
 
 		console.SetTitle(fmt.Sprintf("Implex %s [%s] ⇸ %s", version, uptimeStr, bar))
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(150 * time.Millisecond)
 	}
 }
 

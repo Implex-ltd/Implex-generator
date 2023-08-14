@@ -1,18 +1,13 @@
-import httpx, hashlib
+import time, httpx, hashlib
 import hcaptcha_challenger as solver
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from fastapi import FastAPI, HTTPException
-from onnxruntime import InferenceSession
-from httpx import Client
-from PIL import Image
-from io import BytesIO
-import numpy as np
-import json, os, httpx, contextlib
 from base64 import b64encode
-from fastapi import Request
 from fastapi import Body
+import threading
+
 workers = 0
 save = False
 challenger = solver.new_challenger()
@@ -243,6 +238,58 @@ def bytedance(payload):
     prompt = payload["question"]
     if prompt not in hashlist:
         hashlist[prompt] = []
+    
+    print(prompt)
+    images = {}
+
+    def scrape(task):
+        with httpx.Client(headers=head) as client:
+            img = client.get(task["datapoint_uri"].replace("https: //imgs", "https://imgs")).content
+
+            hash = hashlib.md5(img).hexdigest()
+
+            if hashlist[prompt] is not None and hash in hashlist[prompt]:
+                images[task["task_key"]] = "true"
+                return
+
+            #t = time.time()
+            r = challenger.classify(prompt=prompt, images=[img])
+            # print(time.time()-t)
+
+            if result := r:
+                images[task["task_key"]] = (
+                    str(result).lower().replace("[", "").replace("]", "")
+                )
+
+                if images[task["task_key"]] == "true":
+                    hashlist[prompt].append(hash)
+
+                    with open("./hash.csv", "a+") as ff:
+                        ff.write(f"{hash},{prompt}\n")
+
+    threads = []
+    for task in payload["tasklist"]:
+        t = threading.Thread(target=scrape, args=[task])
+        threads.append(t)
+        t.start()
+    
+    for t in threads:
+        t.join()
+    
+    """for task in payload["tasklist"]:
+        scrape(task)"""
+
+    workers -= 1
+    return images
+
+
+def _bytedance(payload):
+    global workers
+    workers += 1
+
+    prompt = payload["question"]
+    if prompt not in hashlist:
+        hashlist[prompt] = []
 
     images = {}
     with httpx.Client(headers=head) as client:
@@ -284,14 +331,25 @@ AREA_SELECT = "image_label_area_select"
 BINARY = "image_label_binary"
 
 
-def process(data):
-    print(data["task_type"])
+for h in ["caccb7a35ab0091e6368c7d817233868", "c89ba2a922a7cb0125e9c8b425b93a50"]:
+    t = time.time()
+    if (
+        hashlist["Please click each image containing a tree"] is not None
+        and h in hashlist["Please click each image containing a tree"]
+    ):
+        print("found")
+    else:
+        print("not found")
+    print("time hash:", time.time() - t)
 
+
+def process(data):
     if data["task_type"] not in [AREA_SELECT, BINARY]:
         return {"success": False, "data": {"error": "invalid task_type"}}
 
     if data["task_type"] == BINARY:
         return {"success": True, "data": bytedance(data)}
+        # return {"success": True, "data": predict(AREA_SELECT, data["question"], data["tasklist"])}
 
     if data["task_type"] == AREA_SELECT:
         return {
@@ -309,7 +367,7 @@ def read_root():
 
 
 @app.post("/solve")
-def solve(req:dict = Body()):
+def solve(req: dict = Body()):
     try:
         r = process(req)
         print(r)

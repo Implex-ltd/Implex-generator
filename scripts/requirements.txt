@@ -2,6 +2,14 @@ httpx
 uvicorn
 fastapi
 hcaptcha_challenger
+onnxruntime
+pillow
+numpy
+websocket-client
+tls_client
+matplotlib
+bezier
+tqdm
 
 # hcaptcha_challenger dependencies
 fire~=0.4.0

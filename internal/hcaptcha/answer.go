@@ -64,7 +64,7 @@ func (c *Client) SolveImages(captcha *Challenge) (map[string]any, error) {
 	}
 
 	if len(responseJSON.Data) == 0 {
-		return nil, fmt.Errorf("empti answer %s, %+v", captcha.RequestType, responseJSON)
+		return nil, fmt.Errorf("empty answer %s, %+v", captcha.RequestType, responseJSON)
 	}
 
 	return responseJSON.Data, nil

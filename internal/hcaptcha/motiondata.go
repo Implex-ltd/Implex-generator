@@ -332,8 +332,8 @@ func (c *Client) GenerateMotionCheck(answers map[string]string) string {
 							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
-							Brand:   "Not:A-Brand",
-							Version: "8",
+							Brand:   "Not/A)Brand",
+							Version: "99",
 						},
 					},
 					Mobile:   false,
@@ -439,8 +439,8 @@ func (c *Client) GenerateMotionGet() string {
 							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
-							Brand:   "Not:A-Brand",
-							Version: "8",
+							Brand:   "Not/A)Brand",
+							Version: "99",
 						},
 					},
 					Mobile:   false,

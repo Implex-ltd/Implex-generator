@@ -747,3 +747,6 @@ label_alias:
   hedgehog:
     zh: [ "动物" ]
     en: [ "hedgehog" ]
+  meerkat:
+    zh: [ "动物" ]
+    en: [ "meerkat" ]

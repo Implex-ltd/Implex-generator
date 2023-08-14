@@ -20,8 +20,7 @@ import (
 
 var (
 	Scrape int
-
-	hsl = false
+	hsl    = false
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {
@@ -77,7 +76,7 @@ func (c *Client) checkSiteConfig() (*SiteConfig, error) {
 
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
-		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=0", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
+		Url:    fmt.Sprintf("https://api2.hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=1", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
 		Header: h,
 	})
 	if err != nil {
@@ -103,7 +102,7 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 	var pow string
 	var err error
 
-	if c.Config.Scrape || hsl {
+	if hsl {
 		pow, err = HSLHashProof(config.C.Req)
 		if err != nil {
 			return nil, err
@@ -153,23 +152,48 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 }
 
 func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, error) {
-	st := time.Now()
 	var payload []byte
 	var pow string
+	var answers map[string]any
+	var err error
 
-	answers, err := c.SolveImages(captcha)
-	if err != nil {
-		return nil, err
-	}
+	resultChans := make(chan error)
+	st := time.Now()
 
-	if hsl {
-		pow, err = HSLHashProof(captcha.C.Req)
+	// proccess img and hsw at the same time to be fasterrrr
+
+	go func() {
+		answers, err = c.SolveImages(captcha)
+		if err != nil {
+			resultChans <- err
+			return
+		}
+
+		c.AnswerProcessTime = time.Since(st)
+		resultChans <- nil
+	}()
+
+	go func() {
+		if hsl {
+			pow, err = HSLHashProof(captcha.C.Req)
+			if err != nil {
+				resultChans <- err
+				return
+			}
+			captcha.C.Type = "hsl"
+		} else {
+			pow = c.GetHsw(captcha.C.Req)
+		}
+
+		c.HswProcessTime = time.Since(st)
+		resultChans <- nil
+	}()
+
+	for i := 0; i < 2; i++ {
+		err := <-resultChans
 		if err != nil {
 			return nil, err
 		}
-		captcha.C.Type = "hsl"
-	} else {
-		pow = c.GetHsw(captcha.C.Req)
 	}
 
 	payload, err = json.Marshal(&PayloadCheckChallenge{
@@ -219,33 +243,29 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 	return &Resp, nil
 }
 
-func (c *Client) SolveImage() (string, error) {
+func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 	config, err := c.checkSiteConfig()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if !config.Pass {
-		return "", fmt.Errorf("checkSiteConfig wont pass: %+v", config)
+		return nil, fmt.Errorf("checkSiteConfig wont pass: %+v", config)
 	}
 
 	imgCap, err := c.getChallenge(config)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if len(imgCap.Tasklist) <= 0 {
 		fmt.Println(imgCap)
-		return "", fmt.Errorf("no images found")
+		return nil, fmt.Errorf("no images found")
 	}
-
-	/*if imgCap.RequestType == "image_label_area_select" {
-		return "", errors.New("invalid request-type: image_label_area_select")
-	}*/
 
 	if c.Config.Scrape && imgCap.RequestType == "image_label_binary" {
 		if len(imgCap.Tasklist) <= 0 {
-			return "", fmt.Errorf("no images found")
+			return nil, fmt.Errorf("no images found")
 		}
 
 		for _, t := range imgCap.Tasklist {
@@ -255,17 +275,25 @@ func (c *Client) SolveImage() (string, error) {
 			c.DownloadFile(t.DatapointURI, fmt.Sprintf("scrapped/%s", path))
 		}
 
-		return "", nil
+		return nil, nil
+	}
+
+	if c.Config.Scrape {
+		return nil, fmt.Errorf("invalid label for scraping")
 	}
 
 	resp, err := c.checkChallenge(imgCap)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if !resp.Pass {
-		return "", fmt.Errorf("SolveImage(): submit failed pass")
+		return nil, fmt.Errorf("SolveImage(): submit failed pass")
 	}
 
-	return resp.GeneratedPassUUID, nil
+	return &HcaptchaTaskResponse{
+		Token:            resp.GeneratedPassUUID,
+		AnswerProcessing: &c.AnswerProcessTime,
+		HswProcessing:    &c.HswProcessTime,
+	}, nil
 }

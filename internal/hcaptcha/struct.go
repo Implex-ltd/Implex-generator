@@ -14,6 +14,12 @@ type Point struct {
 	X, Y, T int64
 }
 
+type HcaptchaTaskResponse struct {
+	Token            string
+	AnswerProcessing *time.Duration
+	HswProcessing    *time.Duration
+}
+
 type HcaptchaConfig struct {
 	Sitekey       string
 	Domain        string
@@ -28,6 +34,10 @@ type HcaptchaConfig struct {
 
 type Client struct {
 	Config *HcaptchaConfig
+
+	// profiler
+	AnswerProcessTime time.Duration
+	HswProcessTime    time.Duration
 }
 
 type SiteConfig struct {

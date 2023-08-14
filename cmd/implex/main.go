@@ -51,7 +51,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		return
 	}
 
-	console.Log(fmt.Sprintf("[+] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
+	//console.Log(fmt.Sprintf("[+] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	Generated++
 
 	go func() {
@@ -102,7 +102,8 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 				ChannelID: Config.Discord.SendChannelID,
 			})
 		}
-		
+
+		time.Sleep(25 * time.Second)
 		locked, err := api.IsLocked()
 		if err != nil {
 			utils.AppendFile("output/unknown.txt", resp.Token)
@@ -145,18 +146,24 @@ func worker(fp *fpclient.Fingerprint) {
 		Scrape:        false,
 	})
 
-	key, err := hc.SolveImage()
+	t := time.Now()
+	response, err := hc.SolveImage()
 	if err != nil {
 		if Config.Performances.Debug {
-			fmt.Println(err)
+			console.Log(err.Error())
 		}
 		Error++
 		return
 	}
 
+	duration := time.Since(t)
+
 	Solved++
-	console.Log(fmt.Sprintf("[>] %s", key[:50]))
-	go job(key, proxy, http)
+	Durations = append(Durations, &duration)
+	AvgImgProcDuration = append(AvgImgProcDuration, response.AnswerProcessing)
+	AvgHswProcDuration = append(AvgHswProcDuration, response.HswProcessing)
+	console.Log(fmt.Sprintf("[>] %s (%vs) (img-proc: %vms) (hsw-proc: %vms)", response.Token[:50], duration.Seconds(), response.AnswerProcessing.Milliseconds(), response.HswProcessing.Milliseconds()))
+	go job(response.Token, proxy, http)
 }
 
 func scrapeWorker(fp *fpclient.Fingerprint) {
@@ -185,7 +192,7 @@ func scrapeWorker(fp *fpclient.Fingerprint) {
 	_, err = hc.SolveImage()
 	if err != nil {
 		if Config.Performances.Debug {
-			fmt.Println(err)
+			console.Log(err.Error())
 		}
 		ScrapeError++
 		return

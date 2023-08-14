@@ -4,16 +4,27 @@ from httpx import Client
 from PIL import Image
 from io import BytesIO
 import numpy as np
-import json, os, httpx, contextlib
+import json, os, httpx, contextlib, threading
 from base64 import b64encode
 from fastapi import Request
+import time
+from fastapi import Body
 
 __models__ = list(set(os.listdir("./models")))
+__loaded__ = {}
 
 
 class Ai:
     def __init__(self, model):
-        self.session = InferenceSession(f"./models/{model}")
+        global __loaded__
+
+        x = f"./models/{model}"
+
+        if x not in __loaded__:
+            print("load", x)
+            __loaded__[x] = InferenceSession(x)
+
+        self.session = __loaded__[x]
 
     def preprocess_image(self, img):
         image = Image.open(BytesIO(img))
@@ -147,7 +158,7 @@ def predict(
                 c = [
                     {
                         "entity_name": 0,
-                        "entity_type": qa+"watercolor-lmv2",
+                        "entity_type": qa + "watercolor-lmv2",
                         "entity_coords": prediction[i],
                     }
                 ]
@@ -248,7 +259,6 @@ class Task(Ai):
         if qa not in __models__:
             return False
 
-        print(f"load model: {qa}")
         super().__init__(qa)
         return True
 
@@ -261,84 +271,88 @@ class Task(Ai):
         if data["task_type"] == Task.AREA_SELECT and "entity_type" not in data:
             return {"success": False, "data": {"error": "invalid entity_type"}}
 
-        for task in data["tasklist"]:
-            if data["task_type"] == Task.BINARY:
-                if not self.parse_question(data):
-                    return {"success": False, "data": {"error": "model not added yet"}}
+        if data["task_type"] == Task.BINARY:
+            if not self.parse_question(data):
+                return {"success": False, "data": {"error": "model not added yet"}}
 
+            for task in data["tasklist"]:
                 img = self.download(task["datapoint_uri"])
+                # t = time.time()
                 answer[task["task_key"]] = "true" if self.determine(img) else "false"
+                # print(time.time()-t)
 
-            if data["task_type"] == Task.AREA_SELECT:
-                answer = predict(data["task_type"], data["question"], data["tasklist"])
+        if data["task_type"] == Task.AREA_SELECT:
+            answer = predict(data["task_type"], data["question"], data["tasklist"])
 
         return {"success": True, "data": answer}
 
 
 def test():
-    T = Task()
+    while True:
+        T = Task()
 
-    print(
-        T.process(
-            data={
-                "task_type": "image_label_area_select",
-                "question": "Please click on the elephant",
-                "entity_type": "dogwatercolorlmv2",
-                "tasklist": [
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200745103274044/XmXrKMc.png",
-                        "task_key": "e5fe5314-229e-4a06-9a63-7c103988cedb",
-                    },
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200885222379600/sWD4RZ4.png",
-                        "task_key": "5f371311-81eb-41e3-b109-4d81b146972d",
-                    },
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200939110805545/2tuzDkJ.png",
-                        "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c20",
-                    },
-                ],
-            },
+        """print(
+            T.process(
+                data={
+                    "task_type": "image_label_area_select",
+                    "question": "Please click on the elephant",
+                    "entity_type": "dogwatercolorlmv2",
+                    "tasklist": [
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200745103274044/XmXrKMc.png",
+                            "task_key": "e5fe5314-229e-4a06-9a63-7c103988cedb",
+                        },
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200885222379600/sWD4RZ4.png",
+                            "task_key": "5f371311-81eb-41e3-b109-4d81b146972d",
+                        },
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140200939110805545/2tuzDkJ.png",
+                            "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c20",
+                        },
+                    ],
+                },
+            )
+        )"""
+
+        print(
+            T.process(
+                data={
+                    "task_type": "image_label_binary",
+                    "question": "Please click each image containing a robot",
+                    "tasklist": [
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140201993110040698/jHzRN5a.png",
+                            "task_key": "e5fe5314-229e-4a06-9a63-7c103988cedb",
+                        },
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140202059740754022/LzHaow5.png",
+                            "task_key": "5f371311-81eb-41e3-b109-4d81b146972d",
+                        },
+                        {
+                            "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140202118603624498/GAfDPm0.png",
+                            "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c20",
+                        },
+                        {
+                            "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224613461274695/31tkN8I.png",
+                            "task_key": "e5fe5314-229e-4a06-9a63-7c103988cfsf",
+                        },
+                        {
+                            "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224628221026354/Lqv8iHN.png",
+                            "task_key": "5f371311-81eb-41e3-b109-4d81b146972q",
+                        },
+                        {
+                            "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224653885964379/C0tHiFU.png",
+                            "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c56",
+                        },
+                    ],
+                },
+            )
         )
-    )
-
-    print(
-        T.process(
-            data={
-                "task_type": "image_label_binary",
-                "question": "Please click each image containing a robot",
-                "tasklist": [
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140201993110040698/jHzRN5a.png",
-                        "task_key": "e5fe5314-229e-4a06-9a63-7c103988cedb",
-                    },
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140202059740754022/LzHaow5.png",
-                        "task_key": "5f371311-81eb-41e3-b109-4d81b146972d",
-                    },
-                    {
-                        "datapoint_uri": "https://media.discordapp.net/attachments/1139977468325937233/1140202118603624498/GAfDPm0.png",
-                        "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c20",
-                    },
-                    {
-                        "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224613461274695/31tkN8I.png",
-                        "task_key": "e5fe5314-229e-4a06-9a63-7c103988cfsf",
-                    },
-                    {
-                        "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224628221026354/Lqv8iHN.png",
-                        "task_key": "5f371311-81eb-41e3-b109-4d81b146972q",
-                    },
-                    {
-                        "datapoint_uri": "https://cdn.discordapp.com/attachments/1139977468325937233/1140224653885964379/C0tHiFU.png",
-                        "task_key": "9d9c4cd4-c5cd-4c9f-aed8-46f8d7639c56",
-                    },
-                ],
-            },
-        )
-    )
 
 
-# test()
+"""for _ in range(10):
+    threading.Thread(target=test).start()"""
 
 app = FastAPI()
 
@@ -349,13 +363,11 @@ def read_root():
 
 
 @app.post("/solve")
-async def solve(req: Request):
-    data = await req.json()
-
-    print(data)
+def solve(req: dict = Body()):
     try:
-        r = Task().process(data)
-        print(r)
+        t = time.time()
+        r = Task().process(req)
+        print(time.time() - t)
         return r
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
