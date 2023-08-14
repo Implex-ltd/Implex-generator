@@ -17,41 +17,26 @@ se.onmessage = async (message) => {
   };
 
   try {
-    /*HTMLCanvasElement.prototype.toDataURL = function (type) {
-      if (type === 'image/png') {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const width = Math.floor(Math.random() * 100) + 200;
-        const height = Math.floor(Math.random() * 30) + 20;
+    // Generate a random number to add noise
+    function generateNoise() {
+      return Math.random() * 2 - 1; // Generates a random number between -1 and 1
+    }
 
-        canvas.width = width;
-        canvas.height = height;
+    // Modify the CanvasRenderingContext2D prototype to add noise
+    function addNoiseToCanvas() {
+      const originalFillText = CanvasRenderingContext2D.prototype.fillText;
 
-        const isColor = Math.random() < 0.5;
-        if (isColor) {
-          const r = Math.floor(Math.random() * 256);
-          const g = Math.floor(Math.random() * 256);
-          const b = Math.floor(Math.random() * 256);
-          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-          ctx.fillRect(0, 0, width, height);
-        } else {
-          const patternCanvas = document.createElement('canvas');
-          const patternCtx = patternCanvas.getContext('2d');
-          patternCanvas.width = 10;
-          patternCanvas.height = 10;
-          patternCtx.fillStyle = '#000000';
-          patternCtx.fillRect(0, 0, 10, 10);
-          patternCtx.fillStyle = '#FFFFFF';
-          patternCtx.fillRect(0, 0, 5, 5);
-          patternCtx.fillRect(5, 5, 5, 5);
-          ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
-          ctx.fillRect(0, 0, width, height);
-        }
+      CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
+        x += generateNoise();
+        y += generateNoise();
+        originalFillText.call(this, text, x, y, maxWidth);
+      };
+    }
 
-        return canvas.toDataURL('image/png');
-      }
-      return originalFunction.apply(this, arguments);
-    };*/
+    // Call the function to add noise to canvas rendering
+    addNoiseToCanvas();
+
+
     reply.token = await hsw(payload.solve);
   } catch (err) {
     reply.type = "failed";
