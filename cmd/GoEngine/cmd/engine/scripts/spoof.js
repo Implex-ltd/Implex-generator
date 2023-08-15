@@ -22,7 +22,7 @@ function webgl() {
 
     WebGL2RenderingContext.prototype.getParameter = function (parameter) {
         if (parameter === this.RENDERER) {
-            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
+            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
         } else if (parameter === this.VENDOR) {
             return "NVIDIA Corporation (NVIDIA)";
         } else if (parameter === this.EXTENSIONS) {
@@ -46,7 +46,7 @@ function webgl() {
     // Override the getParameter function
     WebGLRenderingContext.prototype.getParameter = function (parameter) {
         if (parameter === this.RENDERER) {
-            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
+            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
         } else if (parameter === this.VENDOR) {
             return "NVIDIA Corporation (NVIDIA)";
         } else if (parameter === this.EXTENSIONS) {

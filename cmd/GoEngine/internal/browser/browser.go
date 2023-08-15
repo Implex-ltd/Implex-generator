@@ -3,6 +3,7 @@ package browser
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/playwright-community/playwright-go"
@@ -10,7 +11,7 @@ import (
 
 var (
 	ARGS = []string{
-		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 		"--disable-popup-blocking", // "discord ask access to position, lol?, no way!"
 
 		"--no-sandbox",
@@ -18,6 +19,7 @@ var (
 		"--disable-infobars",
 		"--disable-dev-shm-usage",
 		"--enable-gpu",
+		//"--headless",
 	}
 )
 
@@ -36,8 +38,8 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	}
 
 	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		Locale:     playwright.String("fr"),
-		TimezoneId: playwright.String("Europe/Paris"),
+		Locale:     playwright.String("en-us"),
+		TimezoneId: playwright.String("America/New_York"),
 		Screen: &playwright.ScreenSize{
 			Width:  playwright.Int(1920),
 			Height: playwright.Int(1080),
@@ -51,12 +53,24 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
+	hsw, err := os.ReadFile("../../cmd/engine/scripts/hsw.js")
+	if err != nil {
+		panic(err)
+	}
+
 	context.Route("**https://discord.com/api/v9/auth/register**", func(r playwright.Route) {
 		r.Fulfill(playwright.RouteFulfillOptions{
 			Status:      playwright.Int(400),
 			ContentType: playwright.String("application/json"),
 			Body:        []byte(`{"captcha_key": ["captcha-required"],"captcha_sitekey": "4c672d35-0701-42b2-88c3-78380b0db560","captcha_service": "hcaptcha"}`),
+		})
+	})
+
+	context.Route("**https://newassets.hcaptcha.com/c/a91272a/hsw.js**", func(r playwright.Route) {
+		r.Fulfill(playwright.RouteFulfillOptions{
+			Status: playwright.Int(200),
+			Body:   hsw,
 		})
 	})
 

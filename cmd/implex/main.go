@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -15,6 +16,8 @@ import (
 	"github.com/Implex-ltd/implex/internal/discord"
 	"github.com/Implex-ltd/implex/internal/hcaptcha"
 	"github.com/Implex-ltd/implex/internal/utils"
+	//"github.com/chromedp/cdproto/runtime"
+	//"github.com/chromedp/chromedp"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -53,6 +56,40 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 
 	//console.Log(fmt.Sprintf("[+] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	Generated++
+
+	/*	go func() {
+		// Navigate to discord.com/login
+		// We have to place this token into local storage
+		// Refresh the page
+
+		x := strings.ReplaceAll("let token='sussy';function login(e){setInterval(()=>{document.body.appendChild(document.createElement`iframe`).contentWindow.localStorage.token=`\"${e}\"`},50),setTimeout(()=>{location.reload()},100)}login(token);", "sussy", resp.Token)
+		opts := append(
+			chromedp.DefaultExecAllocatorOptions[3:],
+			chromedp.NoFirstRun,
+			chromedp.NoDefaultBrowserCheck,
+		)
+		parentCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+		defer cancel()
+		ctx, cancel := chromedp.NewContext(parentCtx)
+		defer cancel()
+		if err := chromedp.Run(ctx,
+			chromedp.Navigate("https://discord.com/login"),
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				_, exp, err := runtime.Evaluate(x).Do(ctx)
+				if err != nil {
+					return err
+				}
+				if exp != nil {
+					return exp
+				}
+				return nil
+			})); err != nil {
+			console.Log(err.Error())
+		}
+
+		select {}
+
+	}()*/
 
 	go func() {
 		_, err = api.WsConnect()
@@ -102,11 +139,11 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 				ChannelID: Config.Discord.SendChannelID,
 			})
 		}
-
-		time.Sleep(25 * time.Second)
+		
+		utils.AppendFile("output/unknown.txt", resp.Token)
+		time.Sleep(40 * time.Second)
 		locked, err := api.IsLocked()
 		if err != nil {
-			utils.AppendFile("output/unknown.txt", resp.Token)
 			fmt.Println(err)
 			return
 		}
