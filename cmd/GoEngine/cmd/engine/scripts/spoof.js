@@ -15,16 +15,16 @@ function addNoiseToCanvas() {
     };
 }
 
-function webgl() {
+function webgl(vendor, renderer) {
     // Store a reference to the original getParameter function
     const originalGetParameter = WebGLRenderingContext.prototype.getParameter;
     const originalGetParameter2 = WebGL2RenderingContext.prototype.getParameter;
 
     WebGL2RenderingContext.prototype.getParameter = function (parameter) {
         if (parameter === this.RENDERER) {
-            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
+            return vendor;
         } else if (parameter === this.VENDOR) {
-            return "NVIDIA Corporation (NVIDIA)";
+            return renderer;
         } else if (parameter === this.EXTENSIONS) {
             // Modify this part according to your requirements
             const numRandomExtensions = Math.floor(Math.random() * (availableExtensions.length + 1));
@@ -46,9 +46,9 @@ function webgl() {
     // Override the getParameter function
     WebGLRenderingContext.prototype.getParameter = function (parameter) {
         if (parameter === this.RENDERER) {
-            return "ANGLE (NVIDIA, NVIDIA GeForce GTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)";
+            return vendor;
         } else if (parameter === this.VENDOR) {
-            return "NVIDIA Corporation (NVIDIA)";
+            return renderer;
         } else if (parameter === this.EXTENSIONS) {
             // Modify this part according to your requirements
             const numRandomExtensions = Math.floor(Math.random() * (availableExtensions.length + 1));

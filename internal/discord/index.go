@@ -330,7 +330,7 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 
 func (c *Client) IsLocked() (bool, error) {
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
-		Method: "POST",
+		Method: "GET",
 		Url:    "https://discord.com/api/v9/users/@me/affinities/users",
 		Body:   nil,
 		Header: c.getHeader(&HeaderConfig{}),

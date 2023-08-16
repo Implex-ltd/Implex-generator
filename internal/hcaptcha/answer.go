@@ -57,6 +57,7 @@ func (c *Client) SolveImages(captcha *Challenge) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
+	
 
 	var responseJSON AiSolverResponse
 	if err := json.Unmarshal([]byte(abody), &responseJSON); err != nil {

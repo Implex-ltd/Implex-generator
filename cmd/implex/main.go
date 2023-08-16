@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -16,8 +15,6 @@ import (
 	"github.com/Implex-ltd/implex/internal/discord"
 	"github.com/Implex-ltd/implex/internal/hcaptcha"
 	"github.com/Implex-ltd/implex/internal/utils"
-	//"github.com/chromedp/cdproto/runtime"
-	//"github.com/chromedp/chromedp"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -43,6 +40,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		CaptchaKey: key,
 	})
 	if err != nil {
+		fmt.Println(err)
 		Error++
 		return
 	}
@@ -56,40 +54,6 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 
 	//console.Log(fmt.Sprintf("[+] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	Generated++
-
-	/*	go func() {
-		// Navigate to discord.com/login
-		// We have to place this token into local storage
-		// Refresh the page
-
-		x := strings.ReplaceAll("let token='sussy';function login(e){setInterval(()=>{document.body.appendChild(document.createElement`iframe`).contentWindow.localStorage.token=`\"${e}\"`},50),setTimeout(()=>{location.reload()},100)}login(token);", "sussy", resp.Token)
-		opts := append(
-			chromedp.DefaultExecAllocatorOptions[3:],
-			chromedp.NoFirstRun,
-			chromedp.NoDefaultBrowserCheck,
-		)
-		parentCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-		defer cancel()
-		ctx, cancel := chromedp.NewContext(parentCtx)
-		defer cancel()
-		if err := chromedp.Run(ctx,
-			chromedp.Navigate("https://discord.com/login"),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				_, exp, err := runtime.Evaluate(x).Do(ctx)
-				if err != nil {
-					return err
-				}
-				if exp != nil {
-					return exp
-				}
-				return nil
-			})); err != nil {
-			console.Log(err.Error())
-		}
-
-		select {}
-
-	}()*/
 
 	go func() {
 		_, err = api.WsConnect()
@@ -108,9 +72,9 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		}
 
 		if err := api.SetBirth(&discord.EditBirthConfig{
-			Date: "1999-05-01",
+			Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 		}); err != nil {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			//	console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 			Locked++
 			return
 		}
@@ -119,7 +83,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			if err := api.SetProfil(&discord.EditProfilConfig{
 				Bio: BioList.Next(),
 			}); err != nil {
-				console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 				Locked++
 				return
 			}
@@ -127,7 +91,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			if err := api.SetAvatar(&discord.AvatarConfig{
 				FilePath: fmt.Sprintf("../../assets/input/avatars/%s", AvatarList.Next()),
 			}); err != nil {
-				console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 				Locked++
 				return
 			}
@@ -139,9 +103,9 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 				ChannelID: Config.Discord.SendChannelID,
 			})
 		}
-		
+
 		utils.AppendFile("output/unknown.txt", resp.Token)
-		time.Sleep(40 * time.Second)
+
 		locked, err := api.IsLocked()
 		if err != nil {
 			fmt.Println(err)
@@ -149,14 +113,14 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		}
 
 		if locked {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			//console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=%ds)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err, i*10))
 			Locked++
 			return
 		}
 
 		Unlocked++
 		utils.AppendFile("output/unlocked.txt", resp.Token)
-		console.Log(fmt.Sprintf("[unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
+		console.Log(fmt.Sprintf("[CONFIRMED unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	}()
 }
 

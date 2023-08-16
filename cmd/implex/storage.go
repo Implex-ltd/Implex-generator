@@ -132,7 +132,7 @@ func ConsoleTitle() {
 		case TASK_MENU:
 			bar = "Menu"
 		case TASK_GEN:
-			bar = fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, CPM: %d, SolverCPM: %d, Err: %d, AvgSolveTime: %ds, AvgImgProcTime: %ds, AvgHswProcTime: %ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
+			bar = fmt.Sprintf("Gen=%d, Unlock=%d (%s%%), Locked=%d, CPM=%d, SolverCPM=%d, Err=%d, SolveT=%ds, ImgProcT=%ds, HswProcT=%ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
 			console.Log(bar)
 		case TASK_SCRAPE:
 			Scraped = hcaptcha.Scrape
@@ -141,7 +141,7 @@ func ConsoleTitle() {
 		}
 
 		console.SetTitle(fmt.Sprintf("Implex %s [%s] ⇸ %s", version, uptimeStr, bar))
-		time.Sleep(150 * time.Millisecond)
+		time.Sleep(1500 * time.Millisecond)
 	}
 }
 

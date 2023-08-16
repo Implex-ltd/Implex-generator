@@ -6,14 +6,14 @@ sendChannelID = "1140717857047584801"
 sendMessage = false
 sendMessageContent = "@everyone follow tos !"
 tryJoin = true
-joinOnRegister = true
-humanize = false
+joinOnRegister = false
+humanize = true
 version = 218604
 
 [hcaptcha]
 lang = "en"
-version = "d442197"
-submitTime = 3
+version = "c29d40e"
+submitTime = 2
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1332"
 siteKey = "4c672d35-0701-42b2-88c3-78380b0db560"
@@ -26,12 +26,12 @@ proxyType = "http"
 sessionReplaceMe = "REPLACEME"
 
 [performances]
-goroutines = 100
+goroutines = 60
 debug = true
 
 [engine]
 browserHswThreadCount = 500
-browserCount = 8
+browserCount = 7
 
 [extra]
 theme = "random"

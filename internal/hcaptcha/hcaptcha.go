@@ -258,6 +258,10 @@ func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 		return nil, err
 	}
 
+	if imgCap.RequestType == "image_label_area_select" {
+		return nil, errors.New("invalid")
+	}
+
 	if len(imgCap.Tasklist) <= 0 {
 		fmt.Println(imgCap)
 		return nil, fmt.Errorf("no images found")
