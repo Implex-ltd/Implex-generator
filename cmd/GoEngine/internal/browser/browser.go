@@ -3,6 +3,7 @@ package browser
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -68,13 +69,15 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	})
 
 	context.Route("**https://newassets.hcaptcha.com/c/a91272a/hsw.js**", func(r playwright.Route) {
+		log.Println("Injected !")
+
 		r.Fulfill(playwright.RouteFulfillOptions{
 			Status: playwright.Int(200),
 			Body:   hsw,
 		})
 	})
 
-	page, err := context.NewPage()
+		page, err := context.NewPage()
 	if err != nil {
 		return nil, err
 	}

@@ -62,7 +62,6 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			Locked++ // not really locked, but it's to not destroy stats
 			return
 		}
-
 		if Config.Discord.TryJoin {
 			go api.JoinGuild(&discord.JoinConfig{
 				InviteCode: Config.Discord.Invite,
@@ -117,6 +116,18 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			Locked++
 			return
 		}
+		time.Sleep(10 * time.Second)
+		locked, err = api.IsLocked()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if locked {
+			console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=60s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			Locked++
+			return
+		}
 
 		Unlocked++
 		utils.AppendFile("output/unlocked.txt", resp.Token)
@@ -164,6 +175,8 @@ func worker(fp *fpclient.Fingerprint) {
 	AvgImgProcDuration = append(AvgImgProcDuration, response.AnswerProcessing)
 	AvgHswProcDuration = append(AvgHswProcDuration, response.HswProcessing)
 	console.Log(fmt.Sprintf("[>] %s (%vs) (img-proc: %vms) (hsw-proc: %vms)", response.Token[:50], duration.Seconds(), response.AnswerProcessing.Milliseconds(), response.HswProcessing.Milliseconds()))
+	
+	http.Cookies = nil
 	go job(response.Token, proxy, http)
 }
 

@@ -46,6 +46,8 @@ func (c *Client) SolveImages(captcha *Challenge) (map[string]any, error) {
 		return nil, err
 	}
 
+	req.Header.Add("content-type", "application/json")
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -58,7 +60,6 @@ func (c *Client) SolveImages(captcha *Challenge) (map[string]any, error) {
 		return nil, err
 	}
 	
-
 	var responseJSON AiSolverResponse
 	if err := json.Unmarshal([]byte(abody), &responseJSON); err != nil {
 		return nil, err

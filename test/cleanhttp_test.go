@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -78,14 +77,7 @@ func TestCleanHttp_Do(t *testing.T) {
 				panic(err)
 			}
 
-			defer got.Body.Close()
-
-			c, err := ioutil.ReadAll(got.Body)
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println(string(c))
+			fmt.Println(got.Body)
 		})
 	}
 }

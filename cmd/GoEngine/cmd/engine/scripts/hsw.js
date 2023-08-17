@@ -1,1603 +1,1679 @@
+// lol
+const gpus = [
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD CEDAR, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 600 (Geminilake 2x6) , OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4600 (HSW GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Xe Graphics (TGL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (BYT), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (ICL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 520 (SKL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 2000 (SNB GT1), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (KBL GT2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 630 (KBL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 750 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 3000 (SNB GT2), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD ARUBA, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R9 380 Series (tonga LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4400 (HSW GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R7 360 Series (bonaire LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 2000 (SNB GT1), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (WHL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (ADL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD TURKS, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1050/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RV730, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD CARRIZO, OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT1), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4000 (IVB GT2), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (TGL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 570 Series (polaris10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD RENOIR, OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, Radeon RX 560 Series (POLARIS11), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Custom GPU 0405 (vangogh LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, Quadro 3000M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4400 (HSW GT2), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 710/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 11 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 520 (SKL GT2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 730/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 5700 (NAVI10), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 605 (GLK 3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RV710, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 730/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1650/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 5500 XT (navi14 LLVM 15.0.2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce MX250/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 470 Graphics (polaris10 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 6700 XT (navi22 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 510 (SKL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3060 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Sandybridge Mobile , OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 710/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (nouveau)",
+        "renderer": "ANGLE (nouveau, NVAC, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 460 Graphics (polaris11 LLVM 11.0.1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2060/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 2500 (IVB GT1), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 610 (KBL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4000 (IVB GT2), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce MX150/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (TGL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5500 (BDW GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RAVEN (raven LLVM 15.0.6 DRM 3.41 5.13.0-52-generic), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (CML GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.47 5.19.0-38-generic), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (RKL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 505 (APL 3), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (KBL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD STONEY, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 460/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R7 Graphics (CARRIZO), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 970/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 600 (GLK 2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 505 (APL 3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 3000 (SNB GT2), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (JSL), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, KABINI ( LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, STONEY (stoney LLVM 15.0.2), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics (ICL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD CAICOS, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD SUMO, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD ARUBA, OpenGL 4.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3080/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 580 2048SP (polaris10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics (CML GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 500 (APL 2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (HSW GT1), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (ICL GT1), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4600 (HSW GT2), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 14.0.6), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 1030/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 600 (GLK 2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 540M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1050 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 530 (SKL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 770 (ADL-S GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 8 Graphics (RAVEN), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 13.0.1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 470 Graphics (polaris10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RV770, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 6750 XT (navi22 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 620 (KBL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD KABINI, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RS780, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1660/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 480 Graphics (polaris10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 570 Series (polaris10 LLVM 14.0.0), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 620 (WHL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 2500 (IVB GT1), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 400 (BSW), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CML GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD KABINI, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics (ICL GT1.5), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1660 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 605 (GLK 3), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 950/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "NVIDIA Corporation",
+        "renderer": "NVIDIA Tegra"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 640 (Kaby Lake GT3e) (KBL GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (BYT), OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (HSW GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD CAICOS (DRM 2.50.0 / 5.19.0-38-generic LLVM 15.0.6), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RAVEN2 (raven2 LLVM 15.0.6 DRM 3.47 5.19.0-38-generic), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Pro Graphics P5200 (HSW GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 405 (BSW), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 14.0.0), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 1050/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 500 (APL 2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 600 (GLK 2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RAVEN2 (raven2 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 650/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3080 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD TURKS, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 650 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD KAVERI, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2070 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 500 (APL 2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 660/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 550 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, STONEY (stoney LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 630/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Ti Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2F), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 560 Ti/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, KABINI ( LLVM 15.0.7), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (nouveau)",
+        "renderer": "ANGLE (nouveau, NVD9, OpenGL 4.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, Quadro P1000/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 730 (ADL-S GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 14.0.0), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, KAVERI ( LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD SUMO2, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 11 Graphics (RAVEN), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 5600 XT (navi10 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, KAVERI ( LLVM 15.0.2), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 960/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTS 450/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 425M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R6 Graphics (carrizo LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 515 (SKL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, OLAND ( LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2F), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1080/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD PITCAIRN, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (Ice Lake 4x8 GT1) , OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD KABINI (LLVM 13.0.1), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 6650 XT (navi23 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 520/PCIe/SSE2, OpenGL 4.4.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, CARRIZO (carrizo LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.42 5.15.0-69-generic), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 780/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 400 (BSW), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 610 (KBL GT1), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, TAHITI ( LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 550 / 550 Series (polaris12 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R7 Graphics (carrizo LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 610/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Ivybridge Desktop , OpenGL 4.2)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 6000 (BDW GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce 940MX/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 3GB/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 6650 XT (navi23 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 10 Graphics (RAVEN), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD PALM, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5000 (HSW GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1070/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RAVEN (raven LLVM 15.0.6 DRM 3.47 5.19.0-21-generic), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, Quadro RTX 4000/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 530 (SKL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 405 (BSW), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD STONEY, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 520MX/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD OLAND, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Graphics 6100 (BDW GT3), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (BDW GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3070/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RAVEN, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 525M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RS880, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RS780 (DRM 2.50.0 / 5.15.0-69-generic LLVM 15.0.6), OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD CARRIZO, OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5300 (BDW GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 630/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 14.0.5), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce 605/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 560 Series (polaris11 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (CFL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Mesa/X.org)",
+        "renderer": "ANGLE (Mesa/X.org, virgl (Mesa DRI Intel(R) UHD Graphics (CML GT2)), OpenGL 4.3)"
+    },
+    {
+        "vendor": "Google Inc. (nouveau)",
+        "renderer": "ANGLE (nouveau, NVE7, OpenGL 4.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics (ICL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 5700 XT (navi10 LLVM 15.0.6), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Ivybridge Desktop , OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (WHL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, CARRIZO (carrizo LLVM 15.0.2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Sandybridge Desktop , OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 510 (SKL GT1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce 930M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, Radeon RX550/550 Series (polaris12 LLVM 14.0.1), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 520 (SKL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, VERDE ( LLVM 15.0.6), OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.49 6.1.19-1-MANJARO), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, Radeon RX550/550 Series (POLARIS12), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon R7E Graphics (carrizo LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD VERDE, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL ES 3.2)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 640M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 660M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD VERDE, OpenGL 4.5)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon (TM) RX 460 Graphics (POLARIS11), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 615 (KBL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (Intel Open Source Technology Center)",
+        "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (X.Org)",
+        "renderer": "ANGLE (X.Org, AMD RV610, OpenGL 3.3)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, Quadro M2000M/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 5700 XT (navi10 LLVM 15.0.7), OpenGL 4.6)"
+    },
+    {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, Quadro T2000 with Max-Q Design/PCIe/SSE2, OpenGL 4.5.0)"
+    },
+    {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 14.0.6), OpenGL ES 3.2)"
+    }
+]
+const _fonts = [
+    {
+        "font": "Arial"
+    },
+    {
+        "font": "Bauhaus 93"
+    },
+    {
+        "font": "Calibri"
+    },
+    {
+        "font": "Cambria"
+    },
+    {
+        "font": "Courier New"
+    },
+    {
+        "font": "Lohit Gujarati"
+    },
+    {
+        "font": "Times New Roman"
+    },
+    {
+        "font": "Bitstream Vera Serif"
+    },
+    {
+        "font": "KacstOne"
+    },
+    {
+        "font": "Loma"
+    },
+    {
+        "font": "Rachana"
+    },
+    {
+        "font": "Sawasdee"
+    },
+    {
+        "font": "Ubuntu"
+    },
+    {
+        "font": "Umpush"
+    },
+    {
+        "font": "Arial Black"
+    },
+    {
+        "font": "Comic Sans MS"
+    },
+    {
+        "font": "Georgia"
+    },
+    {
+        "font": "Impact"
+    },
+    {
+        "font": "MS Gothic"
+    },
+    {
+        "font": "MS PGothic"
+    },
+    {
+        "font": "MS PMincho"
+    },
+    {
+        "font": "PMingLiU"
+    },
+    {
+        "font": "SimSun"
+    },
+    {
+        "font": "Trebuchet MS"
+    },
+    {
+        "font": "Verdana"
+    },
+    {
+        "font": "Webdings"
+    },
+    {
+        "font": "Arab"
+    },
+    {
+        "font": "Gabriola"
+    },
+    {
+        "font": "Microsoft Sans Serif"
+    },
+    {
+        "font": "Segoe Script"
+    },
+    {
+        "font": "Mangal"
+    },
+    {
+        "font": "Agency FB"
+    },
+    {
+        "font": "Broadway"
+    },
+    {
+        "font": "Calibri Light"
+    },
+    {
+        "font": "Cambria Math"
+    },
+    {
+        "font": "Candara"
+    },
+    {
+        "font": "Centaur"
+    },
+    {
+        "font": "Century Gothic"
+    },
+    {
+        "font": "Consolas"
+    },
+    {
+        "font": "Constantia"
+    },
+    {
+        "font": "Copperplate Gothic Light"
+    },
+    {
+        "font": "Corbel"
+    },
+    {
+        "font": "Ebrima"
+    },
+    {
+        "font": "Eras Bold ITC"
+    },
+    {
+        "font": "Franklin Gothic Heavy"
+    },
+    {
+        "font": "Franklin Gothic Medium"
+    },
+    {
+        "font": "Haettenschweiler"
+    },
+    {
+        "font": "Harrington"
+    },
+    {
+        "font": "Lucida Console"
+    },
+    {
+        "font": "Lucida Sans Unicode"
+    },
+    {
+        "font": "MS Reference Sans Serif"
+    },
+    {
+        "font": "Segoe Print"
+    },
+    {
+        "font": "Segoe UI Light"
+    },
+    {
+        "font": "Segoe UI Semibold"
+    },
+    {
+        "font": "Segoe UI Symbol"
+    },
+    {
+        "font": "Segoe UI"
+    },
+    {
+        "font": "Tahoma"
+    },
+    {
+        "font": "SimHei"
+    },
+    {
+        "font": "Symbol"
+    },
+    {
+        "font": "Wingdings"
+    },
+    {
+        "font": "Aharoni"
+    },
+    {
+        "font": "Andalus"
+    },
+    {
+        "font": "Angsana New"
+    },
+    {
+        "font": "AngsanaUPC"
+    },
+    {
+        "font": "Aparajita"
+    },
+    {
+        "font": "Arabic Typesetting"
+    },
+    {
+        "font": "Batang"
+    },
+    {
+        "font": "BatangChe"
+    },
+    {
+        "font": "Browallia New"
+    },
+    {
+        "font": "BrowalliaUPC"
+    },
+    {
+        "font": "Cordia New"
+    },
+    {
+        "font": "CordiaUPC"
+    },
+    {
+        "font": "DFKai-SB"
+    },
+    {
+        "font": "DaunPenh"
+    },
+    {
+        "font": "David"
+    },
+    {
+        "font": "DilleniaUPC"
+    },
+    {
+        "font": "DokChampa"
+    },
+    {
+        "font": "Dotum"
+    },
+    {
+        "font": "DotumChe"
+    },
+    {
+        "font": "Estrangelo Edessa"
+    },
+    {
+        "font": "EucrosiaUPC"
+    },
+    {
+        "font": "Euphemia"
+    },
+    {
+        "font": "FangSong"
+    },
+    {
+        "font": "FrankRuehl"
+    },
+    {
+        "font": "FreesiaUPC"
+    },
+    {
+        "font": "Gautami"
+    },
+    {
+        "font": "Gisha"
+    },
+    {
+        "font": "Gulim"
+    },
+    {
+        "font": "GulimChe"
+    },
+    {
+        "font": "Gungsuh"
+    },
+    {
+        "font": "GungsuhChe"
+    },
+    {
+        "font": "IrisUPC"
+    },
+    {
+        "font": "Iskoola Pota"
+    },
+    {
+        "font": "JasmineUPC"
+    },
+    {
+        "font": "KaiTi"
+    },
+    {
+        "font": "Kalinga"
+    },
+    {
+        "font": "Kartika"
+    },
+    {
+        "font": "Khmer UI"
+    },
+    {
+        "font": "KodchiangUPC"
+    },
+    {
+        "font": "Kokila"
+    },
+    {
+        "font": "Lao UI"
+    },
+    {
+        "font": "Latha"
+    },
+    {
+        "font": "Leelawadee"
+    },
+    {
+        "font": "Levenim MT"
+    },
+    {
+        "font": "LilyUPC"
+    },
+    {
+        "font": "MS Mincho"
+    },
+    {
+        "font": "MS UI Gothic"
+    },
+    {
+        "font": "MV Boli"
+    },
+    {
+        "font": "Malgun Gothic"
+    },
+    {
+        "font": "Marlett"
+    },
+    {
+        "font": "Meiryo UI"
+    },
+    {
+        "font": "Meiryo"
+    },
+    {
+        "font": "Microsoft Himalaya"
+    },
+    {
+        "font": "Microsoft JhengHei"
+    },
+    {
+        "font": "Microsoft New Tai Lue"
+    },
+    {
+        "font": "Microsoft PhagsPa"
+    },
+    {
+        "font": "Microsoft Tai Le"
+    },
+    {
+        "font": "Microsoft Uighur"
+    },
+    {
+        "font": "Microsoft YaHei"
+    },
+    {
+        "font": "Microsoft Yi Baiti"
+    },
+    {
+        "font": "MingLiU"
+    },
+    {
+        "font": "MingLiU-ExtB"
+    },
+    {
+        "font": "MingLiU_HKSCS"
+    },
+    {
+        "font": "MingLiU_HKSCS-ExtB"
+    },
+    {
+        "font": "Miriam Fixed"
+    },
+    {
+        "font": "Miriam"
+    },
+    {
+        "font": "Mongolian Baiti"
+    },
+    {
+        "font": "MoolBoran"
+    },
+    {
+        "font": "NSimSun"
+    },
+    {
+        "font": "Narkisim"
+    },
+    {
+        "font": "Nyala"
+    },
+    {
+        "font": "PMingLiU-ExtB"
+    },
+    {
+        "font": "Palatino Linotype"
+    },
+    {
+        "font": "Plantagenet Cherokee"
+    },
+    {
+        "font": "Raavi"
+    },
+    {
+        "font": "Rod"
+    },
+    {
+        "font": "Sakkal Majalla"
+    },
+    {
+        "font": "Shonar Bangla"
+    },
+    {
+        "font": "Shruti"
+    },
+    {
+        "font": "SimSun-ExtB"
+    },
+    {
+        "font": "Simplified Arabic Fixed"
+    },
+    {
+        "font": "Simplified Arabic"
+    },
+    {
+        "font": "Sylfaen"
+    },
+    {
+        "font": "Traditional Arabic"
+    },
+    {
+        "font": "Tunga"
+    },
+    {
+        "font": "Utsaah"
+    },
+    {
+        "font": "Vani"
+    },
+    {
+        "font": "Vijaya"
+    },
+    {
+        "font": "Vrinda"
+    },
+    {
+        "font": "DejaVu LGC Sans Mono"
+    },
+    {
+        "font": "Bell MT"
+    },
+    {
+        "font": "Bodoni MT"
+    },
+    {
+        "font": "Bookman Old Style"
+    },
+    {
+        "font": "Californian FB"
+    },
+    {
+        "font": "Castellar"
+    },
+    {
+        "font": "Colonna MT"
+    },
+    {
+        "font": "Engravers MT"
+    },
+    {
+        "font": "Forte"
+    },
+    {
+        "font": "French Script MT"
+    },
+    {
+        "font": "Gigi"
+    },
+    {
+        "font": "Goudy Old Style"
+    },
+    {
+        "font": "Informal Roman"
+    },
+    {
+        "font": "Lucida Bright"
+    },
+    {
+        "font": "Lucida Fax"
+    },
+    {
+        "font": "Magneto"
+    },
+    {
+        "font": "Matura MT Script Capitals"
+    },
+    {
+        "font": "Niagara Solid"
+    },
+    {
+        "font": "Palace Script MT"
+    },
+    {
+        "font": "Papyrus"
+    },
+    {
+        "font": "Perpetua"
+    },
+    {
+        "font": "Playbill"
+    },
+    {
+        "font": "Rockwell"
+    },
+    {
+        "font": "Script MT Bold"
+    },
+    {
+        "font": "Showcard Gothic"
+    },
+    {
+        "font": "Snap ITC"
+    },
+    {
+        "font": "Tw Cen MT Condensed Extra Bold"
+    },
+    {
+        "font": "Vladimir Script"
+    },
+    {
+        "font": "Wide Latin"
+    },
+    {
+        "font": "Courier New Greek"
+    },
+    {
+        "font": "Times New Roman Greek"
+    },
+    {
+        "font": "Utopia"
+    },
+    {
+        "font": "Casual"
+    },
+    {
+        "font": "Menlo"
+    },
+    {
+        "font": "Chalkduster"
+    }
+]
+
+let uwu;
+
+var stringArray = [
+    // Block webdriver check
+    "__driver_evaluate",
+    "__webdriver_evaluate",
+    "__selenium_evaluate",
+    "__fxdriver_evaluate",
+    "__driver_unwrapped",
+    "__webdriver_unwrapped",
+    "__selenium_unwrapped",
+    "__fxdriver_unwrapped",
+    "__webdriver_script_func",
+    "_selenium",
+    "__phantomas",
+    "domAutomationController",
+    "awesomium",
+    "_WEBDRIVER_ELEM_CACHE",
+    "webdriver",
+    "_Selenium_IDE_Recorder",
+    "__webdriver_script_fn",
+    "__nightmare",
+    "callPhantom",
+    "callSelenium",
+    "spawn"
+];
+
+function getRandomFontsString(fontsList, numFonts) {
+    const selectedFonts = [];
+
+    for (let i = 0; i < numFonts; i++) {
+        const randomIndex = Math.floor(Math.random() * fontsList.length);
+        selectedFonts.push(`"${fontsList[randomIndex].font}"`);
+    }
+
+    return `[${selectedFonts.join(',')}]`;
+}
+
+function fuckhcaptcha(A) {
+
+    if (typeof A !== 'string') {
+        return {ok: false, a: A}; // Return early for non-string inputs
+    }
+
+    // Check if A is in stringArray
+    if (stringArray.includes(A)) {
+        return {ok: true, a: A}
+    }
+
+    uwu = gpus[Math.floor(Math.random() * gpus.length)]
+    var toReplace = [
+        // Remove Locale function
+        [',addNoiseToCanvas', ''],
+        [",spoofall", ''],
+        [",fonts", ''],
+        [",devices", ''],
+        [",webgl", ''],
+        [",webrtc", ''],
+        [`"addNoiseToCanvas",`, ''],
+        [`"getRandomNumber",`, ''],
+        [`"spoofall",`, ''],
+        [`"webrtc",`, ''],
+        [`"devices",`, ''],
+        [`"fonts",`, ''],
+        [`"webgl",`, ''],
+
+        // GPU
+        ["Google Inc. (NVIDIA)", uwu.vendor],
+        ["ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)", uwu.renderer],
+
+        // Font
+        [`["Arial","`, getRandomFontsString(_fonts, Math.floor(Math.random() * (7 - 3 + 1)) + 3)],
+
+        // detect
+        //",getRandomNumber"
+    ]
+
+
+    for (const [pattern, replacement] of toReplace) {
+        while (A.includes(pattern)) {
+            A = A.replace(pattern, replacement);
+        }
+    }
+
+    return {ok: false, a: A}
+}
+
 var hsw = function () {
     "use strict";
 
-    // lol
-    const gpus = [
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD CEDAR, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 600 (Geminilake 2x6) , OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4600 (HSW GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Xe Graphics (TGL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (BYT), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (ICL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 520 (SKL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 2000 (SNB GT1), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (KBL GT2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 630 (KBL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 750 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 3000 (SNB GT2), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD ARUBA, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R9 380 Series (tonga LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4400 (HSW GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R7 360 Series (bonaire LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 2000 (SNB GT1), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (WHL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (ADL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD TURKS, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1050/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RV730, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD CARRIZO, OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT1), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 4000 (IVB GT2), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (TGL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 570 Series (polaris10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD RENOIR, OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, Radeon RX 560 Series (POLARIS11), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Custom GPU 0405 (vangogh LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, Quadro 3000M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4400 (HSW GT2), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 710/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 11 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 520 (SKL GT2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 730/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 5700 (NAVI10), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 605 (GLK 3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RV710, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 730/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1650/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 5500 XT (navi14 LLVM 15.0.2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce MX250/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 470 Graphics (polaris10 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 6700 XT (navi22 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 510 (SKL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3060 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Sandybridge Mobile , OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 710/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (nouveau)",
-            "renderer": "ANGLE (nouveau, NVAC, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 460 Graphics (polaris11 LLVM 11.0.1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2060/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 2500 (IVB GT1), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 610 (KBL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4000 (IVB GT2), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce MX150/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (TGL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5500 (BDW GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RAVEN (raven LLVM 15.0.6 DRM 3.41 5.13.0-52-generic), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (CML GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.47 5.19.0-38-generic), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Graphics (RKL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 505 (APL 3), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 620 (KBL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD STONEY, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 460/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R7 Graphics (CARRIZO), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 970/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 600 (GLK 2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 505 (APL 3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 3000 (SNB GT2), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 6GB/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (JSL), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, KABINI ( LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, STONEY (stoney LLVM 15.0.2), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics (ICL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD CAICOS, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD SUMO, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD ARUBA, OpenGL 4.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3080/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 580 2048SP (polaris10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics (CML GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 500 (APL 2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (HSW GT1), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (ICL GT1), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 4600 (HSW GT2), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 14.0.6), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 1030/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 600 (GLK 2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 540M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1050 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 530 (SKL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 770 (ADL-S GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 8 Graphics (RAVEN), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 13.0.1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 470 Graphics (polaris10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RV770, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 6750 XT (navi22 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 620 (KBL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics (CML GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD KABINI, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RS780, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1660/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 480 Graphics (polaris10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 570 Series (polaris10 LLVM 14.0.0), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 620 (WHL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 2500 (IVB GT1), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 400 (BSW), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CML GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD KABINI, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics (ICL GT1.5), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1660 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 605 (GLK 3), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 950/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "NVIDIA Corporation",
-            "renderer": "NVIDIA Tegra"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Plus Graphics 640 (Kaby Lake GT3e) (KBL GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (BYT), OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (HSW GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD CAICOS (DRM 2.50.0 / 5.19.0-38-generic LLVM 15.0.6), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RAVEN2 (raven2 LLVM 15.0.6 DRM 3.47 5.19.0-38-generic), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Pro Graphics P5200 (HSW GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 405 (BSW), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Graphics (renoir LLVM 14.0.0), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 1050/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 500 (APL 2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 600 (GLK 2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RAVEN2 (raven2 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 650/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3080 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD TURKS, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 650 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD KAVERI, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2070 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 500 (APL 2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 660/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 550 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, STONEY (stoney LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 630/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Ti Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2F), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 560 Ti/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, KABINI ( LLVM 15.0.7), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (nouveau)",
-            "renderer": "ANGLE (nouveau, NVD9, OpenGL 4.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, Quadro P1000/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 730 (ADL-S GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 14.0.0), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, KAVERI ( LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD SUMO2, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 11 Graphics (RAVEN), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 5600 XT (navi10 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, KAVERI ( LLVM 15.0.2), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 960/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTS 450/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 425M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R6 Graphics (carrizo LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 515 (SKL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, OLAND ( LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Iris(R) Plus Graphics 655 (CFL GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (raven LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 620 (KBL GT2F), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1080/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD PITCAIRN, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 15.0.2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics (Ice Lake 4x8 GT1) , OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD KABINI (LLVM 13.0.1), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 6650 XT (navi23 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 520/PCIe/SSE2, OpenGL 4.4.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, CARRIZO (carrizo LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.42 5.15.0-69-generic), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 780/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 3 Graphics (raven2 LLVM 15.0.2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 400 (BSW), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 610 (KBL GT1), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, TAHITI ( LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 550 / 550 Series (polaris12 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R7 Graphics (carrizo LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 610/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Ivybridge Desktop , OpenGL 4.2)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 6000 (BDW GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce 940MX/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060 3GB/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 6650 XT (navi23 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon(TM) Vega 10 Graphics (RAVEN), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD PALM, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5000 (HSW GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1070/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RAVEN (raven LLVM 15.0.6 DRM 3.47 5.19.0-21-generic), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, Quadro RTX 4000/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 530 (SKL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 405 (BSW), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD STONEY, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 520MX/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD OLAND, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) Iris(R) Graphics 6100 (BDW GT3), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics (BDW GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3070/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RAVEN, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 525M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RS880, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RS780 (DRM 2.50.0 / 5.15.0-69-generic LLVM 15.0.6), OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD CARRIZO, OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 5300 (BDW GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GT 630/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 580 Series (polaris10 LLVM 14.0.5), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce 605/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 560 Series (polaris11 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (CFL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Mesa/X.org)",
-            "renderer": "ANGLE (Mesa/X.org, virgl (Mesa DRI Intel(R) UHD Graphics (CML GT2)), OpenGL 4.3)"
-        },
-        {
-            "vendor": "Google Inc. (nouveau)",
-            "renderer": "ANGLE (nouveau, NVE7, OpenGL 4.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics (ICL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 5700 XT (navi10 LLVM 15.0.6), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Ivybridge Desktop , OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 610 (WHL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, CARRIZO (carrizo LLVM 15.0.2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) Sandybridge Desktop , OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 510 (SKL GT1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce 930M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, Radeon RX550/550 Series (polaris12 LLVM 14.0.1), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) HD Graphics 520 (SKL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, VERDE ( LLVM 15.0.6), OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, RENOIR (renoir LLVM 15.0.6 DRM 3.49 6.1.19-1-MANJARO), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, Radeon RX550/550 Series (POLARIS12), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon R7E Graphics (carrizo LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD VERDE, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL ES 3.2)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GT 640M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, GeForce GTX 660M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD VERDE, OpenGL 4.5)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon (TM) RX 460 Graphics (POLARIS11), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel)",
-            "renderer": "ANGLE (Intel, Mesa Intel(R) HD Graphics 615 (KBL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (Intel Open Source Technology Center)",
-            "renderer": "ANGLE (Intel Open Source Technology Center, Mesa DRI Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (X.Org)",
-            "renderer": "ANGLE (X.Org, AMD RV610, OpenGL 3.3)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, Quadro M2000M/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon RX 5700 XT (navi10 LLVM 15.0.7), OpenGL 4.6)"
-        },
-        {
-            "vendor": "Google Inc. (NVIDIA Corporation)",
-            "renderer": "ANGLE (NVIDIA Corporation, Quadro T2000 with Max-Q Design/PCIe/SSE2, OpenGL 4.5.0)"
-        },
-        {
-            "vendor": "Google Inc. (AMD)",
-            "renderer": "ANGLE (AMD, AMD Radeon Vega 8 Graphics (raven LLVM 14.0.6), OpenGL ES 3.2)"
-        }
-    ]
-    const _fonts = [
-        {
-            "font": "Arial"
-        },
-        {
-            "font": "Bauhaus 93"
-        },
-        {
-            "font": "Calibri"
-        },
-        {
-            "font": "Cambria"
-        },
-        {
-            "font": "Courier New"
-        },
-        {
-            "font": "Lohit Gujarati"
-        },
-        {
-            "font": "Times New Roman"
-        },
-        {
-            "font": "Bitstream Vera Serif"
-        },
-        {
-            "font": "KacstOne"
-        },
-        {
-            "font": "Loma"
-        },
-        {
-            "font": "Rachana"
-        },
-        {
-            "font": "Sawasdee"
-        },
-        {
-            "font": "Ubuntu"
-        },
-        {
-            "font": "Umpush"
-        },
-        {
-            "font": "Arial Black"
-        },
-        {
-            "font": "Comic Sans MS"
-        },
-        {
-            "font": "Georgia"
-        },
-        {
-            "font": "Impact"
-        },
-        {
-            "font": "MS Gothic"
-        },
-        {
-            "font": "MS PGothic"
-        },
-        {
-            "font": "MS PMincho"
-        },
-        {
-            "font": "PMingLiU"
-        },
-        {
-            "font": "SimSun"
-        },
-        {
-            "font": "Trebuchet MS"
-        },
-        {
-            "font": "Verdana"
-        },
-        {
-            "font": "Webdings"
-        },
-        {
-            "font": "Arab"
-        },
-        {
-            "font": "Gabriola"
-        },
-        {
-            "font": "Microsoft Sans Serif"
-        },
-        {
-            "font": "Segoe Script"
-        },
-        {
-            "font": "Mangal"
-        },
-        {
-            "font": "Agency FB"
-        },
-        {
-            "font": "Broadway"
-        },
-        {
-            "font": "Calibri Light"
-        },
-        {
-            "font": "Cambria Math"
-        },
-        {
-            "font": "Candara"
-        },
-        {
-            "font": "Centaur"
-        },
-        {
-            "font": "Century Gothic"
-        },
-        {
-            "font": "Consolas"
-        },
-        {
-            "font": "Constantia"
-        },
-        {
-            "font": "Copperplate Gothic Light"
-        },
-        {
-            "font": "Corbel"
-        },
-        {
-            "font": "Ebrima"
-        },
-        {
-            "font": "Eras Bold ITC"
-        },
-        {
-            "font": "Franklin Gothic Heavy"
-        },
-        {
-            "font": "Franklin Gothic Medium"
-        },
-        {
-            "font": "Haettenschweiler"
-        },
-        {
-            "font": "Harrington"
-        },
-        {
-            "font": "Lucida Console"
-        },
-        {
-            "font": "Lucida Sans Unicode"
-        },
-        {
-            "font": "MS Reference Sans Serif"
-        },
-        {
-            "font": "Segoe Print"
-        },
-        {
-            "font": "Segoe UI Light"
-        },
-        {
-            "font": "Segoe UI Semibold"
-        },
-        {
-            "font": "Segoe UI Symbol"
-        },
-        {
-            "font": "Segoe UI"
-        },
-        {
-            "font": "Tahoma"
-        },
-        {
-            "font": "SimHei"
-        },
-        {
-            "font": "Symbol"
-        },
-        {
-            "font": "Wingdings"
-        },
-        {
-            "font": "Aharoni"
-        },
-        {
-            "font": "Andalus"
-        },
-        {
-            "font": "Angsana New"
-        },
-        {
-            "font": "AngsanaUPC"
-        },
-        {
-            "font": "Aparajita"
-        },
-        {
-            "font": "Arabic Typesetting"
-        },
-        {
-            "font": "Batang"
-        },
-        {
-            "font": "BatangChe"
-        },
-        {
-            "font": "Browallia New"
-        },
-        {
-            "font": "BrowalliaUPC"
-        },
-        {
-            "font": "Cordia New"
-        },
-        {
-            "font": "CordiaUPC"
-        },
-        {
-            "font": "DFKai-SB"
-        },
-        {
-            "font": "DaunPenh"
-        },
-        {
-            "font": "David"
-        },
-        {
-            "font": "DilleniaUPC"
-        },
-        {
-            "font": "DokChampa"
-        },
-        {
-            "font": "Dotum"
-        },
-        {
-            "font": "DotumChe"
-        },
-        {
-            "font": "Estrangelo Edessa"
-        },
-        {
-            "font": "EucrosiaUPC"
-        },
-        {
-            "font": "Euphemia"
-        },
-        {
-            "font": "FangSong"
-        },
-        {
-            "font": "FrankRuehl"
-        },
-        {
-            "font": "FreesiaUPC"
-        },
-        {
-            "font": "Gautami"
-        },
-        {
-            "font": "Gisha"
-        },
-        {
-            "font": "Gulim"
-        },
-        {
-            "font": "GulimChe"
-        },
-        {
-            "font": "Gungsuh"
-        },
-        {
-            "font": "GungsuhChe"
-        },
-        {
-            "font": "IrisUPC"
-        },
-        {
-            "font": "Iskoola Pota"
-        },
-        {
-            "font": "JasmineUPC"
-        },
-        {
-            "font": "KaiTi"
-        },
-        {
-            "font": "Kalinga"
-        },
-        {
-            "font": "Kartika"
-        },
-        {
-            "font": "Khmer UI"
-        },
-        {
-            "font": "KodchiangUPC"
-        },
-        {
-            "font": "Kokila"
-        },
-        {
-            "font": "Lao UI"
-        },
-        {
-            "font": "Latha"
-        },
-        {
-            "font": "Leelawadee"
-        },
-        {
-            "font": "Levenim MT"
-        },
-        {
-            "font": "LilyUPC"
-        },
-        {
-            "font": "MS Mincho"
-        },
-        {
-            "font": "MS UI Gothic"
-        },
-        {
-            "font": "MV Boli"
-        },
-        {
-            "font": "Malgun Gothic"
-        },
-        {
-            "font": "Marlett"
-        },
-        {
-            "font": "Meiryo UI"
-        },
-        {
-            "font": "Meiryo"
-        },
-        {
-            "font": "Microsoft Himalaya"
-        },
-        {
-            "font": "Microsoft JhengHei"
-        },
-        {
-            "font": "Microsoft New Tai Lue"
-        },
-        {
-            "font": "Microsoft PhagsPa"
-        },
-        {
-            "font": "Microsoft Tai Le"
-        },
-        {
-            "font": "Microsoft Uighur"
-        },
-        {
-            "font": "Microsoft YaHei"
-        },
-        {
-            "font": "Microsoft Yi Baiti"
-        },
-        {
-            "font": "MingLiU"
-        },
-        {
-            "font": "MingLiU-ExtB"
-        },
-        {
-            "font": "MingLiU_HKSCS"
-        },
-        {
-            "font": "MingLiU_HKSCS-ExtB"
-        },
-        {
-            "font": "Miriam Fixed"
-        },
-        {
-            "font": "Miriam"
-        },
-        {
-            "font": "Mongolian Baiti"
-        },
-        {
-            "font": "MoolBoran"
-        },
-        {
-            "font": "NSimSun"
-        },
-        {
-            "font": "Narkisim"
-        },
-        {
-            "font": "Nyala"
-        },
-        {
-            "font": "PMingLiU-ExtB"
-        },
-        {
-            "font": "Palatino Linotype"
-        },
-        {
-            "font": "Plantagenet Cherokee"
-        },
-        {
-            "font": "Raavi"
-        },
-        {
-            "font": "Rod"
-        },
-        {
-            "font": "Sakkal Majalla"
-        },
-        {
-            "font": "Shonar Bangla"
-        },
-        {
-            "font": "Shruti"
-        },
-        {
-            "font": "SimSun-ExtB"
-        },
-        {
-            "font": "Simplified Arabic Fixed"
-        },
-        {
-            "font": "Simplified Arabic"
-        },
-        {
-            "font": "Sylfaen"
-        },
-        {
-            "font": "Traditional Arabic"
-        },
-        {
-            "font": "Tunga"
-        },
-        {
-            "font": "Utsaah"
-        },
-        {
-            "font": "Vani"
-        },
-        {
-            "font": "Vijaya"
-        },
-        {
-            "font": "Vrinda"
-        },
-        {
-            "font": "DejaVu LGC Sans Mono"
-        },
-        {
-            "font": "Bell MT"
-        },
-        {
-            "font": "Bodoni MT"
-        },
-        {
-            "font": "Bookman Old Style"
-        },
-        {
-            "font": "Californian FB"
-        },
-        {
-            "font": "Castellar"
-        },
-        {
-            "font": "Colonna MT"
-        },
-        {
-            "font": "Engravers MT"
-        },
-        {
-            "font": "Forte"
-        },
-        {
-            "font": "French Script MT"
-        },
-        {
-            "font": "Gigi"
-        },
-        {
-            "font": "Goudy Old Style"
-        },
-        {
-            "font": "Informal Roman"
-        },
-        {
-            "font": "Lucida Bright"
-        },
-        {
-            "font": "Lucida Fax"
-        },
-        {
-            "font": "Magneto"
-        },
-        {
-            "font": "Matura MT Script Capitals"
-        },
-        {
-            "font": "Niagara Solid"
-        },
-        {
-            "font": "Palace Script MT"
-        },
-        {
-            "font": "Papyrus"
-        },
-        {
-            "font": "Perpetua"
-        },
-        {
-            "font": "Playbill"
-        },
-        {
-            "font": "Rockwell"
-        },
-        {
-            "font": "Script MT Bold"
-        },
-        {
-            "font": "Showcard Gothic"
-        },
-        {
-            "font": "Snap ITC"
-        },
-        {
-            "font": "Tw Cen MT Condensed Extra Bold"
-        },
-        {
-            "font": "Vladimir Script"
-        },
-        {
-            "font": "Wide Latin"
-        },
-        {
-            "font": "Courier New Greek"
-        },
-        {
-            "font": "Times New Roman Greek"
-        },
-        {
-            "font": "Utopia"
-        },
-        {
-            "font": "Casual"
-        },
-        {
-            "font": "Menlo"
-        },
-        {
-            "font": "Chalkduster"
-        }
-    ]
-    let uwu;
-
-    function getRandomFontsString(fontsList, numFonts) {
-        const selectedFonts = [];
-      
-        for (let i = 0; i < numFonts; i++) {
-          const randomIndex = Math.floor(Math.random() * fontsList.length);
-          selectedFonts.push(`"${fontsList[randomIndex].font}"`);
-        }
-      
-        return `[${selectedFonts.join(',')}]`;
-      }
 
     function A(A, g, I) {
         return g <= A && A <= I
@@ -4155,85 +4231,22 @@ var hsw = function () {
         return AI.decode(pg().subarray(A, A + g))
     }
 
-    var stringArray = [
-        "__driver_evaluate",
-        "__webdriver_evaluate",
-        "__selenium_evaluate",
-        "__fxdriver_evaluate",
-        "__driver_unwrapped",
-        "__webdriver_unwrapped",
-        "__selenium_unwrapped",
-        "__fxdriver_unwrapped",
-        "__webdriver_script_func",
-        "_selenium",
-        "__phantomas",
-        "domAutomationController",
-        "awesomium",
-        "_WEBDRIVER_ELEM_CACHE",
-        "webdriver",
-        "_Selenium_IDE_Recorder",
-        "__webdriver_script_fn",
-        "__nightmare",
-        "callPhantom",
-        "callSelenium",
-        "spawn"
-    ];
 
-    var toReplace = [
-        ',addNoiseToCanvas',
-        ",spoofall",
-        ",fonts",
-        ",devices",
-        ",webgl",
-        ",webrtc",
-        `"addNoiseToCanvas","webgl","devices","fonts","webrtc","getRandomNumber","spoofall",`
-
-        // detect
-        //",getRandomNumber"
-    ]
 
     function II(A) {
-        if (typeof A == 'string') {
-            stringArray.forEach(e => {
-                if (A === e) {
-                    //console.log(`String '${e}' found in A`);
-                    return undefined, undefined
-                }
-            });
-
-            if (A.includes(toReplace[0])) {
-                toReplace.forEach(e => {
-                    A = A.replace(e, '');
-                });
-            }
-
-            if (A.includes("(NVIDIA)")) {
-                A = A.replace("Google Inc. (NVIDIA)", uwu.vendor);
-                A = A.replace("ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)", uwu.renderer);
-            }
-
-            if (A.includes(`["Arial","`)) {
-                const numRandomFonts = Math.floor(Math.random() * (7 - 3 + 1)) + 3;
-                A = `${getRandomFontsString(_fonts, numRandomFonts)}`
-                //console.log('font set', A)
-            }
-
-
-
-            //console.log(A, typeof A)
-
-            /* Less joins
-             if (A == 'Europe/Paris') {
-                 A.replace(e, 'America/New_York')
-             }
- 
-             A.replace('fr-FR', 'en-US')
-             */
+        let resp = fuckhcaptcha(A)
+        if (resp.ok) {
+            console.log('FUCKED', A)
+            return undefined
         }
+        A = resp.a
+        console.log(A)
 
         lg === bg.length && bg.push(bg.length + 1);
-        var g = lg;
-        return lg = bg[g], bg[g] = A, g;
+        const g = lg;
+        lg = bg[g];
+        bg[g] = A;
+        return g;
     }
 
     function BI(A) {
@@ -5153,20 +5166,13 @@ var hsw = function () {
         }))
     }
 
-    function getRandomGPU(gpuList) {
-        if (gpuList.length === 0) {
-            return null; // Return null if the list is empty
-        }
 
-        const randomIndex = Math.floor(Math.random() * gpuList.length);
-        return gpuList[randomIndex];
-    }
 
     var YI = function (A) {
         return function (g, I) {
             var B = function (A) {
                 try {
-                    uwu = getRandomGPU(gpus)
+
 
                     var g = A.split(".");
                     return {

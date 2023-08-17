@@ -7,31 +7,31 @@ sendMessage = false
 sendMessageContent = "@everyone follow tos !"
 tryJoin = true
 joinOnRegister = false
-humanize = true
+humanize = false
 version = 218604
 
 [hcaptcha]
 lang = "en"
-version = "c29d40e"
-submitTime = 2
+version = "a8bdc18"
+submitTime = 6
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1332"
 siteKey = "4c672d35-0701-42b2-88c3-78380b0db560"
 
 
 [spoof]
-cfbm = false
+cfbm = true
 profilePath = "../../assets/fingerprints/chrome.json"
 proxyType = "http"
 sessionReplaceMe = "REPLACEME"
 
 [performances]
-goroutines = 60
+goroutines = 40
 debug = true
 
 [engine]
 browserHswThreadCount = 500
-browserCount = 7
+browserCount = 6
 
 [extra]
 theme = "random"

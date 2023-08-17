@@ -7,7 +7,7 @@ func (c *Client) HeaderCheckSiteConfig() http.Header {
 		`authority`:          {`hcaptcha.com`},
 		`accept`:             {`application/json`},
 		`accept-language`:    {c.Config.HttpClient.BaseHeader.AcceptLanguage},
-		`content-length`:     {`0`},
+	//	`content-length`:     {`0`},
 		`content-type`:       {`text/plain`},
 		`origin`:             {`https://newassets.hcaptcha.com`},
 		`referer`:            {`https://newassets.hcaptcha.com/`},

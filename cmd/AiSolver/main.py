@@ -7,11 +7,32 @@ import numpy as np
 import json, os, httpx, contextlib, threading
 from base64 import b64encode
 from fastapi import Request
-import time
+import time, xxhash, requests, httpx
 from fastapi import Body
+import concurrent.futures
 
 __models__ = list(set(os.listdir("./models")))
 __loaded__ = {}
+
+hashlist = {}
+
+
+def load_hash():
+    for lines in open("./hash.csv", "r+").read().splitlines():
+        try:
+            if "," not in lines:
+                continue
+
+            hash, prompt = lines.split(",")
+
+            if prompt not in hashlist:
+                hashlist[prompt] = []
+
+            hashlist[prompt].append(hash)
+        except:
+            pass
+
+    print(len(hashlist), "loaded hash")
 
 
 class Ai:
@@ -22,7 +43,12 @@ class Ai:
 
         if x not in __loaded__:
             print("load", x)
-            __loaded__[x] = InferenceSession(x)
+            __loaded__[x] = InferenceSession(
+                x,
+                providers=[
+                    "CUDAExecutionProvider",
+                ],
+            )
 
         self.session = __loaded__[x]
 
@@ -149,15 +175,13 @@ def predict(
         prediction = task.json()["answers"]
         result = {}
         print(question)
-        qa = question.split("on the ")[1].replace(
-                " ", "_"
-            )
-        
+        qa = question.split("on the ")[1].replace(" ", "_")
+
         print("prediction:", qa, prediction)
         for i in range(len(taskList)):
             try:
                 k = taskList[i]["task_key"]
-            
+
                 c = [
                     {
                         "entity_name": 0,
@@ -168,7 +192,7 @@ def predict(
                 result[k] = result.get(k, []) + [c]
                 print(result)
             except Exception as e:
-                print('uwu', e, qa, prediction)
+                print("uwu", e, qa, prediction)
                 continue
         return result
     elif captcha_type == "image_label_multiple_choice":
@@ -223,6 +247,42 @@ def predict(
         return prediction
 
 
+def download_image(url, prompt):
+    # Download the first 650 bytes
+    response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        return None, None, None
+
+    content = b""
+    for chunk in response.iter_content(chunk_size=650):
+        content += chunk
+        break  # Download only the first 650 bytes
+
+    # Calculate hash of the downloaded content using XXHash
+    content_hash = xxhash.xxh64(content).hexdigest()
+
+    # Check if hash exists in the list
+    if hashlist[prompt] is not None and content_hash in hashlist[prompt]:
+        return True, content_hash, None
+
+    # Download the complete image
+    response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        return False, None, None
+
+    return False, content_hash, response.content
+
+
+__lock__ = threading.Lock()
+
+
+def saves(string, prompt):
+    __lock__.acquire()
+    with open("./hash.csv", "a+") as ff:
+        ff.write(f"{string},{prompt}\n")
+    __lock__.release()
+
+
 class Task(Ai):
     AREA_SELECT = "image_label_area_select"
     BINARY = "image_label_binary"
@@ -244,10 +304,6 @@ class Task(Ai):
 
     def __init__(self):
         pass
-
-    def download(self, url):
-        with Client(headers=Task.HEADER) as client:
-            return client.get(url).content
 
     def parse_question(self, data):
         qa = ""
@@ -276,16 +332,37 @@ class Task(Ai):
             return {"success": False, "data": {"error": "invalid task_type"}}
 
         if data["task_type"] == Task.BINARY:
+            t = time.time()
             if not self.parse_question(data):
                 return {"success": False, "data": {"error": "model not added yet"}}
 
+            if data["question"] not in hashlist:
+                hashlist[data["question"]] = []
+
             for task in data["tasklist"]:
-                img = self.download(task["datapoint_uri"])
-                # t = time.time()
-                answer[task["task_key"]] = "true" if self.determine(img) else "false"
-                # print(time.time()-t)
-            
-            return {"success": True, "data": answer}
+                dl = time.time()
+                found, imghash, img = download_image(
+                    task["datapoint_uri"], data["question"]
+                )
+                print("dl time", time.time() - dl)
+
+                hl = time.time()
+                if found:
+                    answer[task["task_key"]] = "true"
+                    print("hash", time.time() - hl)
+                else:
+                    pl = time.time()
+                    answer[task["task_key"]] = (
+                        "true" if self.determine(img) else "false"
+                    )
+                    print("determine", time.time() - pl)
+
+                    if answer[task["task_key"]] == "true":
+                        hashlist[data["question"]].append(imghash)
+
+                        threading.Thread(
+                            target=saves, args=[imghash, data["question"]]
+                        ).start()
 
         if data["task_type"] == Task.AREA_SELECT:
             try:
@@ -298,7 +375,7 @@ class Task(Ai):
             except Exception as e:
                 print(e)
 
-        return {"success": True, "data": answer}
+        return answer
 
 
 def test():
@@ -365,23 +442,36 @@ def test():
         )
 
 
-"""for _ in range(10):
-    threading.Thread(target=test).start()"""
+load_hash()
 
-app = FastAPI()
+from flask import Flask, jsonify, request
 
-
-@app.get("/")
-def read_root():
-    return {"status": "online"}
+app = Flask(__name__)
 
 
-@app.post("/solve")
-def solve(req: dict = Body()):
+@app.route("/solve", methods=["POST"])
+def add_expense():
     try:
         t = time.time()
-        r = Task().process(req)
-        print(time.time() - t, r)
-        return r
+        data = request.get_json()
+        r = Task().process(data)
+        processing_time = time.time() - t
+
+        # Log processing time and result
+        print("Processing Time:", processing_time, "seconds")
+
+        response = app.response_class(
+            response=json.dumps({"success": True, "data": r}),
+            status=200,
+            mimetype="application/json",
+        )
+
+        return response
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(port=1332)

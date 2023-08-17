@@ -14,6 +14,15 @@ type Point struct {
 	X, Y, T int64
 }
 
+// 17/08/2023 Introduced new payload "pdc" into /getcaptcha
+// {"s":1692305150490,"n":0,"p":1,"gcs":696}
+type Pdc struct {
+	S   int64 `json:"s"`
+	N   int   `json:"n"`
+	P   int   `json:"p"`
+	Gcs int   `json:"gcs"`
+}
+
 type HcaptchaTaskResponse struct {
 	Token            string
 	AnswerProcessing *time.Duration
