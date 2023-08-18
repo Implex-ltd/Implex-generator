@@ -12,8 +12,6 @@ import (
 )
 
 func TestClient_Solve(t *testing.T) {
-	hcaptcha.LoadAnswer()
-
 	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
 		FilePath: "../assets/fingerprints/chrome.json",
 	})

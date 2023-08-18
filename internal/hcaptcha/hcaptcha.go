@@ -18,7 +18,6 @@ import (
 
 var (
 	Scrape int
-	hsl    = false
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {
@@ -90,21 +89,13 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 
 	hsl_start := time.Now()
 
-	if hsl {
-		pow, err = HSLHashProof(config.C.Req)
-		if err != nil {
-			return nil, err
-		}
-		config.C.Type = "hsl"
-	} else {
-		pow = c.GetHsw(config.C.Req)
-	}
+	pow = c.GetHsw(config.C.Req)
 
 	pdc := &Pdc{
-		S:   hsl_start.UTC().UnixNano() / 1e6,
+		S:   hsl_start.UTC().UnixNano() / 1e6, // Date.now()
 		N:   0,
 		P:   1,
-		Gcs: int(time.Since(hsl_start).Milliseconds()),
+		Gcs: int(time.Since(hsl_start).Milliseconds()), // pow time
 	}
 
 	payload := url.Values{}
@@ -149,8 +140,6 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 	resultChans := make(chan error)
 	st := time.Now()
 
-	// proccess img and hsw at the same time to be fasterrrr
-
 	go func() {
 		answers, err = c.SolveImages(captcha)
 		if err != nil {
@@ -162,32 +151,19 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 		resultChans <- nil
 	}()
 
-	fmt.Println(answers)
-
 	go func() {
-		if hsl {
-			pow, err = HSLHashProof(captcha.C.Req)
-			if err != nil {
-				resultChans <- err
-				return
-			}
-			captcha.C.Type = "hsl"
-		} else {
-			pow = c.GetHsw(captcha.C.Req)
-		}
+		pow = c.GetHsw(captcha.C.Req)
 
 		c.HswProcessTime = time.Since(st)
 		resultChans <- nil
 	}()
 
-	ttt := time.Now()
 	for i := 0; i < 2; i++ {
 		err := <-resultChans
 		if err != nil {
 			return nil, err
 		}
 	}
-	fmt.Println("waiting workertime", time.Since(ttt).Seconds(), c.HswProcessTime, c.AnswerProcessTime)
 
 	payload, err = json.Marshal(&PayloadCheckChallenge{
 		V:            c.Config.Version,
@@ -204,11 +180,8 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 		return nil, err
 	}
 
-	// We are smart boys 🧠, so we don't waste time !
-
-	/*trrrr := time.Now()
+	// if solving task is too fast, we are waiting the remaning MIN submit time
 	time.Sleep(c.Config.SubmitDelay - time.Since(st))
-	fmt.Println("extra sleeptime:", time.Since(trrrr))*/
 
 	t := time.Now()
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
@@ -276,9 +249,9 @@ func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 		return nil, nil
 	}
 
-	/*if c.Config.Scrape {
+	if c.Config.Scrape {
 		return nil, fmt.Errorf("invalid label for scraping")
-	}*/
+	}
 	
 	resp, err := c.checkChallenge(imgCap)
 	if err != nil {

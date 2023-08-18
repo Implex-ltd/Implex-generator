@@ -166,7 +166,7 @@ func debug() {
 
 	gotos := []string{
 		"https://browserleaks.com/webgl",
-		/*"https://browserleaks.com/webrtc",
+		"https://browserleaks.com/webrtc",
 		"https://browserleaks.com/canvas",
 		"https://browserleaks.com/webgl",
 		"https://browserleaks.com/tls",
@@ -174,7 +174,7 @@ func debug() {
 		"https://browserleaks.com/fonts",
 		"https://browserleaks.com/ip",
 		"https://bot.sannysoft.com/",
-		"https://abrahamjuliot.github.io/creepjs/",*/
+		"https://abrahamjuliot.github.io/creepjs/",
 	}
 
 	c := goccm.New(len(gotos))

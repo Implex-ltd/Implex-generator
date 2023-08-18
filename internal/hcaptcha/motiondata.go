@@ -227,6 +227,7 @@ func calculateMeanPeriod(events [][]int64) float64 {
 	return meanPeriod
 }
 
+// Todo: implement
 // generateRandomBrowserSize generates a random browser width and height. minSize and maxSize specify the range of possible values.
 func generateRandomBrowserSize(minSize, maxSize int) (width, height int64) {
 	aspectRatios := []float64{16.0 / 9.0, 16.0 / 10.0, 4.0 / 3.0}

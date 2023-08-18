@@ -11,6 +11,8 @@ import (
 )
 
 var (
+	HSW_VERSION = "a91272a"
+
 	ARGS = []string{
 		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 		"--disable-popup-blocking", // "discord ask access to position, lol?, no way!"
@@ -68,7 +70,7 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 		})
 	})
 
-	context.Route("**https://newassets.hcaptcha.com/c/a91272a/hsw.js**", func(r playwright.Route) {
+	context.Route(fmt.Sprintf("**https://newassets.hcaptcha.com/c/%s/hsw.js**", HSW_VERSION), func(r playwright.Route) {
 		log.Println("Injected !")
 
 		r.Fulfill(playwright.RouteFulfillOptions{

@@ -52,25 +52,14 @@ func DownloadAndClassify(url, key, prompt string, results chan<- Result, wg *syn
 	}
 	defer resp.Body.Close()
 
-	buff := make([]byte, 1024)
+	buff := make([]byte, 650)
 	_, err = io.ReadFull(resp.Body, buff)
 	if err != nil {
 		results <- Result{Hash: "", Match: false, Err: err, Url: url, St: time.Since(st), Key: key}
 		return
 	}
-
-	content := bytes.Split(buff, []byte("$.' \",#\x1c\x1c(7)"))
-	if len(content) < 1 {
-		results <- Result{Hash: "", Match: false, Err: errors.New("cant split bytes"), Url: url, St: time.Since(st), Key: key}
-		return
-	}
-
-	/**
-		read from file require [:-6] extra byte if downloaded by discord
-	    hcaptcha directly saved imgs doesnt require
-	*/
-	contentWithoutLast6Bytes := content[1] // [:len(content[1])-6]
-	contentHash := xxhash.Sum64(contentWithoutLast6Bytes)
+	
+	contentHash := xxhash.Sum64(buff)
 
 	// already solved [new feature !]
 	if HashExistsInPrompt(prompt, contentHash) {
@@ -86,7 +75,6 @@ func DownloadAndClassify(url, key, prompt string, results chan<- Result, wg *syn
 
 	// Implement your classification logic here
 	// If classification succeeds, add the hash to the prompt's hashlist
-	// For now, let's assume classification succeeds and add the hash
 
 	answer := false
 
@@ -191,58 +179,3 @@ func main() {
 		panic(err)
 	}
 }
-
-/*
-func _main() {
-	LoadLogger()
-
-	count, err := LoadHash()
-	if err != nil {
-		panic(err)
-	}
-
-	logger.Info("Loaded hash csv",
-		zap.Int("count", count),
-	)
-
-	for k, v := range hashlist {
-		logger.Info("Loaded hash",
-			zap.String("prompt", k),
-			zap.Int("count", len(v)),
-		)
-	}
-
-	prompt := []string{
-		"dolphin",
-		"robot",
-		"laptop",
-		"tree",
-		"meerkat",
-	}
-
-	urls := []string{
-		"https://media.discordapp.net/attachments/1140759790482636820/1141572120313344041/5spDoSe.png",
-		"https://media.discordapp.net/attachments/1140759790482636820/1141572120544018502/xpX9Nuv.png",
-		"https://media.discordapp.net/attachments/1140759790482636820/1141572120774725712/4OZMipc.png",
-	}
-
-	c := goccm.New(len(prompt))
-
-	t := time.Now()
-	for _, p := range prompt {
-		c.Wait()
-
-		go func(prompt string) {
-			defer c.Done()
-			Task(prompt, urls)
-		}(p)
-	}
-
-	c.WaitAllDone()
-
-	logger.Info("All task done",
-		zap.Int("imgs", len(prompt)*len(urls)),
-		zap.Int64("ms", time.Since(t).Milliseconds()),
-	)
-}
-*/
