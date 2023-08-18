@@ -27,11 +27,11 @@ sessionReplaceMe = "REPLACEME"
 
 [performances]
 goroutines = 5
-debug = false
+debug = true
 
 [engine]
-browserHswThreadCount = 500
-browserCount = 5
+browserHswThreadCount = 50
+browserCount = 2
 
 [extra]
 theme = "random"

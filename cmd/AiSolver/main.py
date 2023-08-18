@@ -436,6 +436,7 @@ def add_expense():
     try:
         t = time.time()
         data = request.get_json()
+        print(data)
         r = Task().process(data)
         processing_time = time.time() - t
 
