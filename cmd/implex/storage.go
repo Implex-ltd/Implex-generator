@@ -5,8 +5,15 @@ import (
 	"time"
 
 	"github.com/Implex-ltd/implex/internal/console"
+	"github.com/Implex-ltd/implex/internal/hcaptcha"
 	"github.com/Implex-ltd/implex/internal/utils"
 	"github.com/Implex-ltd/implex/pkg/itertools"
+)
+
+const (
+	TASK_MENU   = 0
+	TASK_GEN    = 1
+	TASK_SCRAPE = 2
 )
 
 var (
@@ -20,6 +27,17 @@ var (
 	Unlocked  int
 	Error     int
 	Solved    int
+
+	Scraped     int
+	ScrapeError int
+
+	version = "1.2"
+	Task    = TASK_MENU
+	TaskSt  time.Time
+
+	Durations          []*time.Duration
+	AvgImgProcDuration []*time.Duration
+	AvgHswProcDuration []*time.Duration
 )
 
 func LoadFiles() error {
@@ -32,7 +50,7 @@ func LoadFiles() error {
 	}
 
 	ProxyList = itertools.NewIterator(proxies)
-	
+
 	if err := ProxyList.RandomiseIndex(); err != nil {
 		panic("please put at least 2 proxies")
 	}
@@ -79,18 +97,51 @@ func LoadFiles() error {
 	return nil
 }
 
+func averageDuration(durations []*time.Duration) time.Duration {
+	if len(durations) == 0 {
+		return 0
+	}
+
+	var total time.Duration
+	for _, dur := range durations {
+		total += *dur
+	}
+
+	return time.Duration((total / time.Duration(len(durations))).Seconds())
+}
+
 func ConsoleTitle() {
 	start := time.Now()
+	var Lt int
 
 	for {
-		rate := float64(Unlocked) / float64(Generated) * 100
+		if Task != Lt {
+			TaskSt = time.Now()
+		}
+		Lt = Task
+
+		rate := float64(Unlocked) / float64(Unlocked+Locked) * 100 // skip unchecked tokens
 		rateStr := fmt.Sprintf("%.2f", rate)
 
 		uptime := time.Since(start).Round(time.Second)
 		uptimeStr := fmt.Sprintf("%02.fh %02.fm %02.fs", uptime.Hours(), uptime.Minutes(), uptime.Seconds())
 
-		console.SetTitle(fmt.Sprintf("Implex 1.1 ⇸ Generated: %d, Unlocked: %d (%s%%), Locked: %d, CPM: %d, Solver CPM: %d, Errors: %d, Uptime: %s", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(start))), int(float64(Solved)/float64(minutesPassed(start))), Error, uptimeStr))
-		time.Sleep(50 * time.Millisecond)
+		var bar string
+
+		switch Task {
+		case TASK_MENU:
+			bar = "Menu"
+		case TASK_GEN:
+			bar = fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, CPM: %d, SolverCPM: %d, Err: %d, AvgSolveTime: %ds, AvgImgProcTime: %ds, AvgHswProcTime: %ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
+			console.Log(bar)
+		case TASK_SCRAPE:
+			Scraped = hcaptcha.Scrape
+			bar = fmt.Sprintf("Scrape: %d, ScraperCPM: %d, Err: %d", Scraped, int(float64(Scraped)/float64(minutesPassed(TaskSt))), ScrapeError)
+			console.Log(bar)
+		}
+
+		console.SetTitle(fmt.Sprintf("Implex %s [%s] ⇸ %s", version, uptimeStr, bar))
+		time.Sleep(150 * time.Millisecond)
 	}
 }
 

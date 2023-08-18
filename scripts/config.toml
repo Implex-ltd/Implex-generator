@@ -1,19 +1,37 @@
 [discord]
-invite = ""
-version = 218224
+invite = "JH2j2E5C"
+inviteGuildID = "1140717857047584798"
+inviteChannelID = "1140717857047584801"
+sendChannelID = "1140717857047584801"
+sendMessage = false
+sendMessageContent = "<@1081004946872352958> , why discord tos are suck ?"
+tryJoin = true
+joinOnRegister = false
+humanize = false
+version = 218604
 
 [hcaptcha]
 lang = "en"
 version = "d442197"
-submitTime = 6
-hswAddress = "http://192.168.1.26:4000"
-SolverAddress = "http://127.0.0.1:1337"
+submitTime = 5
+hswAddress = "http://127.0.0.1:4000"
+SolverAddress = "http://127.0.0.1:1332"
+siteKey = "4c672d35-0701-42b2-88c3-78380b0db560"
 
 
 [spoof]
-cfbm = false
-profilePath = "../../assets/fingerprints/login.json"
+cfbm = true
+profilePath = "../../assets/fingerprints/chrome.json"
+proxyType = "http"
+sessionReplaceMe = "REPLACEME"
 
 [performances]
-goroutines = 200
+goroutines = 50
 debug = false
+
+[engine]
+browserHswThreadCount = 500
+browserCount = 10
+
+[extra]
+theme = "random"

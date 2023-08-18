@@ -9,14 +9,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gofiber/fiber/v2"
 	"github.com/playwright-community/playwright-go"
 	"github.com/zenthangplus/goccm"
 )
 
 var (
-	browsers = 5
-
 	pool []*browser.Instance
 	mt   sync.Mutex
 	curr = 0
@@ -37,7 +36,7 @@ func next() *browser.Instance {
 }
 
 func initBrowser() {
-	c := goccm.New(browsers)
+	c := goccm.New(Config.Engine.BrowserCount)
 
 	for {
 		c.Wait()
@@ -45,7 +44,7 @@ func initBrowser() {
 		go func() {
 			defer c.Done()
 
-			client, err := browser.NewInstance(true, false)
+			client, err := browser.NewInstance(true, false, Config.Engine.BrowserHswThreadCount)
 			if err != nil {
 				log.Println(err)
 				return
@@ -94,6 +93,12 @@ func solveHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	if len(token) < 61 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Token is invalid",
+		}) 
+	}
+
 	log.Println("recv", token[:61])
 
 	t := time.Now()
@@ -135,7 +140,7 @@ func crawl(url string, headless bool) {
 		name = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.Split(url, "://")[1], ".", ""), "/", ""), ":", "")
 	}
 
-	client, err := browser.NewInstance(true, headless)
+	client, err := browser.NewInstance(true, headless, Config.Engine.BrowserHswThreadCount)
 	if err != nil {
 		log.Println(err)
 		return
@@ -160,7 +165,8 @@ func debug() {
 	log.Println("ctrl+c to exit.")
 
 	gotos := []string{
-		"https://browserleaks.com/webrtc",
+		"https://browserleaks.com/webgl",
+		/*"https://browserleaks.com/webrtc",
 		"https://browserleaks.com/canvas",
 		"https://browserleaks.com/webgl",
 		"https://browserleaks.com/tls",
@@ -168,7 +174,7 @@ func debug() {
 		"https://browserleaks.com/fonts",
 		"https://browserleaks.com/ip",
 		"https://bot.sannysoft.com/",
-		"https://abrahamjuliot.github.io/creepjs/",
+		"https://abrahamjuliot.github.io/creepjs/",*/
 	}
 
 	c := goccm.New(len(gotos))
@@ -188,6 +194,10 @@ func debug() {
 }
 
 func main() {
+	if _, err := toml.DecodeFile("../../../../scripts/config.toml", &Config); err != nil {
+		panic(err)
+	}
+
 	switch os.Args[1] {
 	case "debug":
 		debug()

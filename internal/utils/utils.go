@@ -89,3 +89,11 @@ func CreateFolderIfNotExist(dirPath string) error {
 	}
 	return nil
 }
+
+func RandomNumber(a, b int) int {
+	if a >= b {
+		panic("Invalid range: a must be less than b")
+	}
+
+	return rand.Intn(b-a+1) + a
+}

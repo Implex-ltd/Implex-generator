@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
@@ -46,13 +46,13 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 	cookies := []*http.Cookie{}
 
 	if c.Config.GetCloudflareCookes {
-		cfbm, err := cloudflarereverse.GetCfbm(c.HttpClient.Config.BrowserFp, c.HttpClient.Config.Proxy) // c.Config.Proxy - make it proxyless because they are detecting proxies...
+		cfbm, err := cloudflarereverse.GetCfbm(c.HttpClient.Config.BrowserFp, c.HttpClient.Config.Proxy) // make it proxyless because they are detecting proxies...
 		if err != nil {
 			return nil, fmt.Errorf("error getting Cloudflare cookies: %w", err)
 		}
 
 		cfCookie := &http.Cookie{
-			Name:  "__cf_bm",
+			Name:  "cf_clearance",
 			Value: cfbm,
 		}
 		cookies = append(cookies, cfCookie)
@@ -65,7 +65,7 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 
 	c.HttpClient.Cookies = append(c.HttpClient.Cookies, cookies...)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
@@ -108,7 +108,7 @@ func (c *Client) JoinGuild(config *JoinConfig) (*JoinServerResponse, error) {
 	}
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
@@ -123,33 +123,48 @@ func (c *Client) JoinGuild(config *JoinConfig) (*JoinServerResponse, error) {
 
 // Create discord accoutn and return *RegisterResponse, take *ResgisterConfig as param.
 func (c *Client) Register(config *RegisterConfig) (*RegisterResponse, error) {
-	p := RegisterPayload{
-		Consent:     true,
-		Fingerprint: c.xfingerprint,
-		Username:    config.Username,
-		CaptchaKey:  config.CaptchaKey,
-		UniqueUsernameRegistration: true,
-	}
+	var pl any
+	var header http.Header
 
 	if config.InviteCode != "" {
-		p.GiftCodeSkuID = ""
-		p.CaptchaKey = ""
-		p.Invite = config.InviteCode
+		pl = RegisterInvitePayload{
+			Fingerprint:                c.xfingerprint,
+			GlobalName:                 config.Username,
+			Invite:                     config.InviteCode,
+			Consent:                    true,
+			GiftCodeSkuID:              nil,
+			UniqueUsernameRegistration: true,
+		}
+
+		header = c.getHeader(&HeaderConfig{
+			IsXtrack: false,
+		})
+
+		header.Add("x-captcha-key", config.CaptchaKey)
+		header.Set("referer", fmt.Sprintf("https://discord.com/invite/%s", config.InviteCode))
+	} else {
+		pl = RegisterSimplePayload{
+			Consent:                    true,
+			Fingerprint:                c.xfingerprint,
+			CaptchaKey:                 config.CaptchaKey,
+			GlobalName:                 config.Username,
+			UniqueUsernameRegistration: true,
+		}
+
+		header = c.getHeader(&HeaderConfig{
+			IsXtrack: true,
+		})
+
+		header.Del("x-discord-timezone")
+		header.Del("x-discord-locale")
+		header.Del("x-debug-options")
 	}
 
-	payload, err := json.Marshal(&p)
+	payload, err := json.Marshal(&pl)
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling payload: %w", err)
 	}
 
-	header := c.getHeader(&HeaderConfig{
-		IsXtrack: false,
-	})
-
-	if config.InviteCode != "" {
-		header.Add("x-captcha-key", config.CaptchaKey)
-		header.Set("referer", fmt.Sprintf("https://discord.com/invite/%s", config.InviteCode))
-	}
 	header.Add("x-fingerprint", c.xfingerprint)
 
 	resp, err := c.HttpClient.Do(cleanhttp.RequestOption{
@@ -163,7 +178,7 @@ func (c *Client) Register(config *RegisterConfig) (*RegisterResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
@@ -196,11 +211,14 @@ func (c *Client) SetAvatar(config *AvatarConfig) error {
 
 	payload := fmt.Sprintf(`{"avatar": "%s"}`, pfp)
 
+	header := c.getHeader(&HeaderConfig{})
+	header.Set("referer", "https://discord.com/channels/@me")
+
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "PATCH",
 		Url:    "https://discord.com/api/v9/users/@me",
 		Body:   strings.NewReader(payload),
-		Header: c.getHeader(&HeaderConfig{}),
+		Header: header,
 	})
 
 	if err != nil {
@@ -209,7 +227,37 @@ func (c *Client) SetAvatar(config *AvatarConfig) error {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to add pfp, status code: %d", response.StatusCode)
+		return fmt.Errorf("failed to set pfp, status code: %d", response.StatusCode)
+	}
+
+	return nil
+}
+
+// Edit user profil. take *EditProfilConfig as param, return error
+func (c *Client) SetBirth(config *EditBirthConfig) error {
+	payload, err := json.Marshal(&EditBirthPayload{
+		DateOfBirth: config.Date,
+	})
+	if err != nil {
+		return fmt.Errorf("error marshaling payload: %w", err)
+	}
+
+	header := c.getHeader(&HeaderConfig{})
+	header.Set("referer", "https://discord.com/channels/@me")
+
+	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
+		Method: "PATCH",
+		Url:    "https://discord.com/api/v9/users/@me",
+		Body:   bytes.NewReader(payload),
+		Header: header,
+	})
+	if err != nil {
+		return fmt.Errorf("error making HTTP request: %w", err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to add birth-date, status code: %d", response.StatusCode)
 	}
 
 	return nil
@@ -226,6 +274,7 @@ func (c *Client) SetProfil(config *EditProfilConfig) error {
 	}
 
 	header := c.getHeader(&HeaderConfig{})
+	header.Set("referer", "https://discord.com/channels/@me")
 
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "PATCH",
@@ -239,7 +288,7 @@ func (c *Client) SetProfil(config *EditProfilConfig) error {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to add profile, status code: %d", response.StatusCode)
+		return fmt.Errorf("failed to edit profile, status code: %d", response.StatusCode)
 	}
 
 	return nil
@@ -255,20 +304,18 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 		return nil, fmt.Errorf("error marshaling payload: %w", err)
 	}
 
-	header := c.getHeader(&HeaderConfig{})
-
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    fmt.Sprintf("https://discord.com/api/v9/channels/%s/messages", config.ChannelID),
 		Body:   bytes.NewReader(payload),
-		Header: header,
+		Header: c.getHeader(&HeaderConfig{}),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
@@ -279,4 +326,28 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 	}
 
 	return &resp, nil
+}
+
+func (c *Client) IsLocked() (bool, error) {
+	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
+		Method: "POST",
+		Url:    "https://discord.com/api/v9/users/@me/affinities/users",
+		Body:   nil,
+		Header: c.getHeader(&HeaderConfig{}),
+	})
+	if err != nil {
+		return true, fmt.Errorf("error making HTTP request: %w", err)
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return true, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	if strings.Contains("You need to verify your account in order to perform this action.", string(body)) {
+		return true, nil
+	}
+
+	return false, nil
 }

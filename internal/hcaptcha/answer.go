@@ -3,78 +3,69 @@ package hcaptcha
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 
 	http "github.com/bogdanfinn/fhttp"
 )
 
 // Get answers for images captchas.
-func (c *Client) SolveImages(captcha *ImgCaptcha) (map[string]string, error) {
+func (c *Client) SolveImages(captcha *Challenge) (map[string]any, error) {
 	if len(captcha.Tasklist) <= 0 {
 		return nil, fmt.Errorf("no images found")
 	}
 
-	type Task struct {
-		DatapointURI string `json:"datapoint_uri"`
-		TaskKey      string `json:"task_key"`
-	}
+	var payload []byte
 
-	type UwU struct {
-		Tasklist []Task `json:"tasklist"`
-		Prompt   string `json:"prompt"`
-	}
+	switch captcha.RequestType {
+	case "image_label_area_select":
+		var entity string
 
-	task := []Task{}
-	for _, t := range captcha.Tasklist {
-		task = append(task, Task{
-			DatapointURI: t.DatapointURI,
-			TaskKey:      t.TaskKey,
+		for _, innerMap := range captcha.RequesterRestrictedAnswerSet {
+			if value, ok := innerMap["en"]; ok {
+				entity = value
+			}
+		}
+
+		payload, _ = json.Marshal(LabelAreaSelect{
+			TaskType:   captcha.RequestType,
+			Question:   captcha.RequesterQuestion.En,
+			EntityType: entity,
+			Tasklist:   captcha.Tasklist,
+		})
+	case "image_label_binary":
+		payload, _ = json.Marshal(LabelBinaryPayload{
+			TaskType: captcha.RequestType,
+			Question: captcha.RequesterQuestion.En,
+			Tasklist: captcha.Tasklist,
 		})
 	}
 
-	imgs, err := json.Marshal(UwU{
-		Tasklist: task,
-		Prompt:   captcha.RequesterQuestion.En,
-	})
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/solve", c.Config.SolverAddress), strings.NewReader(string(payload)))
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/solve", c.Config.SolverAddress), strings.NewReader(string(imgs)))
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	aresp, err := http.DefaultClient.Do(req)
+	defer resp.Body.Close()
+
+	abody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	defer aresp.Body.Close()
-
-	abody, err := ioutil.ReadAll(aresp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var responseJSON map[string]string
+	var responseJSON AiSolverResponse
 	if err := json.Unmarshal([]byte(abody), &responseJSON); err != nil {
 		return nil, err
 	}
 
-	answers := make(map[string]string)
-	for key, value := range responseJSON {
-		if value == "true" || value == "[true]" {
-			answers[key] = "true"
-		} else {
-			answers[key] = "false"
-		}
+	if len(responseJSON.Data) == 0 {
+		return nil, fmt.Errorf("empty answer %s, %+v", captcha.RequestType, responseJSON)
 	}
 
-	if len(answers) == 0 {
-		return nil, fmt.Errorf("no answers found")
-	}
-
-	return answers, nil
+	return responseJSON.Data, nil
 }

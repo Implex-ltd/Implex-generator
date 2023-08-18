@@ -14,6 +14,12 @@ type Point struct {
 	X, Y, T int64
 }
 
+type HcaptchaTaskResponse struct {
+	Token            string
+	AnswerProcessing *time.Duration
+	HswProcessing    *time.Duration
+}
+
 type HcaptchaConfig struct {
 	Sitekey       string
 	Domain        string
@@ -28,6 +34,10 @@ type HcaptchaConfig struct {
 
 type Client struct {
 	Config *HcaptchaConfig
+
+	// profiler
+	AnswerProcessTime time.Duration
+	HswProcessTime    time.Duration
 }
 
 type SiteConfig struct {
@@ -41,7 +51,30 @@ type SiteConfig struct {
 	Pass bool `json:"pass"`
 }
 
-type ImgCaptcha struct {
+type Tasklist []struct {
+	DatapointURI string `json:"datapoint_uri"`
+	TaskKey      string `json:"task_key"`
+}
+
+type LabelAreaSelect struct {
+	TaskType   string   `json:"task_type"`
+	Question   string   `json:"question"`
+	EntityType string   `json:"entity_type"`
+	Tasklist   Tasklist `json:"tasklist"`
+}
+
+type LabelBinaryPayload struct {
+	TaskType string   `json:"task_type"`
+	Question string   `json:"question"`
+	Tasklist Tasklist `json:"tasklist"`
+}
+
+type AiSolverResponse struct {
+	Success bool           `json:"success"`
+	Data    map[string]any `json:"data"`
+}
+
+type Challenge struct {
 	C struct {
 		Type string `json:"type"`
 		Req  string `json:"req"`
@@ -50,34 +83,32 @@ type ImgCaptcha struct {
 	Key           string `json:"key"`
 	RequestConfig struct {
 		Version                      int    `json:"version"`
-		ShapeType                    any    `json:"shape_type"`
-		MinPoints                    any    `json:"min_points"`
-		MaxPoints                    any    `json:"max_points"`
-		MinShapesPerImage            any    `json:"min_shapes_per_image"`
-		MaxShapesPerImage            any    `json:"max_shapes_per_image"`
-		RestrictToCoords             any    `json:"restrict_to_coords"`
-		MinimumSelectionAreaPerShape any    `json:"minimum_selection_area_per_shape"`
+		ShapeType                    string `json:"shape_type"`
+		MinPoints                    int    `json:"min_points"`
+		MaxPoints                    int    `json:"max_points"`
+		MinShapesPerImage            int    `json:"min_shapes_per_image"`
+		MaxShapesPerImage            int    `json:"max_shapes_per_image"`
+		RestrictToCoords             string `json:"restrict_to_coords"`
+		MinimumSelectionAreaPerShape string `json:"minimum_selection_area_per_shape"`
 		MultipleChoiceMaxChoices     int    `json:"multiple_choice_max_choices"`
 		MultipleChoiceMinChoices     int    `json:"multiple_choice_min_choices"`
-		OverlapThreshold             any    `json:"overlap_threshold"`
+		OverlapThreshold             string `json:"overlap_threshold"`
 		AnswerType                   string `json:"answer_type"`
-		MaxValue                     any    `json:"max_value"`
-		MinValue                     any    `json:"min_value"`
-		MaxLength                    any    `json:"max_length"`
-		MinLength                    any    `json:"min_length"`
-		SigFigs                      any    `json:"sig_figs"`
+		MaxValue                     string `json:"max_value"`
+		MinValue                     string `json:"min_value"`
+		MaxLength                    string `json:"max_length"`
+		MinLength                    string `json:"min_length"`
+		SigFigs                      string `json:"sig_figs"`
 		KeepAnswersOrder             bool   `json:"keep_answers_order"`
 	} `json:"request_config"`
 	RequestType       string `json:"request_type"`
 	RequesterQuestion struct {
 		En string `json:"en"`
 	} `json:"requester_question"`
-	RequesterQuestionExample []string `json:"requester_question_example"`
-	Tasklist                 []struct {
-		DatapointURI string `json:"datapoint_uri"`
-		TaskKey      string `json:"task_key"`
-	} `json:"tasklist"`
-	BypassMessage string `json:"bypass-message"`
+	RequesterQuestionExample     []string                     `json:"requester_question_example"`
+	RequesterRestrictedAnswerSet map[string]map[string]string `json:"requester_restricted_answer_set"`
+	Tasklist                     Tasklist                     `json:"tasklist"`
+	BypassMessage                string                       `json:"bypass-message"`
 }
 
 type TxtCaptcha struct {
@@ -117,18 +148,18 @@ type PayloadCheckCaptcha struct {
 	C            string                  `json:"c"`
 }
 
-type PayloadCheckImgCaptcha struct {
-	V            string            `json:"v"`
-	JobMode      string            `json:"job_mode"`
-	Answers      map[string]string `json:"answers"`
-	Serverdomain string            `json:"serverdomain"`
-	Sitekey      string            `json:"sitekey"`
-	MotionData   string            `json:"motionData"`
-	N            string            `json:"n"`
-	C            string            `json:"c"`
+type PayloadCheckChallenge struct {
+	V            string         `json:"v"`
+	JobMode      string         `json:"job_mode"`
+	Answers      map[string]any `json:"answers"`
+	Serverdomain string         `json:"serverdomain"`
+	Sitekey      string         `json:"sitekey"`
+	MotionData   string         `json:"motionData"`
+	N            string         `json:"n"`
+	C            string         `json:"c"`
 }
 
-type PayloadCheckLabelImgCaptcha struct {
+type PayloadCheckLabelChallenge struct {
 	V            string              `json:"v"`
 	JobMode      string              `json:"job_mode"`
 	Answers      map[string][]string `json:"answers"`
@@ -184,54 +215,54 @@ type TopLevel struct {
 }
 
 type Nv struct {
-	VendorSub              string        `json:"vendorSub"`
-	ProductSub             string        `json:"productSub"`
-	Vendor                 string        `json:"vendor"`
-	MaxTouchPoints         int64         `json:"maxTouchPoints"`
-	Scheduling             Bluetooth     `json:"scheduling"`
-	UserActivation         Bluetooth     `json:"userActivation"`
-	DoNotTrack             interface{}   `json:"doNotTrack"`
-	Geolocation            Bluetooth     `json:"geolocation"`
-	Connection             Bluetooth     `json:"connection"`
-	PDFViewerEnabled       bool          `json:"pdfViewerEnabled"`
-	WebkitTemporaryStorage Bluetooth     `json:"webkitTemporaryStorage"`
-	HardwareConcurrency    int64         `json:"hardwareConcurrency"`
-	CookieEnabled          bool          `json:"cookieEnabled"`
-	AppCodeName            string        `json:"appCodeName"`
-	AppName                string        `json:"appName"`
-	AppVersion             string        `json:"appVersion"`
-	Platform               string        `json:"platform"`
-	Product                string        `json:"product"`
-	UserAgent              string        `json:"userAgent"`
-	Language               string        `json:"language"`
-	Languages              []string      `json:"languages"`
-	OnLine                 bool          `json:"onLine"`
-	Webdriver              bool          `json:"webdriver"`
-	Bluetooth              Bluetooth     `json:"bluetooth"`
-	Standalone             bool          `json:"standalone"`
-	Clipboard              Bluetooth     `json:"clipboard"`
-	Credentials            Bluetooth     `json:"credentials"`
-	Keyboard               Bluetooth     `json:"keyboard"`
-	Managed                Bluetooth     `json:"managed"`
-	MediaDevices           Bluetooth     `json:"mediaDevices"`
-	Storage                Bluetooth     `json:"storage"`
-	ServiceWorker          Bluetooth     `json:"serviceWorker"`
-	VirtualKeyboard        Bluetooth     `json:"virtualKeyboard"`
-	WakeLock               Bluetooth     `json:"wakeLock"`
-	DeviceMemory           int64         `json:"deviceMemory"`
-	Ink                    Bluetooth     `json:"ink"`
-	HID                    Bluetooth     `json:"hid"`
-	Locks                  Bluetooth     `json:"locks"`
-	MediaCapabilities      Bluetooth     `json:"mediaCapabilities"`
-	MediaSession           Bluetooth     `json:"mediaSession"`
-	Permissions            Bluetooth     `json:"permissions"`
-	Presentation           Bluetooth     `json:"presentation"`
-	Serial                 Bluetooth     `json:"serial"`
-	USB                    Bluetooth     `json:"usb"`
-	WindowControlsOverlay  Bluetooth     `json:"windowControlsOverlay"`
-	Xr                     Bluetooth     `json:"xr"`
-	UserAgentData          UserAgentData `json:"userAgentData"`
-	Plugins                []string      `json:"plugins"`
+	VendorSub              string      `json:"vendorSub"`
+	ProductSub             string      `json:"productSub"`
+	Vendor                 string      `json:"vendor"`
+	MaxTouchPoints         int64       `json:"maxTouchPoints"`
+	Scheduling             Bluetooth   `json:"scheduling"`
+	UserActivation         Bluetooth   `json:"userActivation"`
+	DoNotTrack             interface{} `json:"doNotTrack"`
+	Geolocation            Bluetooth   `json:"geolocation"`
+	Connection             Bluetooth   `json:"connection"`
+	PDFViewerEnabled       bool        `json:"pdfViewerEnabled"`
+	WebkitTemporaryStorage Bluetooth   `json:"webkitTemporaryStorage"`
+	HardwareConcurrency    int64       `json:"hardwareConcurrency"`
+	CookieEnabled          bool        `json:"cookieEnabled"`
+	AppCodeName            string      `json:"appCodeName"`
+	AppName                string      `json:"appName"`
+	AppVersion             string      `json:"appVersion"`
+	Platform               string      `json:"platform"`
+	Product                string      `json:"product"`
+	UserAgent              string      `json:"userAgent"`
+	Language               string      `json:"language"`
+	Languages              []string    `json:"languages"`
+	OnLine                 bool        `json:"onLine"`
+	Webdriver              bool        `json:"webdriver"`
+	Bluetooth              Bluetooth   `json:"bluetooth"`
+	// Standalone             bool          `json:"standalone"` // iphone
+	Clipboard             Bluetooth     `json:"clipboard"`
+	Credentials           Bluetooth     `json:"credentials"`
+	Keyboard              Bluetooth     `json:"keyboard"`
+	Managed               Bluetooth     `json:"managed"`
+	MediaDevices          Bluetooth     `json:"mediaDevices"`
+	Storage               Bluetooth     `json:"storage"`
+	ServiceWorker         Bluetooth     `json:"serviceWorker"`
+	VirtualKeyboard       Bluetooth     `json:"virtualKeyboard"`
+	WakeLock              Bluetooth     `json:"wakeLock"`
+	DeviceMemory          int64         `json:"deviceMemory"`
+	Ink                   Bluetooth     `json:"ink"`
+	HID                   Bluetooth     `json:"hid"`
+	Locks                 Bluetooth     `json:"locks"`
+	MediaCapabilities     Bluetooth     `json:"mediaCapabilities"`
+	MediaSession          Bluetooth     `json:"mediaSession"`
+	Permissions           Bluetooth     `json:"permissions"`
+	Presentation          Bluetooth     `json:"presentation"`
+	Serial                Bluetooth     `json:"serial"`
+	USB                   Bluetooth     `json:"usb"`
+	WindowControlsOverlay Bluetooth     `json:"windowControlsOverlay"`
+	Xr                    Bluetooth     `json:"xr"`
+	UserAgentData         UserAgentData `json:"userAgentData"`
+	Plugins               []string      `json:"plugins"`
 }
 
 type Bluetooth struct {

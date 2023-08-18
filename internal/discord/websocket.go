@@ -299,7 +299,7 @@ func (c *Client) WsConnect(loginTimeouts ...time.Duration) (*WsLoginResponse, er
 	if len(loginTimeouts) > 0 {
 		loginTimeout = loginTimeouts[0]
 	} else {
-		loginTimeout = 10 * time.Second
+		loginTimeout = 3 * time.Second
 	}
 
 	endTime := time.Now().Add(loginTimeout)
@@ -338,7 +338,7 @@ func (c *Client) WsConnect(loginTimeouts ...time.Duration) (*WsLoginResponse, er
 			Op: 2,
 			D: wsD{
 				Token:        c.Config.Token,
-				Capabilities: 125,
+				Capabilities: 4093,
 				Properties: XProperties{
 					Os:                     c.UaInfo.OSName,
 					Browser:                c.UaInfo.BrowserName,

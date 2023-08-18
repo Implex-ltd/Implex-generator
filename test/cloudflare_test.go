@@ -33,7 +33,7 @@ func TestGetCfbm(t *testing.T) {
 		{
 			args: args{
 				brFp:  brFp,
-				proxy: "http://cap1217:gLAty@172.252.8.224:61234",
+				proxy: "",
 			},
 		},
 	}

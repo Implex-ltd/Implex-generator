@@ -9,13 +9,19 @@ import (
 )
 
 var (
-	THREAD_HSW = 100
-	ARGS       = []string{
+	ARGS = []string{
 		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+		"--disable-popup-blocking", // "discord ask access to position, lol?, no way!"
+
+		"--no-sandbox",
+		"--disable-setuid-sandbox",
+		"--disable-infobars",
+		"--disable-dev-shm-usage",
+		"--enable-gpu",
 	}
 )
 
-func NewInstance(spoof, headless bool) (*Instance, error) {
+func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	pw, err := playwright.Run()
 	if err != nil {
 		return nil, err
@@ -30,7 +36,7 @@ func NewInstance(spoof, headless bool) (*Instance, error) {
 	}
 
 	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		Locale:     playwright.String("en"),
+		Locale:     playwright.String("fr"),
 		TimezoneId: playwright.String("Europe/Paris"),
 		Screen: &playwright.ScreenSize{
 			Width:  playwright.Int(1920),
@@ -45,7 +51,7 @@ func NewInstance(spoof, headless bool) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
 	context.Route("**https://discord.com/api/v9/auth/register**", func(r playwright.Route) {
 		r.Fulfill(playwright.RouteFulfillOptions{
 			Status:      playwright.Int(400),
@@ -71,7 +77,7 @@ func NewInstance(spoof, headless bool) (*Instance, error) {
 		Pw:      pw,
 		Br:      browser,
 		Page:    page,
-		Manager: make(chan struct{}, THREAD_HSW),
+		Manager: make(chan struct{}, threads),
 	}, nil
 }
 
@@ -143,7 +149,7 @@ func (I *Instance) TriggerCaptcha() error {
 		return err
 	}
 
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 5)
 
 	if err := bl.Click(playwright.ElementHandleClickOptions{
 		Timeout: playwright.Float(3000),
@@ -151,10 +157,10 @@ func (I *Instance) TriggerCaptcha() error {
 		return err
 	}
 
+	timeout := time.After(time.Second * 5)
+
 	ticker := time.NewTicker(time.Millisecond * 250)
 	defer ticker.Stop()
-
-	timeout := time.After(time.Second * 5)
 
 	for {
 		select {
@@ -183,8 +189,10 @@ func (I *Instance) Hsw(jwt string) (string, error) {
 		<-I.Manager
 	}()
 
-	answer, err := I.Frame.Evaluate(fmt.Sprintf("hsw(`%s`)", jwt)) // const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}',document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};
+	answer, err := I.Frame.Evaluate(fmt.Sprintf("spoofall();hsw(`%s`)", jwt)) // const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}",document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};
+
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 

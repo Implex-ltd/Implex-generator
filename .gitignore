@@ -56,3 +56,6 @@ scripts/datasetBuilder/input/unlabeled
 *.png
 *.jpg
 *.jpeg
+cmd/AiSolver/models/*
+scripts/datasetBuilder/input/models/*
+assets/output/*

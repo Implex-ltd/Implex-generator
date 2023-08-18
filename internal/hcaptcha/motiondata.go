@@ -43,28 +43,20 @@ func RandomPointInBox(box Box) Point {
 	}
 }
 
-func calculateBezier(t float64, start, ctrl1, ctrl2, end int64) int64 {
-	u := 1.0 - t
-	tt := t * t
+func calculateBezier(WnTime float64, start, ctrl1, ctrl2, end int64) int64 {
+	u := 1.0 - WnTime
+	tt := WnTime * WnTime
 	uu := u * u
 	uuu := uu * u
-	ttt := tt * t
+	ttt := tt * WnTime
 
-	res := uuu*float64(start) + 3*uu*t*float64(ctrl1) + 3*u*tt*float64(ctrl2) + ttt*float64(end)
+	res := uuu*float64(start) + 3*uu*WnTime*float64(ctrl1) + 3*u*tt*float64(ctrl2) + ttt*float64(end)
 	return int64(res)
 }
 
 // Function to generate points along the Bezier curve
 func GenerateMousePath(start, end Point, numPoints int) []Point {
 	const minDiff = 1
-	deltaX := abs(end.X - start.X)
-	if deltaX < minDiff {
-		deltaX = minDiff
-	}
-	deltaY := abs(end.Y - start.Y)
-	if deltaY < minDiff {
-		deltaY = minDiff
-	}
 
 	ctrl1 := Point{
 		X: start.X + max(rand.Int63n(max((end.X-start.X)/2, minDiff)), minDiff),
@@ -79,11 +71,13 @@ func GenerateMousePath(start, end Point, numPoints int) []Point {
 
 	var path []Point
 	for i := 0; i < numPoints; i++ {
-		t := float64(i) / float64(numPoints-1)
-		X := calculateBezier(t, start.X, ctrl1.X, ctrl2.X, end.X)
-		Y := calculateBezier(t, start.Y, ctrl1.Y, ctrl2.Y, end.Y)
-		T := int64((1.0-t)*float64(start.T) + t*float64(end.T))
-		path = append(path, Point{X, Y, T})
+		WnTime := float64(i) / float64(numPoints-1)
+
+		path = append(path, Point{
+			X: calculateBezier(WnTime, start.X, ctrl1.X, ctrl2.X, end.X),
+			Y: calculateBezier(WnTime, start.Y, ctrl1.Y, ctrl2.Y, end.Y),
+			T: int64((1.0-WnTime)*float64(start.T) + WnTime*float64(end.T)),
+		})
 	}
 
 	return path
@@ -94,13 +88,6 @@ func max(a, b int64) int64 {
 		return a
 	}
 	return b
-}
-
-func abs(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
 
 func PlotPoints(points [][]int64) {
@@ -213,15 +200,6 @@ func addTime(st int64, toAdd time.Duration) int64 {
 	return st + toAdd.Milliseconds()
 }
 
-func RandomNumber(a, b int) int {
-	if a >= b {
-		panic("Invalid range: a must be less than b")
-	}
-
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	return rand.Intn(b-a+1) + a
-}
-
 func GetRandomBox() Box {
 	boxIDs := make([]int, 0, len(boxes))
 	for boxID := range boxes {
@@ -233,22 +211,6 @@ func GetRandomBox() Box {
 	randomBoxID := boxIDs[randomIndex]
 
 	return boxes[randomBoxID]
-}
-
-func getTrueItems(data map[string]string) []int {
-	trueItems := make([]int, 0)
-	if len(data) == 0 {
-		return trueItems
-	}
-
-	i := 0
-	for _, value := range data {
-		if value == "true" {
-			trueItems = append(trueItems, i)
-		}
-		i++
-	}
-	return trueItems
 }
 
 func calculateMeanPeriod(events [][]int64) float64 {
@@ -281,94 +243,101 @@ func generateRandomBrowserSize(minSize, maxSize int) (width, height int64) {
 	return width, height
 }
 
-func GenerateMotionCheck(answers map[string]string, w, h int64) string {
-	st := time.Now().UnixNano() / 1e6
-	duration := int64(RandomNumber(1000, 5000))
-
+func genBoxToClick(answers map[string]string) []int {
+	var num = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	var items []int
-	if len(answers) != 0 {
-		items = getTrueItems(answers)
-	} else {
-		items = []int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}
+
+	rand.Shuffle(len(num), func(i, j int) {
+		num[i], num[j] = num[j], num[i]
+	})
+
+	// Ensure the loop doesn't go beyond the length of the num array
+	for i := 0; i < len(answers) && i < len(num); i++ {
+		items = append(items, num[i])
 	}
 
-	if len(items) < 2 {
-		items = []int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}
-	}
+	return items
+}
 
-	path := Click(items, st, duration, RandomNumber(10, 30))
+/*
+* Todo: add right mouse moovements side, if box is lower/higher edit path to add right box
+ */
+func (c *Client) GenerateMotionCheck(answers map[string]string) string {
+	st := time.Now().UnixNano() / 1e6
+	duration := int64(utils.RandomNumber(1000, 5000))
 
-	p2 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(1000, 3000)), RandomNumber(8, 16))
-	p3 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(1000, 3000)), RandomNumber(3, 10))
-	p5 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(1000, 3000)), RandomNumber(10, 20))
+	toClick := genBoxToClick(answers)
+
+	// Generate all mouse curves
+	CaptchaPath := Click(toClick, st, duration, utils.RandomNumber(10, 30))
+	MdPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(1000, 3000)), utils.RandomNumber(8, 16))
+	MuPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(1000, 3000)), utils.RandomNumber(3, 10))
+	MmPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(1000, 3000)), utils.RandomNumber(10, 20))
+	WnTime := time.Duration(utils.RandomNumber(100, 200)) * time.Millisecond
 
 	//PlotPoints(path)
 
-	t := time.Duration(RandomNumber(100, 200)) * time.Millisecond
-
-	m, _ := json.Marshal(&Data{
+	data, _ := json.Marshal(&Data{
 		St:   st,
 		Dct:  st,
-		Mm:   path,
-		MmMp: calculateMeanPeriod(path),
-		Md:   p2,
-		MdMp: calculateMeanPeriod(p2),
-		Mu:   p3,
-		MuMp: calculateMeanPeriod(p3),
+		Mm:   CaptchaPath,
+		MmMp: calculateMeanPeriod(CaptchaPath),
+		Md:   MdPath,
+		MdMp: calculateMeanPeriod(MdPath),
+		Mu:   MuPath,
+		MuMp: calculateMeanPeriod(MuPath),
 		TopLevel: TopLevel{
 			St: st,
 			Sc: Sc{
-				AvailWidth:  w * 2,
-				AvailHeight: h * 2,
-				Width:       w * 2,
-				Height:      h * 2,
-				ColorDepth:  24,
-				PixelDepth:  24,
-				AvailLeft:   0,
-				AvailTop:    0,
+				AvailWidth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth),
+				AvailHeight: int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailHeight),
+				Width:       int64(c.Config.HttpClient.Config.BrowserFp.Screen.Width),
+				Height:      int64(c.Config.HttpClient.Config.BrowserFp.Screen.Height),
+				ColorDepth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.ColorDepth),
+				PixelDepth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.PixelDepth),
+				AvailLeft:   int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailLeft),
+				AvailTop:    int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailTop),
 				Onchange:    nil,
 				IsExtended:  true,
 			},
 			Nv: Nv{
-				HardwareConcurrency: 16,
-				DeviceMemory:        8,
+				HardwareConcurrency: int64(c.Config.HttpClient.Config.BrowserFp.Navigator.HardwareConcurrency),
+				DeviceMemory:        int64(c.Config.HttpClient.Config.BrowserFp.Navigator.DeviceMemory),
 				Webdriver:           false,
-				MaxTouchPoints:      0,
+				MaxTouchPoints:      int64(c.Config.HttpClient.Config.BrowserFp.Navigator.MaxTouchPoints),
 				CookieEnabled:       true,
-				AppCodeName:         "Mozilla",
-				AppName:             "Netscape",
-				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-				Platform:            "Win32",
-				Product:             "Gecko",
-				ProductSub:          "20030107",
-				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-				Vendor:              "Google Inc.",
-				VendorSub:           "",
-				Language:            "fr-FR",
-				Languages: []string{
-					"fr-FR", "fr", "en-US", "en",
-				},
-				OnLine:           true,
-				PDFViewerEnabled: true,
-				DoNotTrack:       nil,
-				Plugins:          []string{"internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer"},
+				AppCodeName:         c.Config.HttpClient.Config.BrowserFp.Navigator.AppCodeName,
+				AppName:             c.Config.HttpClient.Config.BrowserFp.Navigator.AppName,
+				AppVersion:          c.Config.HttpClient.Config.BrowserFp.Navigator.AppVersion,
+				Platform:            c.Config.HttpClient.Config.BrowserFp.Navigator.Platform,
+				Product:             c.Config.HttpClient.Config.BrowserFp.Navigator.Product,
+				ProductSub:          c.Config.HttpClient.Config.BrowserFp.Navigator.ProductSub,
+				UserAgent:           c.Config.HttpClient.Config.BrowserFp.Navigator.UserAgent,
+				Vendor:              c.Config.HttpClient.Config.BrowserFp.Navigator.Vendor,
+				VendorSub:           c.Config.HttpClient.Config.BrowserFp.Navigator.VendorSub,
+				Language:            c.Config.HttpClient.Config.BrowserFp.Navigator.Language,
+				Languages:           c.Config.HttpClient.Config.BrowserFp.Navigator.Languages,
+				OnLine:              true,
+				PDFViewerEnabled:    true,
+				DoNotTrack:          c.Config.HttpClient.Config.BrowserFp.Navigator.DoNotTrack,
+				Plugins:             []string{"internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer"},
 				UserAgentData: UserAgentData{
 					Brands: []Brand{
 						{
-							Brand:   "Chromium",
-							Version: "115",
+							Brand:   c.Config.HttpClient.BaseHeader.UaInfo.BrowserName,
+							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
 							Brand:   "Google Chrome",
-							Version: "115",
+							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
-							Brand:   "Not:A-Brand",
-							Version: "8",
+							Brand:   "Not/A)Brand",
+							Version: "99",
 						},
 					},
 					Mobile:   false,
-					Platform: "Windows",
+					Platform: c.Config.HttpClient.Config.BrowserFp.Navigator.Platform,
 				},
 			},
 			DR:   "",
@@ -376,109 +345,106 @@ func GenerateMotionCheck(answers map[string]string, w, h int64) string {
 			Exec: false,
 			Wn: [][]int64{
 				{
-					w,              // mt.Browser.width()   // ---> return window.innerWidth && window.document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || window.document.documentElement.clientWidth || document.body.clientWidth;
-					h,              // mt.Browser.height()  // ---> return window.innerHeight || window.document.documentElement.clientHeight || document.body.clientHeight;
-					1,              // mt.System.dpr()
-					addTime(st, t), // Date.now()
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth),  // mt.Browser.width()   // ---> return window.innerWidth && window.document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || window.document.documentElement.clientWidth || document.body.clientWidth;
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailHeight), // mt.Browser.height()  // ---> return window.innerHeight || window.document.documentElement.clientHeight || document.body.clientHeight;
+					1,                   // mt.System.dpr()
+					addTime(st, WnTime), // Date.now()
 				},
 			},
 			WnMp: 0,
 			Xy: [][]int64{
 				{
-					0,              // mt.Browser.scrollX(),  // ---> return window.pageXOffset !== undefined ? window.pageXOffset : t.isCSS1 ? document.documentElement.scrollLeft : document.body.scrollLeft;
-					0,              // mt.Browser.scrollY(),  // ---> return window.pageYOffset !== undefined ? window.pageYOffset : t.isCSS1 ? document.documentElement.scrollTop : document.body.scrollTop;
-					w / (w * 2),    // document.documentElement.clientWidth / mt.Browser.width(),
-					addTime(st, t), // Date.now()
+					0, // mt.Browser.scrollX(),  // ---> return window.pageXOffset !== undefined ? window.pageXOffset : WnTime.isCSS1 ? document.documentElement.scrollLeft : document.body.scrollLeft;
+					0, // mt.Browser.scrollY(),  // ---> return window.pageYOffset !== undefined ? window.pageYOffset : WnTime.isCSS1 ? document.documentElement.scrollTop : document.body.scrollTop;
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth) / (int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth) * 2), // document.documentElement.clientWidth / mt.Browser.width(),
+					addTime(st, WnTime), // Date.now()
 				},
 			},
 			XyMp: 0,
-			Mm:   p5,
-			MmMp: calculateMeanPeriod(p5),
+			Mm:   MmPath,
+			MmMp: calculateMeanPeriod(MmPath),
 		},
 		V: 1,
 	})
 
-	return string(m)
+	return string(data)
 }
 
-func GenerateMotionGet(w, h int64) string {
+func (c *Client) GenerateMotionGet() string {
 	st := time.Now().UnixNano() / 1e6
-	duration := int64(RandomNumber(300, 3500))
+	duration := int64(utils.RandomNumber(300, 3500))
 
-	path := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8)}, st, duration, 14)
+	CaptchaId := utils.RandomString(12)
 
-	p2 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(100, 1500)), 2)
-	p3 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(100, 1500)), RandomNumber(2, 5))
-	p7 := Click([]int{RandomNumber(0, 8), RandomNumber(0, 8)}, st, int64(RandomNumber(100, 1500)), RandomNumber(2, 18))
+	// Generate all mouse curves
+	CaptchaPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, duration, 14)
+	MdPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(100, 1500)), 2)
+	MuPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(100, 1500)), utils.RandomNumber(2, 5))
+	MmPath := Click([]int{utils.RandomNumber(0, 8), utils.RandomNumber(0, 8)}, st, int64(utils.RandomNumber(100, 1500)), utils.RandomNumber(2, 18))
+	Wntime := time.Duration(utils.RandomNumber(100, 200)) * time.Millisecond
 
 	//PlotPoints(path)
-
-	id := utils.RandomString(12)
-	t := time.Duration(RandomNumber(100, 200)) * time.Millisecond
-
-	m, _ := json.Marshal(&GetData{
+	data, _ := json.Marshal(&GetData{
 		St:   st,
-		Mm:   path,
-		MmMp: calculateMeanPeriod(path),
-		Md:   p2,
-		MdMp: int64(calculateMeanPeriod(p2)),
-		Mu:   p3,
-		MuMp: int64(calculateMeanPeriod(p3)),
+		Mm:   CaptchaPath,
+		MmMp: calculateMeanPeriod(CaptchaPath),
+		Md:   MdPath,
+		MdMp: int64(calculateMeanPeriod(MdPath)),
+		Mu:   MuPath,
+		MuMp: int64(calculateMeanPeriod(MuPath)),
 		V:    1,
 		TopLevel: GetTopLevel{
 			St: st,
 			Sc: GetSc{
-				AvailWidth:  w * 2,
-				AvailHeight: h * 2,
-				Width:       w * 2,
-				Height:      h * 2,
-				ColorDepth:  24,
-				PixelDepth:  24,
-				AvailLeft:   0,
-				AvailTop:    0,
+				AvailWidth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth),
+				AvailHeight: int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailHeight),
+				Width:       int64(c.Config.HttpClient.Config.BrowserFp.Screen.Width),
+				Height:      int64(c.Config.HttpClient.Config.BrowserFp.Screen.Height),
+				ColorDepth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.ColorDepth),
+				PixelDepth:  int64(c.Config.HttpClient.Config.BrowserFp.Screen.PixelDepth),
+				AvailLeft:   int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailLeft),
+				AvailTop:    int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailTop),
 				Onchange:    nil,
 				IsExtended:  true,
 			},
 			Nv: GetNv{
-				HardwareConcurrency: 16,
-				DeviceMemory:        8,
+				HardwareConcurrency: int64(c.Config.HttpClient.Config.BrowserFp.Navigator.HardwareConcurrency),
+				DeviceMemory:        int64(c.Config.HttpClient.Config.BrowserFp.Navigator.DeviceMemory),
 				Webdriver:           false,
-				MaxTouchPoints:      0,
+				MaxTouchPoints:      int64(c.Config.HttpClient.Config.BrowserFp.Navigator.MaxTouchPoints),
 				CookieEnabled:       true,
-				AppCodeName:         "Mozilla",
-				AppName:             "Netscape",
-				AppVersion:          "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-				Platform:            "Win32",
-				Product:             "Gecko",
-				ProductSub:          "20030107",
-				UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-				Vendor:              "Google Inc.",
-				VendorSub:           "",
-				Language:            "fr-FR",
-				Languages: []string{
-					"fr-FR", "fr", "en-US", "en",
-				},
-				OnLine:           true,
-				PDFViewerEnabled: true,
-				DoNotTrack:       nil,
-				Plugins:          []string{"internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer"},
+				AppCodeName:         c.Config.HttpClient.Config.BrowserFp.Navigator.AppCodeName,
+				AppName:             c.Config.HttpClient.Config.BrowserFp.Navigator.AppName,
+				AppVersion:          c.Config.HttpClient.Config.BrowserFp.Navigator.AppVersion,
+				Platform:            c.Config.HttpClient.Config.BrowserFp.Navigator.Platform,
+				Product:             c.Config.HttpClient.Config.BrowserFp.Navigator.Product,
+				ProductSub:          c.Config.HttpClient.Config.BrowserFp.Navigator.ProductSub,
+				UserAgent:           c.Config.HttpClient.Config.BrowserFp.Navigator.UserAgent,
+				Vendor:              c.Config.HttpClient.Config.BrowserFp.Navigator.Vendor,
+				VendorSub:           c.Config.HttpClient.Config.BrowserFp.Navigator.VendorSub,
+				Language:            c.Config.HttpClient.Config.BrowserFp.Navigator.Language,
+				Languages:           c.Config.HttpClient.Config.BrowserFp.Navigator.Languages,
+				OnLine:              true,
+				PDFViewerEnabled:    true,
+				DoNotTrack:          c.Config.HttpClient.Config.BrowserFp.Navigator.DoNotTrack,
+				Plugins:             []string{"internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer", "internal-pdf-viewer"},
 				UserAgentData: UserAgentData{
 					Brands: []Brand{
 						{
-							Brand:   "Chromium",
-							Version: "115",
+							Brand:   c.Config.HttpClient.BaseHeader.UaInfo.BrowserName,
+							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
 							Brand:   "Google Chrome",
-							Version: "115",
+							Version: c.Config.HttpClient.BaseHeader.UaInfo.UaVersion,
 						},
 						{
-							Brand:   "Not:A-Brand",
-							Version: "8",
+							Brand:   "Not/A)Brand",
+							Version: "99",
 						},
 					},
 					Mobile:   false,
-					Platform: "Windows", // MacIntel
+					Platform: c.Config.HttpClient.Config.BrowserFp.Navigator.Platform,
 				},
 			},
 			DR:   "",
@@ -486,30 +452,30 @@ func GenerateMotionGet(w, h int64) string {
 			Exec: false,
 			Wn: [][]int64{
 				{
-					w,              // mt.Browser.width()   // ---> return window.innerWidth && window.document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || window.document.documentElement.clientWidth || document.body.clientWidth;
-					h,              // mt.Browser.height()  // ---> return window.innerHeight || window.document.documentElement.clientHeight || document.body.clientHeight;
-					1,              // mt.System.dpr()
-					addTime(st, t), // Date.now()
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth),  // mt.Browser.width()   // ---> return window.innerWidth && window.document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || window.document.documentElement.clientWidth || document.body.clientWidth;
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailHeight), // mt.Browser.height()  // ---> return window.innerHeight || window.document.documentElement.clientHeight || document.body.clientHeight;
+					1,                   // mt.System.dpr()
+					addTime(st, Wntime), // Date.now()
 				},
 			},
 			WnMp: 0,
 			Xy: [][]int64{
 				{
-					0,              // mt.Browser.scrollX(),  // ---> return window.pageXOffset !== undefined ? window.pageXOffset : t.isCSS1 ? document.documentElement.scrollLeft : document.body.scrollLeft;
-					0,              // mt.Browser.scrollY(),  // ---> return window.pageYOffset !== undefined ? window.pageYOffset : t.isCSS1 ? document.documentElement.scrollTop : document.body.scrollTop;
-					w / (w * 2),    // document.documentElement.clientWidth / mt.Browser.width(),
-					addTime(st, t), // Date.now()
+					0, // mt.Browser.scrollX(),  // ---> return window.pageXOffset !== undefined ? window.pageXOffset : WnTime.isCSS1 ? document.documentElement.scrollLeft : document.body.scrollLeft;
+					0, // mt.Browser.scrollY(),  // ---> return window.pageYOffset !== undefined ? window.pageYOffset : WnTime.isCSS1 ? document.documentElement.scrollTop : document.body.scrollTop;
+					int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth) / (int64(c.Config.HttpClient.Config.BrowserFp.Screen.AvailWidth) * 2), // document.documentElement.clientWidth / mt.Browser.width(),
+					addTime(st, Wntime), // Date.now()
 				},
 			},
 			XyMp: 0,
-			Mm:   p7,
-			MmMp: calculateMeanPeriod(p7),
+			Mm:   MmPath,
+			MmMp: calculateMeanPeriod(MmPath),
 		},
 		Session: []string{},
 		WidgetList: []string{
-			id,
+			CaptchaId,
 		},
-		WidgetID: id,
+		WidgetID: CaptchaId,
 		Href:     "https://discord.com/",
 		Prev: GetPrev{
 			Escaped:          false,
@@ -519,5 +485,5 @@ func GenerateMotionGet(w, h int64) string {
 		},
 	})
 
-	return string(m)
+	return string(data)
 }
