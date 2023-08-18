@@ -1,15 +1,11 @@
-from fastapi import FastAPI, HTTPException
 from onnxruntime import InferenceSession
-from httpx import Client
 from PIL import Image
 from io import BytesIO
 import numpy as np
-import json, os, httpx, contextlib, threading
+import json, os, httpx, threading
 from base64 import b64encode
-from fastapi import Request
 import time, xxhash, requests, httpx
-from fastapi import Body
-import concurrent.futures
+import multiprocessing, concurrent
 
 __models__ = list(set(os.listdir("./models")))
 __loaded__ = {}
@@ -339,43 +335,29 @@ class Task(Ai):
             if data["question"] not in hashlist:
                 hashlist[data["question"]] = []
 
-            for task in data["tasklist"]:
-                dl = time.time()
+            def process_task(task):
                 found, imghash, img = download_image(
                     task["datapoint_uri"], data["question"]
                 )
-                print("dl time", time.time() - dl)
 
-                hl = time.time()
                 if found:
-                    answer[task["task_key"]] = "true"
-                    print("hash", time.time() - hl)
+                    return "true"
                 else:
-                    pl = time.time()
-                    answer[task["task_key"]] = (
-                        "true" if self.determine(img) else "false"
-                    )
-                    print("determine", time.time() - pl)
-
-                    if answer[task["task_key"]] == "true":
+                    if self.determine(img):
                         hashlist[data["question"]].append(imghash)
+                        saves(imghash, data["question"])
+                        return "true"
+                    else:
+                        return "false"
 
-                        threading.Thread(
-                            target=saves, args=[imghash, data["question"]]
-                        ).start()
+            num_threads = min(concurrent.futures.thread.ThreadPoolExecutor()._max_workers, len(data["tasklist"]/2))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+                task_results = list(executor.map(process_task, data["tasklist"]))
 
-        if data["task_type"] == Task.AREA_SELECT:
-            try:
-                {
-                    "success": True,
-                    "data": predict(
-                        data["task_type"], data["question"], data["tasklist"]
-                    ),
-                }
-            except Exception as e:
-                print(e)
+            for idx, task in enumerate(data["tasklist"]):
+                answer[task["task_key"]] = task_results[idx]
 
-        return answer
+            return answer
 
 
 def test():

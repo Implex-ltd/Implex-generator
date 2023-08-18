@@ -13,7 +13,7 @@ version = 218604
 [hcaptcha]
 lang = "en"
 version = "a8bdc18"
-submitTime = 6
+submitTime = 3
 hswAddress = "http://127.0.0.1:4000"
 SolverAddress = "http://127.0.0.1:1332"
 siteKey = "4c672d35-0701-42b2-88c3-78380b0db560"
@@ -26,12 +26,12 @@ proxyType = "http"
 sessionReplaceMe = "REPLACEME"
 
 [performances]
-goroutines = 40
-debug = true
+goroutines = 5
+debug = false
 
 [engine]
 browserHswThreadCount = 500
-browserCount = 6
+browserCount = 5
 
 [extra]
 theme = "random"

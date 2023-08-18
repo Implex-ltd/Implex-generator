@@ -30,7 +30,7 @@ func NewHcaptchaClient(config *HcaptchaConfig) *Client {
 func (c *Client) DownloadFile(url string, filePath string) error {
 	h := c.HeaderCheckSiteConfig()
 
-	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
+	resp, err := c.Config.HttpClient.DoTls(cleanhttp.RequestOption{
 		Method: "GET",
 		Url:    url,
 		Header: h,
@@ -49,7 +49,7 @@ func (c *Client) DownloadFile(url string, filePath string) error {
 	x := md5.Sum(buff)
 	hash := hex.EncodeToString(x[:])
 
-	file, err := os.Create(fmt.Sprintf("%s/%s/%s.png", utils.BasePath, filePath, hash))
+	file, err := os.Create(fmt.Sprintf("%s/%s/%s.jpeg", utils.BasePath, filePath, hash))
 	if err != nil {
 		return err
 	}
@@ -106,8 +106,6 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 		P:   1,
 		Gcs: int(time.Since(hsl_start).Milliseconds()),
 	}
-
-	fmt.Println(fmt.Sprintf(`{"s":%v,"n":%d,"p":%d,"gcs":%d}`, pdc.S, pdc.N, pdc.P, pdc.Gcs))
 
 	payload := url.Values{}
 	for name, value := range map[string]string{
@@ -240,7 +238,6 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 }
 
 func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
-	a := time.Now()
 	config, err := c.checkSiteConfig()
 	if err != nil {
 		return nil, err
@@ -282,14 +279,11 @@ func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 	/*if c.Config.Scrape {
 		return nil, fmt.Errorf("invalid label for scraping")
 	}*/
-
-	t := time.Now()
+	
 	resp, err := c.checkChallenge(imgCap)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("check time:", time.Since(t).Seconds())
-	fmt.Println("all captcha time", time.Now().Sub(a).Seconds())
 
 	if !resp.Pass {
 		return nil, fmt.Errorf("SolveImage(): submit failed pass")

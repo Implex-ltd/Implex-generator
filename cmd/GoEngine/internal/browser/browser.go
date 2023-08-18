@@ -77,7 +77,7 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 		})
 	})
 
-		page, err := context.NewPage()
+	page, err := context.NewPage()
 	if err != nil {
 		return nil, err
 	}
@@ -206,8 +206,7 @@ func (I *Instance) Hsw(jwt string) (string, error) {
 		<-I.Manager
 	}()
 
-	answer, err := I.Frame.Evaluate(fmt.Sprintf("spoofall();hsw(`%s`)", jwt)) // const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}",document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};
-
+	answer, err := I.Frame.Evaluate(fmt.Sprintf("spoofall();hsw(`%s`)", jwt))
 	if err != nil {
 		fmt.Println(err)
 		return "", err

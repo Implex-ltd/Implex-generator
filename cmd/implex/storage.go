@@ -132,23 +132,15 @@ func ConsoleTitle() {
 		case TASK_MENU:
 			bar = "Menu"
 		case TASK_GEN:
-			bar = fmt.Sprintf("Gen=%d, Unlock=%d (%s%%), Locked=%d, CPM=%d, SolverCPM=%d, Err=%d, SolveT=%ds, ImgProcT=%ds, HswProcT=%ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(minutesPassed(TaskSt))), int(float64(Solved)/float64(minutesPassed(TaskSt))), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
+			bar = fmt.Sprintf("Gen=%d, Unlock=%d (%s%%), Locked=%d, CPM=%d, SolverCPM=%d, Err=%d, SolveT=%ds, ImgProcT=%ds, HswProcT=%ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(time.Since(TaskSt).Minutes())), int(float64(Solved)/float64(time.Since(TaskSt).Minutes())), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
 			console.Log(bar)
 		case TASK_SCRAPE:
 			Scraped = hcaptcha.Scrape
-			bar = fmt.Sprintf("Scrape: %d, ScraperCPM: %d, Err: %d", Scraped, int(float64(Scraped)/float64(minutesPassed(TaskSt))), ScrapeError)
+			bar = fmt.Sprintf("Scrape=%d, CPS=%d, CPM=%d, Err=%d", Scraped, int(float64(Scraped)/float64(time.Since(TaskSt).Seconds())), int(float64(Scraped)/float64(time.Since(TaskSt).Minutes())), ScrapeError)
 			console.Log(bar)
 		}
 
 		console.SetTitle(fmt.Sprintf("Implex %s [%s] ⇸ %s", version, uptimeStr, bar))
 		time.Sleep(1500 * time.Millisecond)
 	}
-}
-
-func minutesPassed(startTime time.Time) int {
-	minutes := int(time.Since(startTime).Minutes())
-	if minutes == 0 {
-		return 1
-	}
-	return minutes
 }
