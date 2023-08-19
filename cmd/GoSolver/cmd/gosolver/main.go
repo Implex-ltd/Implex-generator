@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"github.com/cespare/xxhash"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -58,7 +57,7 @@ func DownloadAndClassify(url, key, prompt string, results chan<- Result, wg *syn
 		results <- Result{Hash: "", Match: false, Err: err, Url: url, St: time.Since(st), Key: key}
 		return
 	}
-	
+
 	contentHash := xxhash.Sum64(buff)
 
 	// already solved [new feature !]
@@ -151,6 +150,9 @@ func HandlerSolve(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	if _, err := toml.DecodeFile("../../scripts/config.toml", &Config); err != nil {
+		panic(err)
+	}
 	LoadLogger()
 
 	count, err := LoadHash()
@@ -174,7 +176,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Post("/solve", HandlerSolve)
 
-	err = http.ListenAndServe(":1332", r)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", Config.Server.Port), r)
 	if err != nil {
 		panic(err)
 	}

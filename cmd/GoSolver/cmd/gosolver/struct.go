@@ -10,6 +10,7 @@ var (
 	hashlist = map[string][]string{}
 	logger   *zap.Logger
 	mu       sync.Mutex
+	Config   = Cfg{}
 )
 
 type Result struct {
@@ -35,4 +36,14 @@ type BodyNewSolveTask struct {
 type SolveRepsonse struct {
 	Success bool              `json:"success"`
 	Data    map[string]string `json:"data"`
+}
+
+type Cfg struct {
+	Server struct {
+		Port int `toml:"port"`
+	} `toml:"server"`
+	Login struct {
+		Output  string `toml:"output"`
+		Enabled bool   `toml:"enabled"`
+	} `toml:"login"`
 }

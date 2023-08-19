@@ -10,7 +10,7 @@ import (
 )
 
 func LoadHash() (int, error) {
-	file, err := os.Open("asset/hash.csv")
+	file, err := os.Open("../../asset/hash.csv")
 	if err != nil {
 		return 0, err
 	}
@@ -88,7 +88,7 @@ func LoadLogger() {
 		zapcore.NewCore(kafkaEncoder, topicDebugging, lowPriority),
 		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
 	)
-
+	
 	// From a zapcore.Core, it's easy to construct a Logger.
 	logger = zap.New(core)
 }

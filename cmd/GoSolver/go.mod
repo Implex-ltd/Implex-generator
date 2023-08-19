@@ -1,6 +1,6 @@
 module github.com/0xF7A4C6/GoSolver
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/cespare/xxhash v1.1.0
@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/go-chi/chi/v5 v5.0.10 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
