@@ -1,6 +1,0 @@
-[server]
-port = 1332
-
-[login]
-output = '../asset/logs/logs.log'
-enabled = true

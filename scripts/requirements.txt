@@ -10,6 +10,7 @@ tls_client
 matplotlib
 bezier
 tqdm
+xxhash
 
 # hcaptcha_challenger dependencies
 fire~=0.4.0
