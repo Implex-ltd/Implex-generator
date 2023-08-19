@@ -1,17 +1,34 @@
-from fastapi import FastAPI, HTTPException
 from onnxruntime import InferenceSession
-from httpx import Client
 from PIL import Image
 from io import BytesIO
 import numpy as np
-import json, os, httpx, contextlib, threading
+import json, os, httpx, threading
 from base64 import b64encode
-from fastapi import Request
-import time
-from fastapi import Body
+import time, xxhash, requests, httpx
+import multiprocessing, concurrent
 
 __models__ = list(set(os.listdir("./models")))
 __loaded__ = {}
+
+hashlist = {}
+
+
+def load_hash():
+    for lines in open("./hash.csv", "r+").read().splitlines():
+        try:
+            if "," not in lines:
+                continue
+
+            hash, prompt = lines.split(",")
+
+            if prompt not in hashlist:
+                hashlist[prompt] = []
+
+            hashlist[prompt].append(hash)
+        except:
+            pass
+
+    print(len(hashlist), "loaded hash")
 
 
 class Ai:
@@ -22,7 +39,12 @@ class Ai:
 
         if x not in __loaded__:
             print("load", x)
-            __loaded__[x] = InferenceSession(x)
+            __loaded__[x] = InferenceSession(
+                x,
+                providers=[
+                    "CUDAExecutionProvider",
+                ],
+            )
 
         self.session = __loaded__[x]
 
@@ -54,166 +76,207 @@ class Ai:
 def predict(
     captcha_type, question, taskList
 ) -> dict:  # sourcery skip: extract-duplicate-method
-    with contextlib.suppress(Exception):
-        if captcha_type == "image_label_binary":
-            imgB64 = {
-                str(i): b64encode(
-                    httpx.get(
-                        str(img["datapoint_uri"]),
-                        headers={
-                            "authority": "imgs.hcaptcha.com",
-                            "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                            "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-                            "cache-control": "no-cache",
-                            "pragma": "no-cache",
-                            "referer": "https://newassets.hcaptcha.com/",
-                            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
-                            "sec-ch-ua-mobile": "?0",
-                            "sec-ch-ua-platform": '"Windows"',
-                            "sec-fetch-dest": "image",
-                            "sec-fetch-mode": "no-cors",
-                            "sec-fetch-site": "same-site",
-                            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                        },
-                    ).content
-                ).decode("utf-8")
-                for i, img in enumerate(taskList)
-            }
+    if captcha_type == "image_label_binary":
+        imgB64 = {
+            str(i): b64encode(
+                httpx.get(
+                    str(img["datapoint_uri"]),
+                    headers={
+                        "authority": "imgs.hcaptcha.com",
+                        "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                        "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+                        "cache-control": "no-cache",
+                        "pragma": "no-cache",
+                        "referer": "https://newassets.hcaptcha.com/",
+                        "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": '"Windows"',
+                        "sec-fetch-dest": "image",
+                        "sec-fetch-mode": "no-cors",
+                        "sec-fetch-site": "same-site",
+                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                    },
+                ).content
+            ).decode("utf-8")
+            for i, img in enumerate(taskList)
+        }
 
-            task = httpx.post(
-                "https://pro.nocaptchaai.com/solve",
-                headers={
-                    "Content-type": "application/json",
-                    "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
-                },
-                json={
-                    "images": imgB64,
-                    "target": question,
-                    "method": "hcaptcha_base64",
-                    "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
-                    "site": "discord.com",
-                },
-            )
-            prediction = task.json()["solution"]
-            resp = [i in prediction for i in range(len(taskList))]
-            return {
-                task["task_key"]: str(resp).lower()
-                for task, resp in zip(taskList, resp)
-            }
-        elif captcha_type == "image_label_area_select":
-            imgB64 = {
-                str(i): b64encode(
-                    httpx.get(
-                        str(img["datapoint_uri"]),
-                        headers={
-                            "authority": "imgs.hcaptcha.com",
-                            "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                            "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-                            "cache-control": "no-cache",
-                            "pragma": "no-cache",
-                            "referer": "https://newassets.hcaptcha.com/",
-                            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
-                            "sec-ch-ua-mobile": "?0",
-                            "sec-ch-ua-platform": '"Windows"',
-                            "sec-fetch-dest": "image",
-                            "sec-fetch-mode": "no-cors",
-                            "sec-fetch-site": "same-site",
-                            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                        },
-                    ).content
-                ).decode("utf-8")
-                for i, img in enumerate(taskList)
-            }
+        task = httpx.post(
+            "https://pro.nocaptchaai.com/solve",
+            headers={
+                "Content-type": "application/json",
+                "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
+            },
+            json={
+                "images": imgB64,
+                "target": question,
+                "method": "hcaptcha_base64",
+                "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
+                "site": "discord.com",
+            },
+        )
+        prediction = task.json()["solution"]
+        resp = [i in prediction for i in range(len(taskList))]
+        return {
+            task["task_key"]: str(resp).lower() for task, resp in zip(taskList, resp)
+        }
+    elif captcha_type == "image_label_area_select":
+        imgB64 = {
+            str(i): b64encode(
+                httpx.get(
+                    str(img["datapoint_uri"]),
+                    headers={
+                        "authority": "imgs.hcaptcha.com",
+                        "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                        "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+                        "cache-control": "no-cache",
+                        "pragma": "no-cache",
+                        "referer": "https://newassets.hcaptcha.com/",
+                        "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": '"Windows"',
+                        "sec-fetch-dest": "image",
+                        "sec-fetch-mode": "no-cors",
+                        "sec-fetch-site": "same-site",
+                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                    },
+                ).content
+            ).decode("utf-8")
+            for i, img in enumerate(taskList)
+        }
 
-            task = httpx.post(
-                "https://pro.nocaptchaai.com/solve",
-                headers={
-                    "Content-type": "application/json",
-                    "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
-                },
-                json={
-                    "images": imgB64,
-                    "target": question,
-                    "type": "bbox",
-                    "method": "hcaptcha_base64",
-                    "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
-                    "site": "discord.com",
-                },
-            )
-            task = httpx.get(
-                task.json()["url"],
-                headers={
-                    "Content-type": "application/json",
-                    "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
-                },
-            )
-            prediction = task.json()["answers"]
-            result = {}
-            print("prediction:", prediction)
-            for i in range(len(taskList)):
+        task = httpx.post(
+            "https://pro.nocaptchaai.com/solve",
+            headers={
+                "Content-type": "application/json",
+                "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
+            },
+            json={
+                "images": imgB64,
+                "target": question,
+                "type": "bbox",
+                "method": "hcaptcha_base64",
+                "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
+                "site": "discord.com",
+            },
+        )
+        print(task.text)
+        task = httpx.get(
+            task.json()["url"],
+            headers={
+                "Content-type": "application/json",
+                "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
+            },
+        )
+        prediction = task.json()["answers"]
+        result = {}
+        print(question)
+        qa = question.split("on the ")[1].replace(" ", "_")
+
+        print("prediction:", qa, prediction)
+        for i in range(len(taskList)):
+            try:
                 k = taskList[i]["task_key"]
-                qa = question.split("Please click each image containing a ")[1].replace(
-                    " ", "_"
-                )
+
                 c = [
                     {
                         "entity_name": 0,
-                        "entity_type": qa + "watercolor-lmv2",
+                        "entity_type": qa + "watercolorlmv2",
                         "entity_coords": prediction[i],
                     }
                 ]
                 result[k] = result.get(k, []) + [c]
-            return result
-        elif captcha_type == "image_label_multiple_choice":
-            imgB64 = {
-                str(i): b64encode(
-                    httpx.get(
-                        str(img["datapoint_uri"]),
-                        headers={
-                            "authority": "imgs.hcaptcha.com",
-                            "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                            "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-                            "cache-control": "no-cache",
-                            "pragma": "no-cache",
-                            "referer": "https://newassets.hcaptcha.com/",
-                            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
-                            "sec-ch-ua-mobile": "?0",
-                            "sec-ch-ua-platform": '"Windows"',
-                            "sec-fetch-dest": "image",
-                            "sec-fetch-mode": "no-cors",
-                            "sec-fetch-site": "same-site",
-                            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                        },
-                    ).content
-                ).decode("utf-8")
-                for i, img in enumerate(taskList)
-            }
+                print(result)
+            except Exception as e:
+                print("uwu", e, qa, prediction)
+                continue
+        return result
+    elif captcha_type == "image_label_multiple_choice":
+        imgB64 = {
+            str(i): b64encode(
+                httpx.get(
+                    str(img["datapoint_uri"]),
+                    headers={
+                        "authority": "imgs.hcaptcha.com",
+                        "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                        "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+                        "cache-control": "no-cache",
+                        "pragma": "no-cache",
+                        "referer": "https://newassets.hcaptcha.com/",
+                        "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="115", "Google Chrome";v="115"',
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": '"Windows"',
+                        "sec-fetch-dest": "image",
+                        "sec-fetch-mode": "no-cors",
+                        "sec-fetch-site": "same-site",
+                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                    },
+                ).content
+            ).decode("utf-8")
+            for i, img in enumerate(taskList)
+        }
 
-            task = httpx.post(
-                "https://pro.nocaptchaai.com/solve",
-                headers={
-                    "Content-type": "application/json",
-                    "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
-                },
-                json={
-                    "images": imgB64,
-                    "target": question,
-                    "type": "multi",
-                    "method": "hcaptcha_base64",
-                    "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
-                    "site": "discord.com",
-                },
-            )
-            task = httpx.get(
-                task.json()["url"],
-                headers={
-                    "Content-type": "application/json",
-                    "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
-                },
-            )
-            print(task.text)
-            prediction = task.json()["answers"]
-            return prediction
+        task = httpx.post(
+            "https://pro.nocaptchaai.com/solve",
+            headers={
+                "Content-type": "application/json",
+                "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
+            },
+            json={
+                "images": imgB64,
+                "target": question,
+                "type": "multi",
+                "method": "hcaptcha_base64",
+                "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
+                "site": "discord.com",
+            },
+        )
+        task = httpx.get(
+            task.json()["url"],
+            headers={
+                "Content-type": "application/json",
+                "apikey": "rorm-8473d243-790d-9184-3fa2-76e4ff8424df",
+            },
+        )
+        print(task.text)
+        prediction = task.json()["answers"]
+        return prediction
+
+
+def download_image(url, prompt):
+    # Download the first 650 bytes
+    response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        return None, None, None
+
+    content = b""
+    for chunk in response.iter_content(chunk_size=650):
+        content += chunk
+        break  # Download only the first 650 bytes
+
+    # Calculate hash of the downloaded content using XXHash
+    content_hash = xxhash.xxh64(content).hexdigest()
+
+    # Check if hash exists in the list
+    if hashlist[prompt] is not None and content_hash in hashlist[prompt]:
+        return True, content_hash, None
+
+    # Download the complete image
+    response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        return False, None, None
+
+    return False, content_hash, response.content
+
+
+__lock__ = threading.Lock()
+
+
+def saves(string, prompt):
+    __lock__.acquire()
+    with open("./hash.csv", "a+") as ff:
+        ff.write(f"{string},{prompt}\n")
+    __lock__.release()
 
 
 class Task(Ai):
@@ -237,10 +300,6 @@ class Task(Ai):
 
     def __init__(self):
         pass
-
-    def download(self, url):
-        with Client(headers=Task.HEADER) as client:
-            return client.get(url).content
 
     def parse_question(self, data):
         qa = ""
@@ -268,23 +327,37 @@ class Task(Ai):
         if data["task_type"] not in [Task.AREA_SELECT, Task.BINARY]:
             return {"success": False, "data": {"error": "invalid task_type"}}
 
-        if data["task_type"] == Task.AREA_SELECT and "entity_type" not in data:
-            return {"success": False, "data": {"error": "invalid entity_type"}}
-
         if data["task_type"] == Task.BINARY:
+            t = time.time()
             if not self.parse_question(data):
                 return {"success": False, "data": {"error": "model not added yet"}}
 
-            for task in data["tasklist"]:
-                img = self.download(task["datapoint_uri"])
-                # t = time.time()
-                answer[task["task_key"]] = "true" if self.determine(img) else "false"
-                # print(time.time()-t)
+            if data["question"] not in hashlist:
+                hashlist[data["question"]] = []
 
-        if data["task_type"] == Task.AREA_SELECT:
-            answer = predict(data["task_type"], data["question"], data["tasklist"])
+            def process_task(task):
+                found, imghash, img = download_image(
+                    task["datapoint_uri"], data["question"]
+                )
 
-        return {"success": True, "data": answer}
+                if found:
+                    return "true"
+                else:
+                    if self.determine(img):
+                        hashlist[data["question"]].append(imghash)
+                        saves(imghash, data["question"])
+                        return "true"
+                    else:
+                        return "false"
+
+            num_threads = min(concurrent.futures.thread.ThreadPoolExecutor()._max_workers, len(data["tasklist"]/2))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+                task_results = list(executor.map(process_task, data["tasklist"]))
+
+            for idx, task in enumerate(data["tasklist"]):
+                answer[task["task_key"]] = task_results[idx]
+
+            return answer
 
 
 def test():
@@ -351,23 +424,36 @@ def test():
         )
 
 
-"""for _ in range(10):
-    threading.Thread(target=test).start()"""
+load_hash()
 
-app = FastAPI()
+from flask import Flask, jsonify, request
 
-
-@app.get("/")
-def read_root():
-    return {"status": "online"}
+app = Flask(__name__)
 
 
-@app.post("/solve")
-def solve(req: dict = Body()):
+@app.route("/solve", methods=["POST"])
+def add_expense():
     try:
         t = time.time()
-        r = Task().process(req)
-        print(time.time() - t)
-        return r
+        data = request.get_json()
+        r = Task().process(data)
+        processing_time = time.time() - t
+
+        # Log processing time and result
+        print("Processing Time:", processing_time, "seconds")
+
+        response = app.response_class(
+            response=json.dumps({"success": True, "data": r}),
+            status=200,
+            mimetype="application/json",
+        )
+
+        return response
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(port=1332)

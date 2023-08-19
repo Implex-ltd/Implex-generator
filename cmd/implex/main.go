@@ -40,6 +40,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		CaptchaKey: key,
 	})
 	if err != nil {
+		fmt.Println(err)
 		Error++
 		return
 	}
@@ -61,7 +62,6 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			Locked++ // not really locked, but it's to not destroy stats
 			return
 		}
-
 		if Config.Discord.TryJoin {
 			go api.JoinGuild(&discord.JoinConfig{
 				InviteCode: Config.Discord.Invite,
@@ -71,9 +71,9 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 		}
 
 		if err := api.SetBirth(&discord.EditBirthConfig{
-			Date: "1999-05-01",
+			Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 		}); err != nil {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			//	console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 			Locked++
 			return
 		}
@@ -82,7 +82,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			if err := api.SetProfil(&discord.EditProfilConfig{
 				Bio: BioList.Next(),
 			}); err != nil {
-				console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 				Locked++
 				return
 			}
@@ -90,7 +90,7 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			if err := api.SetAvatar(&discord.AvatarConfig{
 				FilePath: fmt.Sprintf("../../assets/input/avatars/%s", AvatarList.Next()),
 			}); err != nil {
-				console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 				Locked++
 				return
 			}
@@ -103,23 +103,35 @@ func job(key, proxy string, client *cleanhttp.CleanHttp) {
 			})
 		}
 
-		time.Sleep(25 * time.Second)
+		utils.AppendFile("output/unknown.txt", resp.Token)
+
 		locked, err := api.IsLocked()
 		if err != nil {
-			utils.AppendFile("output/unknown.txt", resp.Token)
 			fmt.Println(err)
 			return
 		}
 
 		if locked {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
+			//console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=%ds)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err, i*10))
+			Locked++
+			return
+		}
+		time.Sleep(10 * time.Second)
+		locked, err = api.IsLocked()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if locked {
+			console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=60s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
 			Locked++
 			return
 		}
 
 		Unlocked++
 		utils.AppendFile("output/unlocked.txt", resp.Token)
-		console.Log(fmt.Sprintf("[unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
+		console.Log(fmt.Sprintf("[CONFIRMED unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	}()
 }
 
@@ -163,6 +175,8 @@ func worker(fp *fpclient.Fingerprint) {
 	AvgImgProcDuration = append(AvgImgProcDuration, response.AnswerProcessing)
 	AvgHswProcDuration = append(AvgHswProcDuration, response.HswProcessing)
 	console.Log(fmt.Sprintf("[>] %s (%vs) (img-proc: %vms) (hsw-proc: %vms)", response.Token[:50], duration.Seconds(), response.AnswerProcessing.Milliseconds(), response.HswProcessing.Milliseconds()))
+	
+	http.Cookies = nil
 	go job(response.Token, proxy, http)
 }
 

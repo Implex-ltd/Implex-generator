@@ -1,10 +1,10 @@
-.PHONY: all clean build install implex ai engine scrape debug
+.PHONY: all clean build install implex ai engine scrape debug hsw jsdom
 
 clear:
 	cls||clear
 
 all: clear
-	@echo "Specify a target: implex, ai, engine, install, clean, build, scrape, debug"
+	@echo "Specify a target: implex, ai, engine, install, clean, build, scrape, debug, hsw, jsdom"
 
 clean: clear
 	cd ../cmd/ai && rm -rf __pycache__ datas/logs datas/temp_cache/ imgs/*
@@ -27,11 +27,14 @@ install: clear
 	
 	cd ../assets && mkdir scrapped
 
+	cd ../hand_hsw && npm i express ws
+	cd ../jsdom_hsw && npm i jsdom express
+
 implex: clear
 	cd ../cmd/implex && go run .
 
 ai: clear
-	cd ../cmd/AiSolver && uvicorn main:app --reload --host 0.0.0.0 --port 1332
+	cd ../cmd/AiSolver && python main.py
 
 engine: clear
 	cd ../cmd/GoEngine/cmd/engine && go run . engine
@@ -41,3 +44,9 @@ debug: clear
 
 scrape: clear
 	cd ../cmd/implex && go run . scrape
+
+hsw: clear
+	cd ../hand_hsw && node server.js
+
+jsdom: clear
+	cd ../jsdom_hsw && node hsw.js

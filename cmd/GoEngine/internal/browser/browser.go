@@ -3,14 +3,18 @@ package browser
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/playwright-community/playwright-go"
 )
 
 var (
+	HSW_VERSION = "a91272a"
+
 	ARGS = []string{
-		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+		"--user-agent=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 		"--disable-popup-blocking", // "discord ask access to position, lol?, no way!"
 
 		"--no-sandbox",
@@ -18,6 +22,7 @@ var (
 		"--disable-infobars",
 		"--disable-dev-shm-usage",
 		"--enable-gpu",
+		//"--headless",
 	}
 )
 
@@ -36,8 +41,8 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	}
 
 	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		Locale:     playwright.String("fr"),
-		TimezoneId: playwright.String("Europe/Paris"),
+		Locale:     playwright.String("en-us"),
+		TimezoneId: playwright.String("America/New_York"),
 		Screen: &playwright.ScreenSize{
 			Width:  playwright.Int(1920),
 			Height: playwright.Int(1080),
@@ -51,12 +56,26 @@ func NewInstance(spoof, headless bool, threads int) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
+	hsw, err := os.ReadFile("../../cmd/engine/scripts/hsw.js")
+	if err != nil {
+		panic(err)
+	}
+
 	context.Route("**https://discord.com/api/v9/auth/register**", func(r playwright.Route) {
 		r.Fulfill(playwright.RouteFulfillOptions{
 			Status:      playwright.Int(400),
 			ContentType: playwright.String("application/json"),
 			Body:        []byte(`{"captcha_key": ["captcha-required"],"captcha_sitekey": "4c672d35-0701-42b2-88c3-78380b0db560","captcha_service": "hcaptcha"}`),
+		})
+	})
+
+	context.Route(fmt.Sprintf("**https://newassets.hcaptcha.com/c/%s/hsw.js**", HSW_VERSION), func(r playwright.Route) {
+		log.Println("Injected !")
+
+		r.Fulfill(playwright.RouteFulfillOptions{
+			Status: playwright.Int(200),
+			Body:   hsw,
 		})
 	})
 
@@ -189,8 +208,7 @@ func (I *Instance) Hsw(jwt string) (string, error) {
 		<-I.Manager
 	}()
 
-	answer, err := I.Frame.Evaluate(fmt.Sprintf("spoofall();hsw(`%s`)", jwt)) // const getParameter=WebGLRenderingContext.getParameter,a=setInterval(()=>{if(document.body){clearInterval(a);var e=document.createElement(`script`);e.type=`text/javascript`,e.text='WebGLRenderingContext.prototype.getParameter = function(parameter) {if (parameter === 37445) { return `Intel Open Source Technology Center`; };if (parameter === 37446) { return `Mesa DRI Intel(R) Ivybridge Mobile ` }; return getParameter(parameter);}",document.body.appendChild(e)}},1);const canvas=document.createElement(`canvas`);canvas.width=220,canvas.height=30;const ctx=canvas.getContext(`2d`);for(let x=0;x<canvas.width;x++)for(let y=0;y<canvas.height;y++){let a=Math.floor(256*Math.random()),t=Math.floor(256*Math.random()),o=Math.floor(256*Math.random());ctx.fillStyle=`rgb(${a},${t},${o})`,ctx.fillRect(x,y,1,1)}const randomDataURL=canvas.toDataURL(`image/png`),originalToDataURL=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(a){return`image/png`===a&&220===this.width&&30===this.height?randomDataURL:originalToDataURL.apply(this,arguments)};
-
+	answer, err := I.Frame.Evaluate(fmt.Sprintf("spoofall();hsw(`%s`)", jwt))
 	if err != nil {
 		fmt.Println(err)
 		return "", err

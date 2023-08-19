@@ -2,12 +2,30 @@ package hcaptcha
 
 import http "github.com/bogdanfinn/fhttp"
 
+var (
+	order = []string{
+		`authority`,
+		`accept`,
+		`accept-language`,
+		`content-length`,
+		`content-type`,
+		`origin`,
+		`referer`,
+		`sec-ch-ua`,
+		`sec-ch-ua-mobile`,
+		`sec-ch-ua-platform`,
+		`sec-fetch-dest`,
+		`sec-fetch-mode`,
+		`sec-fetch-site`,
+		`user-agent`,
+	}
+)
+
 func (c *Client) HeaderCheckSiteConfig() http.Header {
 	return http.Header{
 		`authority`:          {`hcaptcha.com`},
 		`accept`:             {`application/json`},
 		`accept-language`:    {c.Config.HttpClient.BaseHeader.AcceptLanguage},
-		`content-length`:     {`0`},
 		`content-type`:       {`text/plain`},
 		`origin`:             {`https://newassets.hcaptcha.com`},
 		`referer`:            {`https://newassets.hcaptcha.com/`},
@@ -19,22 +37,7 @@ func (c *Client) HeaderCheckSiteConfig() http.Header {
 		`sec-fetch-site`:     {`same-site`},
 		`user-agent`:         {c.Config.HttpClient.Config.BrowserFp.Navigator.UserAgent},
 
-		http.HeaderOrderKey: {
-			`authority`,
-			`accept`,
-			`accept-language`,
-			`content-length`,
-			`content-type`,
-			`origin`,
-			`referer`,
-			`sec-ch-ua`,
-			`sec-ch-ua-mobile`,
-			`sec-ch-ua-platform`,
-			`sec-fetch-dest`,
-			`sec-fetch-mode`,
-			`sec-fetch-site`,
-			`user-agent`,
-		},
+		http.HeaderOrderKey: order,
 	}
 }
 
@@ -54,21 +57,7 @@ func (c *Client) HeaderGetCaptcha() http.Header {
 		`sec-fetch-site`:     {`same-site`},
 		`user-agent`:         {c.Config.HttpClient.Config.BrowserFp.Navigator.UserAgent},
 
-		http.HeaderOrderKey: {
-			`authority`,
-			`accept`,
-			`accept-language`,
-			`content-type`,
-			`origin`,
-			`referer`,
-			`sec-ch-ua`,
-			`sec-ch-ua-mobile`,
-			`sec-ch-ua-platform`,
-			`sec-fetch-dest`,
-			`sec-fetch-mode`,
-			`sec-fetch-site`,
-			`user-agent`,
-		},
+		http.HeaderOrderKey: order,
 	}
 }
 
@@ -89,21 +78,6 @@ func (c *Client) HeaderCheckCaptcha() http.Header {
 		`sec-fetch-site`:     {`same-site`},
 		`user-agent`:         {c.Config.HttpClient.Config.BrowserFp.Navigator.UserAgent},
 
-		http.HeaderOrderKey: {
-			`authority`,
-			`accept`,
-			`accept-language`,
-			`content-type`,
-			`cookie`,
-			`origin`,
-			`referer`,
-			`sec-ch-ua`,
-			`sec-ch-ua-mobile`,
-			`sec-ch-ua-platform`,
-			`sec-fetch-dest`,
-			`sec-fetch-mode`,
-			`sec-fetch-site`,
-			`user-agent`,
-		},
+		http.HeaderOrderKey: order,
 	}
 }

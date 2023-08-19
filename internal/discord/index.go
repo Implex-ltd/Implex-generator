@@ -1,14 +1,12 @@
 package discord
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
-	"github.com/Implex-ltd/cloudflare-reverse/cloudflarereverse"
+	//"github.com/Implex-ltd/cloudflare-reverse/cloudflarereverse"
 	http "github.com/bogdanfinn/fhttp"
 )
 
@@ -22,8 +20,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	}
 
 	if config.GetCookies {
-		_, err := c.GetCookies()
-		if err != nil {
+		if err := c.GetCookies(); err != nil {
 			return nil, fmt.Errorf("error getting cookies: %w", err)
 		}
 	}
@@ -32,18 +29,19 @@ func NewClient(config *ClientConfig) (*Client, error) {
 }
 
 // Get cookies and x-fingerprint. this function is called by defaut if you set "GetCookies" params ClientConfig.
-func (c *Client) GetCookies() ([]*http.Cookie, error) {
+func (c *Client) GetCookies() error {
 	resp, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "GET",
 		Url:    "https://discord.com/api/v9/experiments",
 		Header: c.getHeader(&HeaderConfig{}),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error making HTTP request: %w", err)
+		return fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer resp.Body.Close()
 
-	cookies := []*http.Cookie{}
+	fmt.Println(c.HttpClient.FormatCookies())
+
+	/*cookies := []*cyclepls.Cookie{}
 
 	if c.Config.GetCloudflareCookes {
 		cfbm, err := cloudflarereverse.GetCfbm(c.HttpClient.Config.BrowserFp, c.HttpClient.Config.Proxy) // make it proxyless because they are detecting proxies...
@@ -56,28 +54,23 @@ func (c *Client) GetCookies() ([]*http.Cookie, error) {
 			Value: cfbm,
 		}
 		cookies = append(cookies, cfCookie)
-	}
+	}*/
 
-	cookies = append(cookies, &http.Cookie{
+	/*	c.HttpClient.Cookies = append(c.HttpClient.Cookies, &cyclepls.Cookie{
 		Name:  "locale",
 		Value: strings.Split(c.HttpClient.Config.BrowserFp.Navigator.Language, "-")[0],
-	})
+	})*/
 
-	c.HttpClient.Cookies = append(c.HttpClient.Cookies, cookies...)
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
+	//c.HttpClient.Cookies = append(c.HttpClient.Cookies, cookies...)
 
 	var fp FingerprintResponse
-	if err := json.Unmarshal(body, &fp); err != nil {
-		return nil, fmt.Errorf("cant unmarshal fingerpint: %w", err)
+	if err := json.Unmarshal([]byte(resp.Body), &fp); err != nil {
+		return fmt.Errorf("cant unmarshal fingerpint: %w", err)
 	}
 
 	c.xfingerprint = fp.Fingerprint
 
-	return cookies, nil
+	return nil
 }
 
 // Join server and return *JoinServerResponse, take *JoinConfig as params. WARN: need to connect trougth websocket first.
@@ -97,24 +90,21 @@ func (c *Client) JoinGuild(config *JoinConfig) (*JoinServerResponse, error) {
 		Join: config,
 	})
 
-	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
+	response, err := c.HttpClient.DoTls(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    fmt.Sprintf("https://discord.com/api/v9/invites/%s", config.InviteCode),
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Header: header,
 	})
 	if err != nil {
+		fmt.Println(err)
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
+	fmt.Println("join:", response.Body)
 
 	var resp JoinServerResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
+	if err := json.Unmarshal([]byte(response.Body), &resp); err != nil {
 		return nil, fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
@@ -167,24 +157,19 @@ func (c *Client) Register(config *RegisterConfig) (*RegisterResponse, error) {
 
 	header.Add("x-fingerprint", c.xfingerprint)
 
-	resp, err := c.HttpClient.Do(cleanhttp.RequestOption{
+	resp, err := c.HttpClient.DoTls(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    "https://discord.com/api/v9/auth/register",
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Header: header,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
 
 	var response RegisterResponse
-	if err := json.Unmarshal([]byte(string(body)), &response); err != nil {
+	if err := json.Unmarshal([]byte(resp.Body), &response); err != nil {
 		return nil, fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
@@ -217,17 +202,16 @@ func (c *Client) SetAvatar(config *AvatarConfig) error {
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "PATCH",
 		Url:    "https://discord.com/api/v9/users/@me",
-		Body:   strings.NewReader(payload),
+		Body:   []byte(payload),
 		Header: header,
 	})
 
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to set pfp, status code: %d", response.StatusCode)
+	if response.Status != http.StatusOK {
+		return fmt.Errorf("failed to set pfp, status code: %d", response.Status)
 	}
 
 	return nil
@@ -245,19 +229,18 @@ func (c *Client) SetBirth(config *EditBirthConfig) error {
 	header := c.getHeader(&HeaderConfig{})
 	header.Set("referer", "https://discord.com/channels/@me")
 
-	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
+	response, err := c.HttpClient.DoTls(cleanhttp.RequestOption{
 		Method: "PATCH",
 		Url:    "https://discord.com/api/v9/users/@me",
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Header: header,
 	})
 	if err != nil {
 		return fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer response.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to add birth-date, status code: %d", response.StatusCode)
+	if response.Status != http.StatusOK {
+		return fmt.Errorf("failed to add birth-date, status code: %d", response.Status)
 	}
 
 	return nil
@@ -279,16 +262,15 @@ func (c *Client) SetProfil(config *EditProfilConfig) error {
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "PATCH",
 		Url:    "https://discord.com/api/v9/users/%40me/profile",
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Header: header,
 	})
 	if err != nil {
 		return fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer response.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to edit profile, status code: %d", response.StatusCode)
+	if response.Status != http.StatusOK {
+		return fmt.Errorf("failed to edit profile, status code: %d", response.Status)
 	}
 
 	return nil
@@ -307,21 +289,15 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    fmt.Sprintf("https://discord.com/api/v9/channels/%s/messages", config.ChannelID),
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Header: c.getHeader(&HeaderConfig{}),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
 
 	var resp JoinServerResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
+	if err := json.Unmarshal([]byte(response.Body), &resp); err != nil {
 		return nil, fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
@@ -330,7 +306,7 @@ func (c *Client) SendMessage(config *SendMessageConfig) (any, error) {
 
 func (c *Client) IsLocked() (bool, error) {
 	response, err := c.HttpClient.Do(cleanhttp.RequestOption{
-		Method: "POST",
+		Method: "GET",
 		Url:    "https://discord.com/api/v9/users/@me/affinities/users",
 		Body:   nil,
 		Header: c.getHeader(&HeaderConfig{}),
@@ -338,14 +314,8 @@ func (c *Client) IsLocked() (bool, error) {
 	if err != nil {
 		return true, fmt.Errorf("error making HTTP request: %w", err)
 	}
-	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return true, fmt.Errorf("error reading response body: %w", err)
-	}
-
-	if strings.Contains("You need to verify your account in order to perform this action.", string(body)) {
+	if strings.Contains("You need to verify your account in order to perform this action.", response.Body) {
 		return true, nil
 	}
 

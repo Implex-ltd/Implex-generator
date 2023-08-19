@@ -1,11 +1,9 @@
 package hcaptcha
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -20,7 +18,6 @@ import (
 
 var (
 	Scrape int
-	hsl    = false
 )
 
 func NewHcaptchaClient(config *HcaptchaConfig) *Client {
@@ -32,7 +29,7 @@ func NewHcaptchaClient(config *HcaptchaConfig) *Client {
 func (c *Client) DownloadFile(url string, filePath string) error {
 	h := c.HeaderCheckSiteConfig()
 
-	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
+	resp, err := c.Config.HttpClient.DoTls(cleanhttp.RequestOption{
 		Method: "GET",
 		Url:    url,
 		Header: h,
@@ -42,21 +39,16 @@ func (c *Client) DownloadFile(url string, filePath string) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.Status != 200 {
 		return errors.New("cant get img")
 	}
 
-	defer resp.Body.Close()
-
-	buff, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	buff := []byte(resp.Body)
 
 	x := md5.Sum(buff)
 	hash := hex.EncodeToString(x[:])
 
-	file, err := os.Create(fmt.Sprintf("%s/%s/%s.png", utils.BasePath, filePath, hash))
+	file, err := os.Create(fmt.Sprintf("%s/%s/%s.jpeg", utils.BasePath, filePath, hash))
 	if err != nil {
 		return err
 	}
@@ -72,26 +64,19 @@ func (c *Client) DownloadFile(url string, filePath string) error {
 }
 
 func (c *Client) checkSiteConfig() (*SiteConfig, error) {
-	h := c.HeaderCheckSiteConfig()
-
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
-		Url:    fmt.Sprintf("https://api2.hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=1", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
-		Header: h,
+		Url:    fmt.Sprintf("https://hcaptcha.com/checksiteconfig?v=%s&host=%s&sitekey=%s&sc=1&swa=1&spst=1", c.Config.Version, c.Config.Domain, c.Config.Sitekey),
+		Header: c.HeaderCheckSiteConfig(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+	//fmt.Println(resp.Body)
 
 	var config SiteConfig
-	if err := json.Unmarshal(body, &config); err != nil {
+	if err := json.Unmarshal([]byte(resp.Body), &config); err != nil {
 		return nil, err
 	}
 
@@ -102,14 +87,15 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 	var pow string
 	var err error
 
-	if hsl {
-		pow, err = HSLHashProof(config.C.Req)
-		if err != nil {
-			return nil, err
-		}
-		config.C.Type = "hsl"
-	} else {
-		pow = c.GetHsw(config.C.Req)
+	hsl_start := time.Now()
+
+	pow = c.GetHsw(config.C.Req)
+
+	pdc := &Pdc{
+		S:   hsl_start.UTC().UnixNano() / 1e6, // Date.now()
+		N:   0,
+		P:   1,
+		Gcs: int(time.Since(hsl_start).Milliseconds()), // pow time
 	}
 
 	payload := url.Values{}
@@ -119,6 +105,7 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 		`host`:       c.Config.Domain,
 		`hl`:         c.Config.Lang,
 		`motionData`: c.GenerateMotionGet(),
+		`pdc`:        fmt.Sprintf(`{"s":%v,"n":%d,"p":%d,"gcs":%d}`, pdc.S, pdc.N, pdc.P, pdc.Gcs),
 		`n`:          pow,
 		`c`:          fmt.Sprintf(`{"type":"%s","req":"%s"}`, config.C.Type, config.C.Req),
 		`pst`:        `false`,
@@ -129,22 +116,15 @@ func (c *Client) getChallenge(config *SiteConfig) (*Challenge, error) {
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Method: "POST",
 		Url:    fmt.Sprintf("https://hcaptcha.com/getcaptcha/%s", c.Config.Sitekey),
-		Body:   strings.NewReader(payload.Encode()),
+		Body:   []byte(payload.Encode()),
 		Header: c.HeaderGetCaptcha(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	var captcha Challenge
-	if err := json.Unmarshal(body, &captcha); err != nil {
+	if err := json.Unmarshal([]byte(resp.Body), &captcha); err != nil {
 		return nil, err
 	}
 
@@ -160,8 +140,6 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 	resultChans := make(chan error)
 	st := time.Now()
 
-	// proccess img and hsw at the same time to be fasterrrr
-
 	go func() {
 		answers, err = c.SolveImages(captcha)
 		if err != nil {
@@ -174,16 +152,7 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 	}()
 
 	go func() {
-		if hsl {
-			pow, err = HSLHashProof(captcha.C.Req)
-			if err != nil {
-				resultChans <- err
-				return
-			}
-			captcha.C.Type = "hsl"
-		} else {
-			pow = c.GetHsw(captcha.C.Req)
-		}
+		pow = c.GetHsw(captcha.C.Req)
 
 		c.HswProcessTime = time.Since(st)
 		resultChans <- nil
@@ -211,25 +180,23 @@ func (c *Client) checkChallenge(captcha *Challenge) (*ResponseCheckCaptcha, erro
 		return nil, err
 	}
 
-	// We are smart boys 🧠, so we don't waste time !
+	// if solving task is too fast, we are waiting the remaning MIN submit time
 	time.Sleep(c.Config.SubmitDelay - time.Since(st))
+
+	t := time.Now()
 	resp, err := c.Config.HttpClient.Do(cleanhttp.RequestOption{
 		Url:    fmt.Sprintf("https://hcaptcha.com/checkcaptcha/%s/%s", c.Config.Sitekey, captcha.Key),
-		Body:   bytes.NewReader(payload),
+		Body:   payload,
 		Method: "POST",
 		Header: c.HeaderCheckCaptcha(),
 	})
+	fmt.Println("hcap response time:", time.Since(t))
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+	body := resp.Body
 
 	var Resp ResponseCheckCaptcha
 	if json.Unmarshal([]byte(body), &Resp) != nil {
@@ -258,6 +225,10 @@ func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 		return nil, err
 	}
 
+	if imgCap.RequestType == "image_label_area_select" {
+		return nil, errors.New("invalid")
+	}
+
 	if len(imgCap.Tasklist) <= 0 {
 		fmt.Println(imgCap)
 		return nil, fmt.Errorf("no images found")
@@ -281,7 +252,7 @@ func (c *Client) SolveImage() (*HcaptchaTaskResponse, error) {
 	if c.Config.Scrape {
 		return nil, fmt.Errorf("invalid label for scraping")
 	}
-
+	
 	resp, err := c.checkChallenge(imgCap)
 	if err != nil {
 		return nil, err
