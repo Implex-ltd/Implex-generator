@@ -34,7 +34,7 @@ implex: clear
 	cd ../cmd/implex && go run .
 
 ai: clear
-	cd ../cmd/AiSolver && python main.py
+	cd ../cmd/AiSolver && python3 main.py
 
 engine: clear
 	cd ../cmd/GoEngine/cmd/engine && go run . engine
