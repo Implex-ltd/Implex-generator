@@ -4,9 +4,9 @@ go 1.21.0
 
 require (
 	github.com/Implex-ltd/GoCycle v0.0.0-20230820072814-d220b36de3ae // indirect
-	github.com/Implex-ltd/cleanhttp v0.0.0-20230819172856-3609e39c4dea // indirect
+	github.com/Implex-ltd/cleanhttp v0.0.0-20230821193203-074c6c8003fb // indirect
 	github.com/Implex-ltd/fingerprint-client v0.0.0-20230813033749-fc63d297c0c3 // indirect
-	github.com/Implex-ltd/ucdiscord v0.0.0-20230819172929-23ef5060175e // indirect
+	github.com/Implex-ltd/ucdiscord v0.0.0-20230821195420-c6a3a39f1d40 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/bogdanfinn/fhttp v0.5.23 // indirect
 	github.com/bogdanfinn/tls-client v1.5.0 // indirect
