@@ -96,19 +96,19 @@ func handleNewAccount(token, username string, client *u.Client) {
 		return
 	}
 
-	/*avatar, err := Assets["avatars"].Next()
+	avatar, err := Assets["avatars"].Next()
 	if err != nil {
 		Logger.Error("get-avatar",
 			zap.String("error", err.Error()),
 		)
 		return
-	}*/
+	}
 
 	client.SetBirth(&u.EditBirthConfig{
 		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 	})
 
-	/*client.SetAvatar(&u.AvatarConfig{
+	client.SetAvatar(&u.AvatarConfig{
 		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
 	})
 
@@ -122,7 +122,7 @@ func handleNewAccount(token, username string, client *u.Client) {
 
 	client.SetProfil(&u.EditProfilConfig{
 		Bio: bio,
-	})*/
+	})
 }
 
 func worker(fp *fpclient.Fingerprint) {
@@ -169,7 +169,6 @@ func worker(fp *fpclient.Fingerprint) {
 				Logger.Error("load-http",
 					zap.String("error", err.Error()),
 				)
-				discordClient <- nil
 				continue
 			}
 
@@ -182,7 +181,6 @@ func worker(fp *fpclient.Fingerprint) {
 				Logger.Error("load-discord",
 					zap.String("error", err.Error()),
 				)
-				discordClient <- nil
 				continue
 			}
 
@@ -243,6 +241,9 @@ func main() {
 	c := goccm.New(Config.Performances.Threads)
 
 	for {
+		/*if Generated%100 == 0 {
+			time.Sleep(10)
+		}*/
 		c.Wait()
 
 		go func() {
