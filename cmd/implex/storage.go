@@ -55,7 +55,7 @@ func NewPrettyHandler(out io.Writer, opts PrettyHandlerOptions) *PrettyHandler {
 		MessageKey:     "message",
 		LevelKey:       "level",
 		TimeKey:        "time",
-		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // This enables built-in level coloring
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 		EncodeTime:     zapcore.TimeEncoderOfLayout("[15:04:05.000]"),
 		EncodeDuration: zapcore.StringDurationEncoder,
 	}

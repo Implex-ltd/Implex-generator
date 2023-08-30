@@ -46,8 +46,8 @@ func handleNewAccount(token, username string, client *u.Client) {
 		if Config.Discord.JoinAfter {
 			cfg := u.JoinConfig{
 				InviteCode: Config.Discord.Invite,
-				GuildID:    "1145382975857492019",
-				ChannelID:  "1145382976721539104",
+				GuildID:    Config.Discord.GuildID,
+				ChannelID:  Config.Discord.ChannelID,
 			}
 
 			resp, err := client.JoinGuild(&cfg)
@@ -83,6 +83,52 @@ func handleNewAccount(token, username string, client *u.Client) {
 		return
 	}
 
+	avatar, err := Assets["avatars"].Next()
+	if err != nil {
+		Logger.Error("get-avatar",
+			zap.String("error", err.Error()),
+		)
+		return
+	}
+
+	if err := client.SetBirth(&u.EditBirthConfig{
+		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
+	}); err != nil {
+		Logger.Error("set-birth",
+			zap.String("error", err.Error()),
+		)
+		Locked++
+		return
+	}
+
+	if err := client.SetAvatar(&u.AvatarConfig{
+		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
+	}); err != nil {
+		Logger.Error("set-avatar",
+			zap.String("error", err.Error()),
+		)
+		Locked++
+		return
+	}
+
+	bio, err := Assets["bio"].Next()
+	if err != nil {
+		Logger.Error("get-bio",
+			zap.String("error", err.Error()),
+		)
+		return
+	}
+
+	if err := client.SetProfil(&u.EditProfilConfig{
+		Bio: bio,
+	}); err != nil {
+		Logger.Error("set-bio",
+			zap.String("error", err.Error()),
+		)
+		Locked++
+		return
+	}
+
 	Unlocked++
 	Logger.Info("unlocked",
 		zap.String("username", username),
@@ -95,34 +141,6 @@ func handleNewAccount(token, username string, client *u.Client) {
 		)
 		return
 	}
-
-	avatar, err := Assets["avatars"].Next()
-	if err != nil {
-		Logger.Error("get-avatar",
-			zap.String("error", err.Error()),
-		)
-		return
-	}
-
-	client.SetBirth(&u.EditBirthConfig{
-		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
-	})
-
-	client.SetAvatar(&u.AvatarConfig{
-		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-	})
-
-	bio, err := Assets["bio"].Next()
-	if err != nil {
-		Logger.Error("get-bio",
-			zap.String("error", err.Error()),
-		)
-		return
-	}
-
-	client.SetProfil(&u.EditProfilConfig{
-		Bio: bio,
-	})
 }
 
 func worker(fp *fpclient.Fingerprint) {
@@ -241,9 +259,6 @@ func main() {
 	c := goccm.New(Config.Performances.Threads)
 
 	for {
-		/*if Generated%100 == 0 {
-			time.Sleep(10)
-		}*/
 		c.Wait()
 
 		go func() {

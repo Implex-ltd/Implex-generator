@@ -1,5 +1,7 @@
 [discord]
 invite = "3uCQhTJE"
+guild_id = "1145382975857492019"
+channel_id = "1146555112551096356"
 join_after = false
 
 [hcaptcha]

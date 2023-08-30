@@ -5,6 +5,8 @@ var Config = Cfg{}
 type Cfg struct {
 	Discord struct {
 		Invite    string `toml:"invite"`
+		GuildID   string `toml:"guild_id"`
+		ChannelID string `toml:"channel_id"`
 		JoinAfter bool   `toml:"join_after"`
 	} `toml:"discord"`
 	Hcaptcha struct {
