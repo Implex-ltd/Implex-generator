@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 )
+
 var (
 	Generated int
 	Locked    int
@@ -11,7 +12,7 @@ var (
 	Error     int
 	Solved    int
 
-	TaskSt  time.Time
+	TaskSt time.Time
 )
 
 func averageDuration(durations []*time.Duration) time.Duration {
@@ -42,9 +43,14 @@ func ConsoleTitle() {
 		uptime := time.Since(start).Round(time.Second)
 		uptimeStr := fmt.Sprintf("%02.fh %02.fm %02.fs", uptime.Hours(), uptime.Minutes(), uptime.Seconds())
 
-		bar := fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, Solved: %d, CPM=%d, SolverCPM=%d, Err=%d", Generated, Unlocked, rateStr, Locked, Solved, (float64(Generated)/float64(time.Since(TaskSt).Minutes())), int(float64(Solved)/float64(time.Since(TaskSt).Minutes())), Error)
+		cpm := (float64(Generated) / float64(time.Since(TaskSt).Minutes()))
 
-		SetTitle(fmt.Sprintf("Implex v2 %s [%s] ⇸ %s", uptimeStr, bar))
+		bar := fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, Solved: %d, CPM=%v, SolverCPM=%d, Err=%d", Generated, Unlocked, rateStr, Locked, Solved, cpm, int(float64(Solved)/float64(time.Since(TaskSt).Minutes())), Error)
+
+		profit := (0.006 * float64(Unlocked))
+		profit_h := (cpm * 60) * 0.006
+
+		SetTitle(fmt.Sprintf("Implex v2 %s [%s] ⇸ %v$ (%v$/h)", uptimeStr, bar, profit, profit_h))
 		time.Sleep(1500 * time.Millisecond)
 	}
 }
