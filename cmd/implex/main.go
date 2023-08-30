@@ -3,286 +3,253 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"net/http"
-	"os"
-	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
 	"github.com/Implex-ltd/fingerprint-client/fpclient"
-	"github.com/Implex-ltd/implex/internal/console"
-	"github.com/Implex-ltd/implex/internal/discord"
 	"github.com/Implex-ltd/implex/internal/hcaptcha"
 	"github.com/Implex-ltd/implex/internal/utils"
+	u "github.com/Implex-ltd/ucdiscord/ucdiscord"
 	"github.com/zenthangplus/goccm"
+	"go.uber.org/zap"
 )
 
-func job(key, proxy string, client *cleanhttp.CleanHttp) {
-	api, err := discord.NewClient(&discord.ClientConfig{
-		GetCookies:          true,
-		GetCloudflareCookes: Config.Spoof.Cfbm,
-		BuildNumber:         Config.Discord.Version,
-		Client:              client,
-	})
+func GetData() (string, string, error) {
+	proxy, err := Assets["proxies"].Next()
 	if err != nil {
-		return
+		return "", "", err
 	}
 
-	var invite = ""
-	if Config.Discord.JoinOnRegister {
-		invite = Config.Discord.Invite
-	}
-
-	resp, err := api.Register(&discord.RegisterConfig{
-		Username:   UsernameList.Next(),
-		InviteCode: invite,
-		CaptchaKey: key,
-	})
+	username, err := Assets["username"].Next()
 	if err != nil {
-		fmt.Println(err)
-		Error++
-		return
+		return "", "", err
 	}
 
-	go ProxyList.LockByTimeout(proxy, time.Second*120)
+	return "http://" + proxy, username, nil
+}
 
-	if resp.Token == "" {
-		Error++
-		return
-	}
-
-	//console.Log(fmt.Sprintf("[+] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
-	Generated++
-
+func handleNewAccount(token, username string, client *u.Client) {
 	go func() {
-		_, err = api.WsConnect()
+		wsresp, err := client.WsConnect()
 		if err != nil {
-			Error++
-			Locked++ // not really locked, but it's to not destroy stats
+			Logger.Error("ws connect",
+				zap.String("error", err.Error()),
+			)
 			return
 		}
-		if Config.Discord.TryJoin {
-			go api.JoinGuild(&discord.JoinConfig{
+
+		Logger.Info("connected",
+			zap.String("sessionID", wsresp.D.SessionID),
+			zap.String("username", wsresp.D.User.Username),
+		)
+
+		if Config.Discord.JoinAfter {
+			cfg := u.JoinConfig{
 				InviteCode: Config.Discord.Invite,
-				GuildID:    Config.Discord.InviteGuildID,
-				ChannelID:  Config.Discord.InviteChannelID,
-			})
-		}
+				GuildID:    "1145382975857492019",
+				ChannelID:  "1145382976721539104",
+			}
 
-		if err := api.SetBirth(&discord.EditBirthConfig{
-			Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
-		}); err != nil {
-			//	console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
-			Locked++
-			return
-		}
-
-		if Config.Discord.Humanize {
-			if err := api.SetProfil(&discord.EditProfilConfig{
-				Bio: BioList.Next(),
-			}); err != nil {
-				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
-				Locked++
+			resp, err := client.JoinGuild(&cfg)
+			if err != nil {
+				Logger.Error("can't join",
+					zap.String("error", err.Error()),
+				)
 				return
 			}
 
-			if err := api.SetAvatar(&discord.AvatarConfig{
-				FilePath: fmt.Sprintf("../../assets/input/avatars/%s", AvatarList.Next()),
-			}); err != nil {
-				//		console.Log(fmt.Sprintf("[ locked ] %s (%s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
-				Locked++
-				return
-			}
+			Logger.Info("joined",
+				zap.String("name", resp.Guild.Name),
+				zap.String("invite", cfg.InviteCode),
+				zap.String("channelID", cfg.ChannelID),
+				zap.String("guildID", cfg.GuildID),
+			)
 		}
-
-		if Config.Discord.SendMessage {
-			go api.SendMessage(&discord.SendMessageConfig{
-				Content:   Config.Discord.SendMessageContent,
-				ChannelID: Config.Discord.SendChannelID,
-			})
-		}
-
-		utils.AppendFile("output/unknown.txt", resp.Token)
-
-		locked, err := api.IsLocked()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if locked {
-			//console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=%ds)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err, i*10))
-			Locked++
-			return
-		}
-		time.Sleep(10 * time.Second)
-		locked, err = api.IsLocked()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if locked {
-			console.Log(fmt.Sprintf("[ locked ] %s (%s) (after=60s)", resp.Token[:len(resp.Token)-len(resp.Token)/2], err))
-			Locked++
-			return
-		}
-
-		Unlocked++
-		utils.AppendFile("output/unlocked.txt", resp.Token)
-		console.Log(fmt.Sprintf("[CONFIRMED unlocked] %s", resp.Token[:len(resp.Token)-len(resp.Token)/2]))
 	}()
+
+	locked, err := client.IsLocked()
+	if err != nil {
+		Logger.Error("is-locked",
+			zap.String("error", err.Error()),
+		)
+	}
+
+	if locked {
+		Logger.Warn("locked",
+			zap.String("username", username),
+			zap.String("token", token),
+		)
+		Locked++
+		return
+	}
+
+	Unlocked++
+	Logger.Info("unlocked",
+		zap.String("username", username),
+		zap.String("token", token),
+	)
+
+	if err := utils.AppendFile("output/unlocked.txt", token); err != nil {
+		Logger.Error("save-token",
+			zap.String("error", err.Error()),
+		)
+		return
+	}
+
+	/*avatar, err := Assets["avatars"].Next()
+	if err != nil {
+		Logger.Error("get-avatar",
+			zap.String("error", err.Error()),
+		)
+		return
+	}*/
+
+	client.SetBirth(&u.EditBirthConfig{
+		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
+	})
+
+	/*client.SetAvatar(&u.AvatarConfig{
+		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
+	})
+
+	bio, err := Assets["bio"].Next()
+	if err != nil {
+		Logger.Error("get-bio",
+			zap.String("error", err.Error()),
+		)
+		return
+	}
+
+	client.SetProfil(&u.EditProfilConfig{
+		Bio: bio,
+	})*/
 }
 
 func worker(fp *fpclient.Fingerprint) {
-	proxy := strings.Replace(ProxyList.Next(), Config.Spoof.SessionReplaceMe, utils.RandomString(10), -1)
-
-	http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
-		BrowserFp: fp,
-		Proxy:     Config.Spoof.ProxyType + "://" + proxy,
-	})
+	proxy, username, err := GetData()
 	if err != nil {
+		Logger.Error("get profile data",
+			zap.String("err", err.Error()),
+		)
 		return
 	}
 
-	hc := hcaptcha.NewHcaptchaClient(&hcaptcha.HcaptchaConfig{
-		Sitekey:       Config.Hcaptcha.SiteKey,
-		Domain:        "discord.com",
-		Version:       Config.Hcaptcha.Version,
-		Lang:          Config.Hcaptcha.Lang,
-		HttpClient:    http,
-		SubmitDelay:   time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
-		HswAddress:    Config.Hcaptcha.HswAddress,
-		SolverAddress: Config.Hcaptcha.SolverAddress,
-		Scrape:        false,
-	})
+	captchaKey := make(chan string)
+	discordClient := make(chan *u.Client)
 
-	t := time.Now()
-	response, err := hc.SolveImage()
-	if err != nil {
-		if Config.Performances.Debug {
-			console.Log(err.Error())
+	go func() {
+		for {
+			hcap, err := hcaptcha.NewSolve(fp.Navigator.UserAgent, proxy, Config.Hcaptcha.TaskType)
+			if err != nil {
+				Logger.Warn("solve",
+					zap.String("err", err.Error()),
+				)
+				Error++
+				continue
+			}
+
+			Logger.Info("solved",
+				zap.String("key", hcap[:50]),
+			)
+
+			Solved++
+			captchaKey <- hcap
+			break
 		}
-		Error++
-		return
-	}
+	}()
 
-	duration := time.Since(t)
+	go func() {
+		for {
+			http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
+				BrowserFp: fp,
+				Proxy:     proxy,
+			})
 
-	Solved++
-	Durations = append(Durations, &duration)
-	AvgImgProcDuration = append(AvgImgProcDuration, response.AnswerProcessing)
-	AvgHswProcDuration = append(AvgHswProcDuration, response.HswProcessing)
-	console.Log(fmt.Sprintf("[>] %s (%vs) (img-proc: %vms) (hsw-proc: %vms)", response.Token[:50], duration.Seconds(), response.AnswerProcessing.Milliseconds(), response.HswProcessing.Milliseconds()))
-	
-	http.Cookies = nil
-	go job(response.Token, proxy, http)
-}
+			if err != nil {
+				Logger.Error("load-http",
+					zap.String("error", err.Error()),
+				)
+				discordClient <- nil
+				continue
+			}
 
-func scrapeWorker(fp *fpclient.Fingerprint) {
-	proxy := strings.Replace(ProxyList.Next(), Config.Spoof.SessionReplaceMe, utils.RandomString(10), -1)
+			client, err := u.NewClient(&u.ClientConfig{
+				GetCookies:  true,
+				BuildNumber: 222352,
+				Client:      http,
+			})
+			if err != nil {
+				Logger.Error("load-discord",
+					zap.String("error", err.Error()),
+				)
+				discordClient <- nil
+				continue
+			}
 
-	http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
-		BrowserFp: fp,
-		Proxy:     Config.Spoof.ProxyType + "://" + proxy,
-	})
-	if err != nil {
-		return
-	}
-
-	hc := hcaptcha.NewHcaptchaClient(&hcaptcha.HcaptchaConfig{
-		Sitekey:       Config.Hcaptcha.SiteKey,
-		Domain:        "discord.com",
-		Version:       Config.Hcaptcha.Version,
-		Lang:          Config.Hcaptcha.Lang,
-		HttpClient:    http,
-		SubmitDelay:   time.Second * time.Duration(Config.Hcaptcha.SubmitTime),
-		HswAddress:    Config.Hcaptcha.HswAddress,
-		SolverAddress: Config.Hcaptcha.SolverAddress,
-		Scrape:        true,
-	})
-
-	_, err = hc.SolveImage()
-	if err != nil {
-		if Config.Performances.Debug {
-			console.Log(err.Error())
+			discordClient <- client
+			break
 		}
-		ScrapeError++
+	}()
+
+	key := <-captchaKey
+	client := <-discordClient
+
+	resp, err := client.Register(&u.RegisterConfig{
+		Username:   username,
+		InviteCode: Config.Discord.Invite,
+		CaptchaKey: key,
+	})
+	if err != nil {
+		Logger.Error("register",
+			zap.String("error", err.Error()),
+		)
 		return
 	}
-}
 
-func hswStatus() {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/n", Config.Hcaptcha.HswAddress), nil)
-	if err != nil {
-		panic(err)
+	if resp.Token == "" {
+		Logger.Error("register",
+			zap.String("site-key", resp.CaptchaSitekey),
+		)
+		return
 	}
 
-	client := &http.Client{
-		Timeout: time.Second * 3,
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic("hsw server offline, please use `make engine`")
-	}
+	Logger.Info("registered",
+		zap.String("token", resp.Token),
+		zap.String("username", username),
+	)
 
-	defer resp.Body.Close()
-
-	console.Log("Hsw server online!")
+	Generated++
+	go handleNewAccount(resp.Token, username, client)
 }
 
 func main() {
-	if _, err := toml.DecodeFile("../../scripts/config.toml", &Config); err != nil {
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	SetupLogger()
+	if err := LoadStorage(); err != nil {
 		panic(err)
 	}
 
-	console.Current = console.RandomTheme(Config.Extra.Theme)
-	console.PrintLogo()
+	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
+		FilePath: "../../assets/input/chrome.json",
+	})
 
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	if err := LoadFiles(); err != nil {
+	if err != nil {
 		panic(err)
 	}
 
 	go ConsoleTitle()
 
-	c := goccm.New(Config.Performances.Goroutines)
+	c := goccm.New(Config.Performances.Threads)
 
-	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
-		FilePath: Config.Spoof.ProfilePath,
-	})
-	if err != nil {
-		panic(err)
-	}
+	for {
+		c.Wait()
 
-	if len(os.Args) > 1 {
-		switch os.Args[1] {
-		case "scrape":
-			console.PrintLogo()
-			console.Log("[*] Init scraper")
-			Task = TASK_SCRAPE
-
+		go func() {
+			defer c.Done()
 			for {
-				c.Wait()
-
-				go func() {
-					defer c.Done()
-					scrapeWorker(fp)
-				}()
-			}
-		}
-	} else {
-		hswStatus()
-		Task = TASK_GEN
-
-		for {
-			c.Wait()
-
-			go func() {
-				defer c.Done()
 				worker(fp)
-			}()
-		}
+			}
+		}()
 	}
 }

@@ -2,145 +2,151 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
 
-	"github.com/Implex-ltd/implex/internal/console"
-	"github.com/Implex-ltd/implex/internal/hcaptcha"
+	"github.com/BurntSushi/toml"
+	"github.com/Implex-ltd/GoCycle"
 	"github.com/Implex-ltd/implex/internal/utils"
-	"github.com/Implex-ltd/implex/pkg/itertools"
-)
 
-const (
-	TASK_MENU   = 0
-	TASK_GEN    = 1
-	TASK_SCRAPE = 2
+	"context"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"io"
+	"log/slog"
 )
 
 var (
-	UsernameList *itertools.Iterator
-	ProxyList    *itertools.Iterator
-	AvatarList   *itertools.Iterator
-	BioList      *itertools.Iterator
-
-	Generated int
-	Locked    int
-	Unlocked  int
-	Error     int
-	Solved    int
-
-	Scraped     int
-	ScrapeError int
-
-	version = "1.2"
-	Task    = TASK_MENU
-	TaskSt  time.Time
-
-	Durations          []*time.Duration
-	AvgImgProcDuration []*time.Duration
-	AvgHswProcDuration []*time.Duration
+	Assets = make(map[string]*GoCycle.Cycle)
+	Logger *zap.Logger
 )
 
-func LoadFiles() error {
-	defer console.SetTitle("Ready!")
-	console.SetTitle("Loading...")
+type PrettyHandlerOptions struct {
+	ZapOpts zap.Config
+}
 
-	proxies, err := utils.ReadFile("input/proxies.txt")
-	if err != nil {
-		return err
-	}
+type PrettyHandler struct {
+	logger *zap.Logger
+}
 
-	ProxyList = itertools.NewIterator(proxies)
+func (h *PrettyHandler) Handle(ctx context.Context, r slog.Record) error {
+	level := r.Level.String()
 
-	if err := ProxyList.RandomiseIndex(); err != nil {
-		panic("please put at least 2 proxies")
-	}
+	fields := make([]string, 0)
+	r.Attrs(func(a slog.Attr) bool {
+		fields = append(fields, fmt.Sprintf("%v=%v", a.Key, a.Value))
+		return true
+	})
 
-	console.Log(fmt.Sprintf("[+] Loaded %d proxies...", len(proxies)))
+	timeStr := r.Time.Format("[15:04:05.000]")
+	msg := r.Message
+	extraFields := strings.Join(fields, " ")
 
-	usernames, err := utils.ReadFile("input/username.txt")
-	if err != nil {
-		return err
-	}
-
-	UsernameList = itertools.NewIterator(usernames)
-	if err := UsernameList.RandomiseIndex(); err != nil {
-		panic("please put at least 2 usernames")
-	}
-
-	console.Log(fmt.Sprintf("[+] Loaded %d usernames...", len(usernames)))
-
-	bio, err := utils.ReadFile("input/bio.txt")
-	if err != nil {
-		return err
-	}
-
-	BioList = itertools.NewIterator(bio)
-	if err := BioList.RandomiseIndex(); err != nil {
-		panic("please put at least 2 bios")
-	}
-
-	console.Log(fmt.Sprintf("[+] Loaded %d bio...", len(bio)))
-
-	pfp, err := utils.GetAllFilesInDirectory("input/avatars/")
-	if err != nil {
-		return err
-	}
-
-	AvatarList = itertools.NewIterator(pfp)
-	if err := AvatarList.RandomiseIndex(); err != nil {
-		panic("please put at least 2 avatars")
-	}
-
-	console.Log(fmt.Sprintf("[+] Loaded %d pfp...", len(pfp)))
-	fmt.Println("")
+	h.logger.Info(fmt.Sprintf("%s %s %s %s", timeStr, level, msg, extraFields))
 
 	return nil
 }
 
-func averageDuration(durations []*time.Duration) time.Duration {
-	if len(durations) == 0 {
-		return 0
+func NewPrettyHandler(out io.Writer, opts PrettyHandlerOptions) *PrettyHandler {
+	zapConfig := opts.ZapOpts
+	zapConfig.EncoderConfig = zapcore.EncoderConfig{
+		MessageKey:     "message",
+		LevelKey:       "level",
+		TimeKey:        "time",
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // This enables built-in level coloring
+		EncodeTime:     zapcore.TimeEncoderOfLayout("[15:04:05.000]"),
+		EncodeDuration: zapcore.StringDurationEncoder,
 	}
+	logger, _ := zapConfig.Build()
 
-	var total time.Duration
-	for _, dur := range durations {
-		total += *dur
+	return &PrettyHandler{
+		logger: logger,
 	}
-
-	return time.Duration((total / time.Duration(len(durations))).Seconds())
 }
 
-func ConsoleTitle() {
-	start := time.Now()
-	var Lt int
-
-	for {
-		if Task != Lt {
-			TaskSt = time.Now()
-		}
-		Lt = Task
-
-		rate := float64(Unlocked) / float64(Unlocked+Locked) * 100 // skip unchecked tokens
-		rateStr := fmt.Sprintf("%.2f", rate)
-
-		uptime := time.Since(start).Round(time.Second)
-		uptimeStr := fmt.Sprintf("%02.fh %02.fm %02.fs", uptime.Hours(), uptime.Minutes(), uptime.Seconds())
-
-		var bar string
-
-		switch Task {
-		case TASK_MENU:
-			bar = "Menu"
-		case TASK_GEN:
-			bar = fmt.Sprintf("Gen=%d, Unlock=%d (%s%%), Locked=%d, CPM=%d, SolverCPM=%d, Err=%d, SolveT=%ds, ImgProcT=%ds, HswProcT=%ds", Generated, Unlocked, rateStr, Locked, int(float64(Generated)/float64(time.Since(TaskSt).Minutes())), int(float64(Solved)/float64(time.Since(TaskSt).Minutes())), Error, averageDuration(Durations), averageDuration(AvgImgProcDuration), averageDuration(AvgHswProcDuration))
-			console.Log(bar)
-		case TASK_SCRAPE:
-			Scraped = hcaptcha.Scrape
-			bar = fmt.Sprintf("Scrape=%d, CPS=%d, CPM=%d, Err=%d", Scraped, int(float64(Scraped)/float64(time.Since(TaskSt).Seconds())), int(float64(Scraped)/float64(time.Since(TaskSt).Minutes())), ScrapeError)
-			console.Log(bar)
-		}
-
-		console.SetTitle(fmt.Sprintf("Implex %s [%s] ⇸ %s", version, uptimeStr, bar))
-		time.Sleep(1500 * time.Millisecond)
+func SetupLogger() {
+	opts := PrettyHandlerOptions{
+		ZapOpts: zap.NewDevelopmentConfig(),
 	}
+	handler := NewPrettyHandler(os.Stdout, opts)
+	Logger = handler.logger
+}
+
+func LoadStorage() error {
+
+	if _, err := toml.DecodeFile("../../scripts/config.toml", &Config); err != nil {
+		panic(err)
+	}
+
+	inputDir := "../../assets/input/"
+
+	files, err := os.ReadDir(inputDir)
+	if err != nil {
+		return err
+	}
+
+	var wg sync.WaitGroup
+	assetsMutex := sync.Mutex{}
+
+	for _, file := range files {
+		wg.Add(1)
+		go func(file os.DirEntry) {
+			defer wg.Done()
+
+			if file.IsDir() {
+				filePaths, err := utils.GetAllFilesInDirectory(filepath.Join(inputDir, file.Name()))
+				if err != nil {
+					panic(err)
+				}
+
+				c := GoCycle.New(&filePaths)
+				Logger.Info("Loaded",
+					zap.String("file", file.Name()),
+					zap.Int("amount", len(c.List)),
+				)
+
+				if Config.Asset.ClearDups {
+					c.ClearDuplicates()
+				}
+
+				if Config.Asset.Randomize {
+					c.RandomiseIndex()
+				}
+
+				assetsMutex.Lock()
+				Assets[file.Name()] = c
+				assetsMutex.Unlock()
+			} else if strings.HasSuffix(file.Name(), ".txt") {
+				filePath := filepath.Join(inputDir, file.Name())
+
+				c, err := GoCycle.NewFromFile(filePath)
+				if err != nil {
+					panic(err)
+				}
+
+				if Config.Asset.ClearDups {
+					c.ClearDuplicates()
+				}
+
+				if Config.Asset.Randomize {
+					c.RandomiseIndex()
+				}
+
+				assetName := strings.Split(file.Name(), ".txt")[0]
+				Logger.Info("Loaded",
+					zap.String("file", assetName),
+					zap.Int("amount", len(c.List)),
+				)
+
+				assetsMutex.Lock()
+				Assets[assetName] = c
+				assetsMutex.Unlock()
+			}
+		}(file)
+	}
+
+	wg.Wait()
+	return nil
 }

@@ -3679,7 +3679,7 @@
         "platform": "Windows",
         "product": "Gecko",
         "productSub": "20030107",
-        "hardwareConcurrency": 8,
+        "hardwareConcurrency": 16,
         "cpuClass": "_$obj!_undefined_//+_",
         "maxTouchPoints": 0,
         "oscpu": "_$obj!_undefined_//+_",
