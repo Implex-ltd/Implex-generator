@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -22,4 +23,30 @@ func AppendFile(filePath string, line string) error {
 	}
 
 	return nil
+}
+
+func GetAllFilesInDirectory(dirPath string) ([]string, error) {
+	var files []string
+
+	fileInfos, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
+			continue
+		}
+		files = append(files, fileInfo.Name())
+	}
+
+	return files, nil
+}
+
+func RandomNumber(a, b int) int {
+	if a >= b {
+		panic("Invalid range: a must be less than b")
+	}
+
+	return rand.Intn(b-a+1) + a
 }

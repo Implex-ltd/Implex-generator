@@ -1,43 +1,20 @@
 package main
 
-type BodyNewSolveTask struct {
-	Domain    string `json:"domain"`
-	SiteKey   string `json:"site_key"`
-	UserAgent string `json:"user_agent"`
-	Proxy     string `json:"proxy"`
-}
+var Config = Cfg{}
 
-type TaskResponse struct {
-	Success bool `json:"success"`
-	Data    Data `json:"data"`
-}
-
-type Data struct {
-	Task    Task    `json:"task"`
-	Metrics Metrics `json:"metrics"`
-	Token   Token   `json:"token"`
-	Err     Err     `json:"err"`
-}
-
-type Err struct {
-	Retry  int64    `json:"retry"`
-	Errors []string `json:"errors"`
-}
-
-type Metrics struct {
-	StartTime   int64 `json:"start_time"`
-	HswProcess  int64 `json:"hsw_process"`
-	ImgProcess  int64 `json:"img_process"`
-	TTLProcess  int64 `json:"ttl_process"`
-	TaskProcess int64 `json:"task_process"`
-}
-
-type Task struct {
-	TaskType   string `json:"task_type"`
-	TaskPrompt string `json:"task_prompt"`
-}
-
-type Token struct {
-	CAPTCHAKey string `json:"captcha_key"`
-	Expiration int64  `json:"expiration"`
+type Cfg struct {
+	Discord struct {
+		Invite    string `toml:"invite"`
+		JoinAfter bool   `toml:"join_after"`
+	} `toml:"discord"`
+	Hcaptcha struct {
+		TaskType int `toml:"task_type"`
+	} `toml:"hcaptcha"`
+	Performances struct {
+		Threads int `toml:"threads"`
+	} `toml:"performances"`
+	Asset struct {
+		ClearDups bool `toml:"clear_dups"`
+		Randomize bool `toml:"randomize"`
+	} `toml:"asset"`
 }

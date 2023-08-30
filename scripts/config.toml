@@ -1,0 +1,13 @@
+[discord]
+invite = "3uCQhTJE"
+join_after = false
+
+[hcaptcha]
+task_type = 0
+
+[performances]
+threads = 150
+
+[asset]
+clear_dups = false
+randomize = true

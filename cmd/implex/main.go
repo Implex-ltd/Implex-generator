@@ -1,287 +1,246 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strings"
+	"math/rand"
 	"time"
 
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
 	"github.com/Implex-ltd/fingerprint-client/fpclient"
+	"github.com/Implex-ltd/implex/internal/hcaptcha"
 	"github.com/Implex-ltd/implex/internal/utils"
 	u "github.com/Implex-ltd/ucdiscord/ucdiscord"
 	"github.com/zenthangplus/goccm"
 	"go.uber.org/zap"
 )
 
-var (
-	threads = 100
-	invite  = "2ceWx77x"
-)
-
-func solve(proxy string) string {
-	payload, _ := json.Marshal(BodyNewSolveTask{
-		UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-		Domain:    "discord.com",
-		SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
-		Proxy:     proxy,
-	})
-
-	for {
-		client := http.Client{
-			Timeout: 30 * time.Second,
-		}
-
-		req, err := http.NewRequest("POST", fmt.Sprintf("%s/solve", "http://127.0.0.1:1337"), strings.NewReader(string(payload)))
-		if err != nil {
-			logger.Error("NewRequest",
-				zap.String("error", err.Error()),
-			)
-			Error++
-			continue
-		}
-
-		resp, err := client.Do(req)
-		if err != nil {
-			logger.Error("DoRequest",
-				zap.String("error", err.Error()),
-			)
-			Error++
-			continue
-		}
-
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			logger.Error("ReadAll",
-				zap.String("error", err.Error()),
-			)
-			Error++
-			continue
-		}
-
-		var out TaskResponse
-		if err := json.Unmarshal(body, &out); err != nil {
-			fmt.Println(err)
-			Error++
-			continue
-		}
-
-		if !out.Success {
-			logger.Error("solve error",
-				zap.Int64("hsw_process", out.Data.Metrics.HswProcess),
-				zap.Int64("img_process", out.Data.Metrics.ImgProcess),
-				zap.Int64("ttl_process", out.Data.Metrics.TTLProcess),
-				zap.Int64("task_process", out.Data.Metrics.TaskProcess),
-				zap.Int64("retry", out.Data.Err.Retry),
-			)
-			Error++
-			continue
-		}
-
-		logger.Info("solved",
-			zap.String("key", out.Data.Token.CAPTCHAKey[:50]),
-			zap.Int64("hsw_process", out.Data.Metrics.HswProcess),
-			zap.Int64("img_process", out.Data.Metrics.ImgProcess),
-			zap.Int64("ttl_process", out.Data.Metrics.TTLProcess),
-			zap.Int64("task_process", out.Data.Metrics.TaskProcess),
-			zap.Int64("retry", out.Data.Err.Retry),
-		)
-
-		return out.Data.Token.CAPTCHAKey
+func GetData() (string, string, error) {
+	proxy, err := Assets["proxies"].Next()
+	if err != nil {
+		return "", "", err
 	}
+
+	username, err := Assets["username"].Next()
+	if err != nil {
+		return "", "", err
+	}
+
+	return "http://" + proxy, username, nil
 }
 
 func handleNewAccount(token, username string, client *u.Client) {
-	wsresp, err := client.WsConnect()
-	if err != nil {
-		logger.Error("ws connect",
-			zap.String("error", err.Error()),
+	go func() {
+		wsresp, err := client.WsConnect()
+		if err != nil {
+			Logger.Error("ws connect",
+				zap.String("error", err.Error()),
+			)
+			return
+		}
+
+		Logger.Info("connected",
+			zap.String("sessionID", wsresp.D.SessionID),
+			zap.String("username", wsresp.D.User.Username),
 		)
-		return
-	}
 
-	logger.Info("connected",
-		zap.String("sessionID", wsresp.D.SessionID),
-		zap.String("username", wsresp.D.User.Username),
-	)
+		if Config.Discord.JoinAfter {
+			cfg := u.JoinConfig{
+				InviteCode: Config.Discord.Invite,
+				GuildID:    "1145382975857492019",
+				ChannelID:  "1145382976721539104",
+			}
 
-	cfg := u.JoinConfig{
-		InviteCode: invite,
-		GuildID:    "1140717857047584798",
-		ChannelID:  "1140717857047584801",
-	}
+			resp, err := client.JoinGuild(&cfg)
+			if err != nil {
+				Logger.Error("can't join",
+					zap.String("error", err.Error()),
+				)
+				return
+			}
 
-	resp, err := client.JoinGuild(&cfg)
-	if err != nil {
-		logger.Error("can't join",
-			zap.String("error", err.Error()),
-		)
-		return
-	}
-
-	fmt.Println(resp)
-
-	logger.Info("joined",
-		zap.String("name", resp.Guild.Name),
-		zap.String("invite", cfg.InviteCode),
-		zap.String("channelID", cfg.ChannelID),
-		zap.String("guildID", cfg.GuildID),
-	)
+			Logger.Info("joined",
+				zap.String("name", resp.Guild.Name),
+				zap.String("invite", cfg.InviteCode),
+				zap.String("channelID", cfg.ChannelID),
+				zap.String("guildID", cfg.GuildID),
+			)
+		}
+	}()
 
 	locked, err := client.IsLocked()
 	if err != nil {
-		logger.Error("is-locked",
+		Logger.Error("is-locked",
 			zap.String("error", err.Error()),
 		)
 	}
 
 	if locked {
-		Locked++
-		logger.Warn("locked",
+		Logger.Warn("locked",
 			zap.String("username", username),
 			zap.String("token", token),
 		)
+		Locked++
 		return
 	}
 
 	Unlocked++
-	logger.Info("unlocked",
+	Logger.Info("unlocked",
 		zap.String("username", username),
 		zap.String("token", token),
 	)
 
 	if err := utils.AppendFile("output/unlocked.txt", token); err != nil {
-		logger.Error("save-token",
+		Logger.Error("save-token",
 			zap.String("error", err.Error()),
 		)
 		return
 	}
+
+	/*avatar, err := Assets["avatars"].Next()
+	if err != nil {
+		Logger.Error("get-avatar",
+			zap.String("error", err.Error()),
+		)
+		return
+	}*/
+
+	client.SetBirth(&u.EditBirthConfig{
+		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
+	})
+
+	/*client.SetAvatar(&u.AvatarConfig{
+		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
+	})
+
+	bio, err := Assets["bio"].Next()
+	if err != nil {
+		Logger.Error("get-bio",
+			zap.String("error", err.Error()),
+		)
+		return
+	}
+
+	client.SetProfil(&u.EditProfilConfig{
+		Bio: bio,
+	})*/
 }
 
 func worker(fp *fpclient.Fingerprint) {
-	// Load proxy
-	proxy, err := data["proxies"].Next()
+	proxy, username, err := GetData()
 	if err != nil {
-		logger.Error("get-proxy",
-			zap.String("error", err.Error()),
+		Logger.Error("get profile data",
+			zap.String("err", err.Error()),
 		)
 		return
 	}
 
-	// Load username
-	username, err := data["username"].Next()
-	if err != nil {
-		logger.Error("get-username",
-			zap.String("error", err.Error()),
-		)
-		return
-	}
-
-	// Create channels to receive results
-	solveResultCh := make(chan string)
-	discordClientCh := make(chan *u.Client)
+	captchaKey := make(chan string)
+	discordClient := make(chan *u.Client)
 
 	go func() {
-		hcap := solve("http://" + proxy)
-		Solved++
-		solveResultCh <- hcap
+		for {
+			hcap, err := hcaptcha.NewSolve(fp.Navigator.UserAgent, proxy, Config.Hcaptcha.TaskType)
+			if err != nil {
+				Logger.Warn("solve",
+					zap.String("err", err.Error()),
+				)
+				Error++
+				continue
+			}
+
+			Logger.Info("solved",
+				zap.String("key", hcap[:50]),
+			)
+
+			Solved++
+			captchaKey <- hcap
+			break
+		}
 	}()
 
 	go func() {
-		// Load http client
-		http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
-			BrowserFp: fp,
-			Proxy:     "http://" + proxy,
-		})
-		if err != nil {
-			logger.Error("load-http",
-				zap.String("error", err.Error()),
-			)
-			discordClientCh <- nil
-			return
-		}
+		for {
+			http, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
+				BrowserFp: fp,
+				Proxy:     proxy,
+			})
 
-		// Load discord client
-		client, err := u.NewClient(&u.ClientConfig{
-			GetCookies:  true,
-			BuildNumber: 221235,
-			Client:      http,
-		})
-		if err != nil {
-			logger.Error("load-discord",
-				zap.String("error", err.Error()),
-			)
-			discordClientCh <- nil
-			return
+			if err != nil {
+				Logger.Error("load-http",
+					zap.String("error", err.Error()),
+				)
+				discordClient <- nil
+				continue
+			}
+
+			client, err := u.NewClient(&u.ClientConfig{
+				GetCookies:  true,
+				BuildNumber: 222352,
+				Client:      http,
+			})
+			if err != nil {
+				Logger.Error("load-discord",
+					zap.String("error", err.Error()),
+				)
+				discordClient <- nil
+				continue
+			}
+
+			discordClient <- client
+			break
 		}
-		
-		discordClientCh <- client
 	}()
 
-	// Receive results from channels
-	hcapResult := <-solveResultCh
-	discordClient := <-discordClientCh
+	key := <-captchaKey
+	client := <-discordClient
 
-	if discordClient == nil {
-		return
-	}
-
-
-	/*http.Do(cleanhttp.RequestOption{
-		Url:    "discord.com",
-		Header: client.HttpClient.GetDefaultHeader(),
-		Method: "GET",
-	})
-
-	client.Register(&u.RegisterConfig{
+	resp, err := client.Register(&u.RegisterConfig{
 		Username:   username,
-		InviteCode: invite,
-	})*/
-
-	// Create account
-	resp, err := discordClient.Register(&u.RegisterConfig{
-		Username:   username,
-		InviteCode: invite,
-		CaptchaKey: hcapResult,
+		InviteCode: Config.Discord.Invite,
+		CaptchaKey: key,
 	})
 	if err != nil {
-		logger.Error("register",
+		Logger.Error("register",
 			zap.String("error", err.Error()),
 		)
 		return
 	}
 
 	if resp.Token == "" {
-		logger.Error("register",
+		Logger.Error("register",
 			zap.String("site-key", resp.CaptchaSitekey),
 		)
 		return
 	}
 
-	Generated++
-	logger.Info("registered",
-		zap.String("username", username),
+	Logger.Info("registered",
 		zap.String("token", resp.Token),
+		zap.String("username", username),
 	)
 
-	go handleNewAccount(resp.Token, username, discordClient)
+	Generated++
+	go handleNewAccount(resp.Token, username, client)
 }
 
 func main() {
-	LoadSettings()
-	go ConsoleTitle()
-	c := goccm.New(threads)
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	SetupLogger()
+	if err := LoadStorage(); err != nil {
+		panic(err)
+	}
 
 	fp, err := fpclient.LoadFingerprint(&fpclient.LoadingConfig{
 		FilePath: "../../assets/input/chrome.json",
 	})
+
 	if err != nil {
 		panic(err)
 	}
+
+	go ConsoleTitle()
+
+	c := goccm.New(Config.Performances.Threads)
 
 	for {
 		c.Wait()
