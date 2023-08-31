@@ -5,8 +5,8 @@ go 1.21.0
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/Implex-ltd/GoCycle v0.0.0-20230828194937-e5211bbf5f28
-	github.com/Implex-ltd/cleanhttp v0.0.0-20230822061846-9d616913fb9b
-	github.com/Implex-ltd/fingerprint-client v0.0.0-20230813033749-fc63d297c0c3
+	github.com/Implex-ltd/cleanhttp v0.0.0-20230830235720-1fc3f0fcc1be
+	github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b
 	github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c
 	github.com/zenthangplus/goccm v1.1.3
 	go.uber.org/zap v1.25.0

@@ -4,8 +4,12 @@ github.com/Implex-ltd/GoCycle v0.0.0-20230828194937-e5211bbf5f28 h1:7c7ndwM3Vg5h
 github.com/Implex-ltd/GoCycle v0.0.0-20230828194937-e5211bbf5f28/go.mod h1:1oe8qb9iRFVtv7YipOm9jgP6RiIxizuWlsT7yl95+J8=
 github.com/Implex-ltd/cleanhttp v0.0.0-20230822061846-9d616913fb9b h1:0usKLXhyUPJRiUukpnfpXKqHEG62hY9UU2e4QaXOcUc=
 github.com/Implex-ltd/cleanhttp v0.0.0-20230822061846-9d616913fb9b/go.mod h1:L08uIj8QK0n46N3uoHol/0lckNififGHZg9Y0u8gU+k=
+github.com/Implex-ltd/cleanhttp v0.0.0-20230830235720-1fc3f0fcc1be h1:5ZA3fzWqUDrIFFEgj3X9jVWVHoOU9hN1eUPN6lDzB80=
+github.com/Implex-ltd/cleanhttp v0.0.0-20230830235720-1fc3f0fcc1be/go.mod h1:ceH2IB5K5JKx0oVigYXn2a+LZKoQQ2QOLvAinVdzp4o=
 github.com/Implex-ltd/fingerprint-client v0.0.0-20230813033749-fc63d297c0c3 h1:Si/JxlJCzm3orIwds4QUi1ewBNHXTQQqZWf6L373tbo=
 github.com/Implex-ltd/fingerprint-client v0.0.0-20230813033749-fc63d297c0c3/go.mod h1:EpUCk9T3cIggc89ikNdwqTSYnlQ8wVgHah/jTBQukyQ=
+github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b h1:TudRrLEGAwByx88oj6sEJJmumNJoKymzAeQ22xsMBAc=
+github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b/go.mod h1:wqakRN43WgxWu2rZJMJomsWxS0DuGZo3or/gNOn6YvI=
 github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c h1:7n3fwxxH/E49jTCUWdL6Q1FNoHhkZEc+FwxIzu4KwEI=
 github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c/go.mod h1:epHA005oR/2/3Y+km+YM4xNSDOFvoyOlei1OEiakyuE=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=

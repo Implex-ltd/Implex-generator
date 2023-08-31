@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
@@ -71,6 +72,7 @@ func handleNewAccount(token, username string, client *u.Client) {
 	if err != nil {
 		Logger.Error("is-locked",
 			zap.String("error", err.Error()),
+			zap.String("token", token),
 		)
 	}
 
@@ -87,6 +89,7 @@ func handleNewAccount(token, username string, client *u.Client) {
 	if err != nil {
 		Logger.Error("get-avatar",
 			zap.String("error", err.Error()),
+			zap.String("token", token),
 		)
 		return
 	}
@@ -94,21 +97,27 @@ func handleNewAccount(token, username string, client *u.Client) {
 	if err := client.SetBirth(&u.EditBirthConfig{
 		Date: fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 	}); err != nil {
-		Logger.Error("set-birth",
-			zap.String("error", err.Error()),
-		)
-		Locked++
-		return
+		if !strings.Contains(err.Error(), "400") {
+			Logger.Error("set-birth",
+				zap.String("error", err.Error()),
+				zap.String("token", token),
+			)
+			Locked++
+			return
+		}
 	}
 
 	if err := client.SetAvatar(&u.AvatarConfig{
 		FilePath: fmt.Sprintf("../../assets/input/avatars/%s", avatar),
 	}); err != nil {
-		Logger.Error("set-avatar",
-			zap.String("error", err.Error()),
-		)
-		Locked++
-		return
+		if !strings.Contains(err.Error(), "400") {
+			Logger.Error("set-birth",
+				zap.String("error", err.Error()),
+				zap.String("token", token),
+			)
+			Locked++
+			return
+		}
 	}
 
 	bio, err := Assets["bio"].Next()
@@ -122,11 +131,14 @@ func handleNewAccount(token, username string, client *u.Client) {
 	if err := client.SetProfil(&u.EditProfilConfig{
 		Bio: bio,
 	}); err != nil {
-		Logger.Error("set-bio",
-			zap.String("error", err.Error()),
-		)
-		Locked++
-		return
+		if !strings.Contains(err.Error(), "400") {
+			Logger.Error("set-bio",
+				zap.String("error", err.Error()),
+				zap.String("token", token),
+			)
+			Locked++
+			return
+		}
 	}
 
 	Unlocked++
@@ -138,6 +150,7 @@ func handleNewAccount(token, username string, client *u.Client) {
 	if err := utils.AppendFile("output/unlocked.txt", token); err != nil {
 		Logger.Error("save-token",
 			zap.String("error", err.Error()),
+			zap.String("token", token),
 		)
 		return
 	}
