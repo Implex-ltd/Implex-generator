@@ -22,6 +22,7 @@ type BodyNewSolveTask struct {
 	UserAgent string `json:"user_agent"`
 	Proxy     string `json:"proxy"`
 	TaskType  int    `json:"task_type"`
+	Text      bool   `json:"a11y_tfe"`
 }
 
 type TaskResponse struct {

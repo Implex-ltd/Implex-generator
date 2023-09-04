@@ -17,6 +17,7 @@ func NewSolve(UserAgent, Proxy string, TaskType int) (string, error) {
 		SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
 		Proxy:     Proxy,
 		TaskType:  TaskType,
+		Text:      false,
 	})
 
 	// create task
@@ -54,6 +55,7 @@ func NewSolve(UserAgent, Proxy string, TaskType int) (string, error) {
 	//log.Printf("Created task (%v)\n", out.Data[0].ID)
 
 	// get result
+	time.Sleep(5 * time.Second)
 	for {
 		req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/task/%s", SERVER_ADDR, out.Data[0].ID), strings.NewReader(string(payload)))
 		if err != nil {

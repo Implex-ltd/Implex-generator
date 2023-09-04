@@ -7,7 +7,7 @@ require (
 	github.com/Implex-ltd/GoCycle v0.0.0-20230828194937-e5211bbf5f28
 	github.com/Implex-ltd/cleanhttp v0.0.0-20230830235720-1fc3f0fcc1be
 	github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b
-	github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c
+	github.com/Implex-ltd/ucdiscord v0.0.0-20230831014633-0980642af7cf
 	github.com/zenthangplus/goccm v1.1.3
 	go.uber.org/zap v1.25.0
 )

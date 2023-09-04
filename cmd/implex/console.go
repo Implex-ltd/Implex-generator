@@ -48,9 +48,11 @@ func ConsoleTitle() {
 		bar := fmt.Sprintf("Gen: %d, Unlock: %d (%s%%), Locked: %d, Solved: %d, CPM: %v, SolverCPM: %d, Err: %d", Generated, Unlocked, rateStr, Locked, Solved, cpm, int(float64(Solved)/float64(time.Since(TaskSt).Minutes())), Error)
 
 		profit := (0.006 * float64(Unlocked))
-		profit_h := (cpm * 60) * 0.006
+		profit_h := (cpm * 60) * 0.007
+		profit_d := profit_h * 24
+		profit_m := profit_d * 30
 
-		SetTitle(fmt.Sprintf("Implex v2.5 %s [%s] ⇸ %v$ (%v$/h)", uptimeStr, bar, profit, profit_h))
+		SetTitle(fmt.Sprintf("Implex v2.7 %s [%s] ⇸ %.2f$ (%.2f$/h - %.2f$/d - %.2f$/m)", uptimeStr, bar, profit, profit_h, profit_d, profit_m))
 		time.Sleep(1500 * time.Millisecond)
 	}
 }

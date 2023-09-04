@@ -12,6 +12,14 @@ github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b h1:T
 github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b/go.mod h1:wqakRN43WgxWu2rZJMJomsWxS0DuGZo3or/gNOn6YvI=
 github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c h1:7n3fwxxH/E49jTCUWdL6Q1FNoHhkZEc+FwxIzu4KwEI=
 github.com/Implex-ltd/ucdiscord v0.0.0-20230830234019-cddd1b5cdc2c/go.mod h1:epHA005oR/2/3Y+km+YM4xNSDOFvoyOlei1OEiakyuE=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831001817-ffb628ab5026 h1:r14hU7C7gS4k/4yWdKvCV9tskSirdUtCqJi/5f7C6NA=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831001817-ffb628ab5026/go.mod h1:5MBbniVuyyJmHqtsFuRi4wDytI6tYkRYXxZcf/5lXZM=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831002115-c174771e04c9 h1:cIvjvHBKIJ12uL2LuIOncPtML7vNF069SBZ0kA4YEK8=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831002115-c174771e04c9/go.mod h1:5MBbniVuyyJmHqtsFuRi4wDytI6tYkRYXxZcf/5lXZM=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831011334-9ad0e3911504 h1:KbwMgMmmz3EUGVyh6J2hnPw+kIhdIfOjnml0CK7Qewg=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831011334-9ad0e3911504/go.mod h1:5MBbniVuyyJmHqtsFuRi4wDytI6tYkRYXxZcf/5lXZM=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831014633-0980642af7cf h1:Qj46NpUTN69dom7304t7BCbEwVIYTTlOvaV4QfEVHcM=
+github.com/Implex-ltd/ucdiscord v0.0.0-20230831014633-0980642af7cf/go.mod h1:5MBbniVuyyJmHqtsFuRi4wDytI6tYkRYXxZcf/5lXZM=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
