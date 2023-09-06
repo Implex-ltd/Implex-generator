@@ -44,6 +44,10 @@ func handleNewAccount(token, username string, client *u.Client) {
 			zap.String("username", wsresp.D.User.Username),
 		)
 
+		if Config.Hcaptcha.SendEvent {
+			client.SendCaptchaEvent("4c672d35-0701-42b2-88c3-78380b0db560")
+		}
+
 		if Config.Discord.JoinAfter {
 			cfg := u.JoinConfig{
 				InviteCode: Config.Discord.Invite,
@@ -170,7 +174,7 @@ func worker(fp *fpclient.Fingerprint) {
 
 	go func() {
 		for {
-			hcap, err := hcaptcha.NewSolve(fp.Navigator.UserAgent, proxy, Config.Hcaptcha.TaskType)
+			hcap, err := hcaptcha.NewSolve("discord.com", fp.Navigator.UserAgent, proxy, Config.Hcaptcha.TaskType)
 			if err != nil {
 				Logger.Warn("solve",
 					zap.String("err", err.Error()),
@@ -205,7 +209,7 @@ func worker(fp *fpclient.Fingerprint) {
 
 			client, err := u.NewClient(&u.ClientConfig{
 				GetCookies:  true,
-				BuildNumber: 222352,
+				BuildNumber: 225093,
 				Client:      http,
 			})
 			if err != nil {

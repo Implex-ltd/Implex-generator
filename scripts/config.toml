@@ -6,6 +6,7 @@ join_after = false
 
 [hcaptcha]
 task_type = 0
+send_event = true
 
 [performances]
 threads = 150

@@ -10,14 +10,16 @@ import (
 	"time"
 )
 
-func NewSolve(UserAgent, Proxy string, TaskType int) (string, error) {
+func NewSolve(Url, UserAgent, Proxy string, TaskType int) (string, error) {
 	payload, _ := json.Marshal(BodyNewSolveTask{
-		UserAgent: UserAgent,
-		Domain:    "discord.com",
-		SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
-		Proxy:     Proxy,
-		TaskType:  TaskType,
-		Text:      false,
+		UserAgent:     UserAgent,
+		Domain:        Url,
+		SiteKey:       "4c672d35-0701-42b2-88c3-78380b0db560",
+		Proxy:         Proxy,
+		TaskType:      TaskType,
+		FreeTextEntry: true,
+		Turbo:         false,
+		TurboSt:       3500,
 	})
 
 	// create task
@@ -55,7 +57,7 @@ func NewSolve(UserAgent, Proxy string, TaskType int) (string, error) {
 	//log.Printf("Created task (%v)\n", out.Data[0].ID)
 
 	// get result
-	time.Sleep(5 * time.Second)
+	time.Sleep(2 * time.Second)
 	for {
 		req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/task/%s", SERVER_ADDR, out.Data[0].ID), strings.NewReader(string(payload)))
 		if err != nil {
@@ -86,7 +88,7 @@ func NewSolve(UserAgent, Proxy string, TaskType int) (string, error) {
 		case STATUS_SOLVED:
 			return checkresp.Data.Token, nil
 		case STATUS_SOLVING:
-			time.Sleep(1 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 	}
 }

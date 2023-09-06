@@ -10,7 +10,8 @@ type Cfg struct {
 		JoinAfter bool   `toml:"join_after"`
 	} `toml:"discord"`
 	Hcaptcha struct {
-		TaskType int `toml:"task_type"`
+		TaskType  int  `toml:"task_type"`
+		SendEvent bool `toml:"send_event"`
 	} `toml:"hcaptcha"`
 	Performances struct {
 		Threads int `toml:"threads"`
