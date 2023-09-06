@@ -17,7 +17,7 @@ func NewSolve(Url, UserAgent, Proxy string, TaskType int) (string, error) {
 		SiteKey:       "4c672d35-0701-42b2-88c3-78380b0db560",
 		Proxy:         Proxy,
 		TaskType:      TaskType,
-		FreeTextEntry: true,
+		FreeTextEntry: false,
 		Turbo:         false,
 		TurboSt:       3500,
 	})
