@@ -1,15 +1,15 @@
 [discord]
-invite = "EkXTXv7h"
-guild_id = "1147018610737426493"
-channel_id = "1147018611223973891"
+invite = "zaSphzfm"
+guild_id = "1149530064925499402"
+channel_id = "1149530065529491571"
 join_after = false
 
 [hcaptcha]
-task_type = 0
+task_type = 1
 send_event = true
 
 [performances]
-threads = 150
+threads = 100
 
 [asset]
 clear_dups = false
