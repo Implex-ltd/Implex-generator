@@ -103,27 +103,44 @@ func (w *Worker) Humanize(c *HumanizeConfig) error {
 	}
 
 	if c.Date != "" || c.Avatar != "" {
-		if resp, _, err := w.Client.PatchUser(&ucdiscord.Config{
+		fmt.Println(c.Date, c.Avatar)
+		resp, _, err := w.Client.PatchUser(&ucdiscord.Config{
 			Date:   c.Date,
 			Avatar: c.Avatar,
-		}); err != nil || resp.Status != 200 {
-			return fmt.Errorf("cannot patch user, response code %d, error: %v", resp.Status, err.Error())
+		})
+
+		if err != nil {
+			return fmt.Errorf("cannot patch user, error: %v", err.Error())
+		}
+
+		if resp.Status != 200 {
+			return fmt.Errorf("cannot patch user, response code %d", resp.Status)
 		}
 	}
 
 	if c.Pronouns != "" || c.Bio != "" {
-		if resp, _, err := w.Client.PatchProfil(&ucdiscord.Config{
+		resp, _, err := w.Client.PatchProfil(&ucdiscord.Config{
 			Bio:      c.Bio,
 			Pronouns: c.Pronouns,
-		}); err != nil || resp.Status != 200 {
-			return fmt.Errorf("cannot patch profil, response code %d, error: %v", resp.Status, err.Error())
+		})
+
+		if err != nil {
+			return fmt.Errorf("cannot patch profil, error: %v", err.Error())
+		}
+
+		if resp.Status != 200 {
+			return fmt.Errorf("cannot patch profil, response code %d", resp.Status)
 		}
 	}
 
 	if c.Hypesquad {
 		resp, err := w.Client.JoinHypesquad(utils.RandomNumber(1, 3))
-		if err != nil || resp.Status != 204 {
-			return fmt.Errorf("cannot join hypesquad, response code %d, error: %v", resp.Status, err.Error())
+		if err != nil {
+			return fmt.Errorf("cannot join hypesquad, error: %v", err.Error())
+		}
+
+		if resp.Status != 204 {
+			return fmt.Errorf("cannot join hypesquad, response code %d", resp.Status)
 		}
 	}
 

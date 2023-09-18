@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	Threads = 10
+	Threads = 150
 	Invite  = "r8Qhh5Wf"
 )
 
@@ -61,7 +61,7 @@ func main() {
 				Domain:    "discord.com",
 				A11YTfe:   true,
 				Turbo:     true,
-				TurboSt:   3500,
+				TurboSt:   3200,
 				TaskType:  crapsolver.TASKTYPE_ENTERPRISE,
 			})
 			if err != nil {
@@ -92,9 +92,9 @@ func main() {
 					Tutorial:  true,
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
-					Avatar:    avatar,
-					Bio:       bio,
-					Pronouns:  "he/him",
+					//Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
+					Bio:      bio,
+					Pronouns: "he/him",
 				}); err != nil {
 					log.Println(err.Error())
 					return
