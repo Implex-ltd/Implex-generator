@@ -4,3 +4,6 @@ assets/input/proxies.txt
 
 .back
 assets/*
+assets
+.txt
+qodana.yaml
