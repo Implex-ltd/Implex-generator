@@ -2,18 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/Implex-ltd/crapsolver/crapsolver"
 	"github.com/Implex-ltd/generator/internal/console"
 	"github.com/Implex-ltd/generator/internal/discord"
 	"github.com/Implex-ltd/generator/internal/utils"
 	"github.com/zenthangplus/goccm"
-	"log"
-	"time"
 )
 
 var (
-	Threads = 150
-	Invite  = "r8Qhh5Wf"
+	Threads = 50
+	Invite  = "yx2HWKwN"
 )
 
 func main() {
@@ -61,7 +62,7 @@ func main() {
 				Domain:    "discord.com",
 				A11YTfe:   true,
 				Turbo:     true,
-				TurboSt:   3200,
+				TurboSt:   3400,
 				TaskType:  crapsolver.TASKTYPE_ENTERPRISE,
 			})
 			if err != nil {
@@ -88,29 +89,29 @@ func main() {
 					return
 				}
 
+				if err := worker.Websocket(); err != nil {
+					log.Println(err.Error())
+					return
+				}
+
 				if err := worker.Humanize(&discord.HumanizeConfig{
 					Tutorial:  true,
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
-					//Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
+					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
 					Bio:      bio,
 					Pronouns: "he/him",
 				}); err != nil {
 					log.Println(err.Error())
 					return
 				}
-
-				if err := worker.Websocket(); err != nil {
-					log.Println(err.Error())
-					return
-				}
-
+				
 				if err := utils.AppendFile("output/unlocked.txt", worker.Client.Config.Token); err != nil {
 					log.Println(err.Error())
 					return
 				}
 
-				console.Log(fmt.Sprintf("<fg=fc95a3>Unlocked</> (%.2fs): <fg=fc95a3>%s</>", time.Since(st).Seconds(), capKey[:50]))
+				console.Log(fmt.Sprintf("<fg=fc95a3>Unlocked</> (%.2fs): <fg=fc95a3>%s</>", time.Since(st).Seconds(), worker.Client.Config.Token))
 			}(capKey, "http://"+proxy, username, avatars, bio, St)
 		}()
 	}
