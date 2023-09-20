@@ -103,7 +103,6 @@ func (w *Worker) Humanize(c *HumanizeConfig) error {
 	}
 
 	if c.Date != "" || c.Avatar != "" {
-		fmt.Println(c.Date, c.Avatar)
 		resp, _, err := w.Client.PatchUser(&ucdiscord.Config{
 			Date:   c.Date,
 			Avatar: c.Avatar,

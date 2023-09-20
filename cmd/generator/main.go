@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Threads = 50
+	Threads = 130
 	Invite  = "yx2HWKwN"
 )
 
@@ -56,13 +56,13 @@ func main() {
 			St := time.Now()
 
 			capKey, err := Crap.Solve(&crapsolver.TaskConfig{
-				UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+				UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
 				Proxy:     "http://" + proxy,
 				SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
 				Domain:    "discord.com",
 				A11YTfe:   true,
 				Turbo:     true,
-				TurboSt:   3400,
+				TurboSt:   3200,
 				TaskType:  crapsolver.TASKTYPE_ENTERPRISE,
 			})
 			if err != nil {
