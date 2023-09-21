@@ -23,6 +23,8 @@ func main() {
 		panic(err)
 	}
 
+	go console.ConsoleTitle()
+
 	c := goccm.New(Threads)
 
 	for {
@@ -32,6 +34,7 @@ func main() {
 			defer c.Done()
 
 			Crap := crapsolver.NewSolver()
+			Crap.SetWaitTime(time.Second * 2)
 
 			proxy, err := Assets["proxies"].Next()
 			if err != nil {
@@ -62,14 +65,21 @@ func main() {
 				Domain:    "discord.com",
 				A11YTfe:   true,
 				Turbo:     true,
-				TurboSt:   3200,
+				TurboSt:   3500,
 				TaskType:  crapsolver.TASKTYPE_ENTERPRISE,
 			})
 			if err != nil {
+				console.Error++
 				return
 			}
 
 			console.Log(fmt.Sprintf("<fg=5e61b5>Solved</> (%.2fs): <fg=5e61b5>%s</>", time.Since(St).Seconds(), capKey[:50]))
+
+			console.StMut.Lock()
+			console.SolveTime = append(console.SolveTime, time.Since(St))
+			console.StMut.Unlock()
+
+			console.Solved++
 
 			go func(captcha, proxy, username, avatar, bio string, st time.Time) {
 				worker, err := discord.NewWorker(&discord.Config{
@@ -81,16 +91,21 @@ func main() {
 
 				if err != nil {
 					log.Println(err.Error())
+					console.Error++
 					return
 				}
 
 				if err := worker.Generate(); err != nil {
 					log.Println(err.Error())
+					console.Error++
 					return
 				}
 
+				console.Generated++
+
 				if err := worker.Websocket(); err != nil {
 					log.Println(err.Error())
+					console.Locked++
 					return
 				}
 
@@ -99,18 +114,20 @@ func main() {
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-					Bio:      bio,
-					Pronouns: "he/him",
+					Bio:       bio,
+					Pronouns:  "he/him",
 				}); err != nil {
 					log.Println(err.Error())
+					console.Locked++
 					return
 				}
-				
+
 				if err := utils.AppendFile("output/unlocked.txt", worker.Client.Config.Token); err != nil {
 					log.Println(err.Error())
 					return
 				}
 
+				console.Unlocked++
 				console.Log(fmt.Sprintf("<fg=fc95a3>Unlocked</> (%.2fs): <fg=fc95a3>%s</>", time.Since(st).Seconds(), worker.Client.Config.Token))
 			}(capKey, "http://"+proxy, username, avatars, bio, St)
 		}()

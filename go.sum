@@ -6,6 +6,8 @@ github.com/Implex-ltd/crapsolver v0.0.0-20230914061522-9fd96f92e830 h1:rR2BoFXhe
 github.com/Implex-ltd/crapsolver v0.0.0-20230914061522-9fd96f92e830/go.mod h1:Qxwq4zIu12mi/6sE+NZoOCQEByBZTtnJIHd4ptbzc7g=
 github.com/Implex-ltd/crapsolver v0.0.0-20230914080120-c886e6a3d768 h1:a8juOP0g+RxALlgRG94gKhpUkOOZTAnIs/sVUcLEr7g=
 github.com/Implex-ltd/crapsolver v0.0.0-20230914080120-c886e6a3d768/go.mod h1:Qxwq4zIu12mi/6sE+NZoOCQEByBZTtnJIHd4ptbzc7g=
+github.com/Implex-ltd/crapsolver v0.0.0-20230920201104-f48c78cb768e h1:ZzTN7AiAj1Wz6Yb9rG+fO87TmOXxNpF0l9POXaedqvg=
+github.com/Implex-ltd/crapsolver v0.0.0-20230920201104-f48c78cb768e/go.mod h1:Qxwq4zIu12mi/6sE+NZoOCQEByBZTtnJIHd4ptbzc7g=
 github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b h1:TudRrLEGAwByx88oj6sEJJmumNJoKymzAeQ22xsMBAc=
 github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b/go.mod h1:wqakRN43WgxWu2rZJMJomsWxS0DuGZo3or/gNOn6YvI=
 github.com/Implex-ltd/ucdiscord v0.0.0-20230914004308-b946801ce46b h1:Js0CAz5bjHvEgUZReeFLkNq3TjDX1iiZbqLnU+DRwM4=

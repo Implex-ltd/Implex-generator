@@ -5,7 +5,7 @@ go 1.21.0
 require (
 	github.com/Implex-ltd/GoCycle v0.0.0-20230828194937-e5211bbf5f28
 	github.com/Implex-ltd/cleanhttp v0.0.0-20230911013353-e9e5d0aacb6e
-	github.com/Implex-ltd/crapsolver v0.0.0-20230914080120-c886e6a3d768
+	github.com/Implex-ltd/crapsolver v0.0.0-20230920201104-f48c78cb768e
 	github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b
 	github.com/Implex-ltd/ucdiscord v0.0.0-20230917181236-3850cd648c25
 	github.com/gookit/color v1.5.4
