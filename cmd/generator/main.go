@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Threads = 130
+	Threads = 230
 	Invite  = "yx2HWKwN"
 )
 
@@ -59,13 +59,13 @@ func main() {
 			St := time.Now()
 
 			capKey, err := Crap.Solve(&crapsolver.TaskConfig{
-				UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+				UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
 				Proxy:     "http://" + proxy,
 				SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
 				Domain:    "discord.com",
 				A11YTfe:   true,
 				Turbo:     true,
-				TurboSt:   3500,
+				TurboSt:   3200,
 				TaskType:  crapsolver.TASKTYPE_ENTERPRISE,
 			})
 			if err != nil {
@@ -82,6 +82,7 @@ func main() {
 			console.Solved++
 
 			go func(captcha, proxy, username, avatar, bio string, st time.Time) {
+				//iv, _ := Assets["invites"].Next()
 				worker, err := discord.NewWorker(&discord.Config{
 					HcaptchaKey: captcha,
 					Proxy:       proxy,
@@ -118,6 +119,14 @@ func main() {
 					Pronouns:  "he/him",
 				}); err != nil {
 					log.Println(err.Error())
+					console.Locked++
+					return
+				}
+
+				time.Sleep(time.Second * 15)
+
+				if err := worker.Check(); err != nil {
+					log.Println("15: ", err.Error())
 					console.Locked++
 					return
 				}
