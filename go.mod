@@ -7,7 +7,7 @@ require (
 	github.com/Implex-ltd/cleanhttp v0.0.0-20230921225715-5741f21b9557
 	github.com/Implex-ltd/crapsolver v0.0.0-20230920201104-f48c78cb768e
 	github.com/Implex-ltd/fingerprint-client v0.0.0-20230830235428-380e1bbcfa4b
-	github.com/Implex-ltd/ucdiscord v0.0.0-20230921230022-0f5e660a8eb5
+	github.com/Implex-ltd/ucdiscord v0.0.0-20230922195016-fc84ca64f913
 	github.com/gookit/color v1.5.4
 	github.com/inancgumus/screen v0.0.0-20190314163918-06e984b86ed3
 	github.com/zenthangplus/goccm v1.1.3
