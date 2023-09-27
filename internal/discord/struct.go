@@ -2,11 +2,14 @@ package discord
 
 import (
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
+	"github.com/Implex-ltd/fingerprint-client/fpclient"
 	"github.com/Implex-ltd/ucdiscord/ucdiscord"
 )
 
 type Config struct {
 	HcaptchaKey, Proxy, Invite, Username string
+	Fingerprint                          *fpclient.Fingerprint
+	Build                                int
 }
 
 type Worker struct {

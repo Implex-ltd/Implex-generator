@@ -3,23 +3,15 @@ package discord
 import (
 	"fmt"
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
-	"github.com/Implex-ltd/fingerprint-client/fpclient"
 	"github.com/Implex-ltd/generator/internal/utils"
 	"github.com/Implex-ltd/ucdiscord/ucdiscord"
-)
-
-var (
-	Fp, _ = fpclient.LoadFingerprint(&fpclient.LoadingConfig{
-		FilePath: "../../assets/input/chrome.json",
-	})
-	Build = 227559
 )
 
 func NewWorker(c *Config) (*Worker, error) {
 	client, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
 		Proxy:     c.Proxy,
 		Log:       false,
-		BrowserFp: Fp,
+		BrowserFp: c.Fingerprint,
 	})
 
 	if err != nil {
@@ -31,10 +23,10 @@ func NewWorker(c *Config) (*Worker, error) {
 		Browser:           client.BaseHeader.UaInfo.BrowserName,
 		OsVersion:         client.BaseHeader.UaInfo.OSVersion,
 		Os:                client.BaseHeader.UaInfo.OSName,
-		BrowserUserAgent:  Fp.Navigator.UserAgent,
+		BrowserUserAgent:  c.Fingerprint.Navigator.UserAgent,
 		ReleaseChannel:    "stable",
 		SystemLocale:      "fr-FR",
-		ClientBuildNumber: Build,
+		ClientBuildNumber: c.Build,
 		Device:            "",
 	})
 
@@ -43,7 +35,7 @@ func NewWorker(c *Config) (*Worker, error) {
 	}
 
 	discord, err := ucdiscord.NewClient(&ucdiscord.Config{
-		Build:      Build,
+		Build:      c.Build,
 		Http:       client,
 		GetCookies: true,
 		Ws:         ws,

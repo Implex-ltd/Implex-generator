@@ -1,16 +1,18 @@
 [discord]
-invite = "zaSphzfm"
-guild_id = "1149530064925499402"
-channel_id = "1149530065529491571"
-join_after = false
+invite = "wR82V7Ae"
+build = 230961
+check_sleep = 15
 
-[hcaptcha]
-task_type = 1
-send_event = true
+[solver]
+text = true
+turbo = true
+tubo_st = 3200
+task_type = 0
 
 [performances]
-threads = 100
+threads = 150
 
-[asset]
-clear_dups = false
-randomize = true
+[bridge]
+enable = false
+port = 1337
+address ="localhost"

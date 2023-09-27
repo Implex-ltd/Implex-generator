@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/BurntSushi/toml"
 	"github.com/Implex-ltd/GoCycle"
 	"github.com/Implex-ltd/generator/internal/console"
 	"github.com/Implex-ltd/generator/internal/utils"
@@ -17,6 +18,10 @@ var (
 )
 
 func LoadStorage() error {
+	if _, err := toml.DecodeFile("../../scripts/config.toml", &Config); err != nil {
+		panic(err)
+	}
+
 	inputDir := "../../assets/input/"
 
 	files, err := os.ReadDir(inputDir)
