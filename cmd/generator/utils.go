@@ -50,7 +50,7 @@ func LoadStorage() error {
 				assetsMutex.Lock()
 				Assets[file.Name()] = c
 				assetsMutex.Unlock()
-			} else if strings.HasSuffix(file.Name(), ".txt") {
+			} else if strings.HasSuffix(file.Name(), ".txt") && !strings.HasPrefix(file.Name(), "_") {
 				filePath := filepath.Join(inputDir, file.Name())
 
 				c, err := GoCycle.NewFromFile(filePath)

@@ -45,9 +45,11 @@ func main() {
 
 		go func() {
 			defer c.Done()
+			F := Fp
+			//F.Navigator.UserAgent = fmt.Sprintf("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%d.0.0.0 Safari/537.36", utils.RandomNumber(30, 118))
 
 			Crap := crapsolver.NewSolver()
-			Crap.SetWaitTime(time.Second * 3)
+			Crap.SetWaitTime(time.Millisecond * 2000)
 
 			proxy, err := Assets["proxies"].Next()
 			if err != nil {
@@ -72,7 +74,7 @@ func main() {
 			St := time.Now()
 
 			capKey, err := Crap.Solve(&crapsolver.TaskConfig{
-				UserAgent: Fp.Navigator.UserAgent,
+				UserAgent: F.Navigator.UserAgent,
 				Proxy:     "http://" + proxy,
 				SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
 				Domain:    "discord.com",
@@ -87,7 +89,7 @@ func main() {
 				return
 			}
 
-			console.Log(fmt.Sprintf("<fg=5e61b5>Solved</> (%.2fs): <fg=5e61b5>%s</>", time.Since(St).Seconds(), capKey[:50]))
+			console.Log(fmt.Sprintf("%dms  | <fg=fccb42>Solved</>: <fg=fccb42>%s</>", time.Since(St).Milliseconds(), capKey[:62]))
 
 			console.StMut.Lock()
 			console.SolveTime = append(console.SolveTime, time.Since(St))
@@ -103,17 +105,17 @@ func main() {
 					Invite:      Config.Discord.Invite,
 					Username:    username,
 					Build:       Config.Discord.Build,
-					Fingerprint: Fp,
+					Fingerprint: F,
 				})
 
 				if err != nil {
-					log.Println(err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Error++
 					return
 				}
 
 				if err := worker.Generate(); err != nil {
-					log.Println(err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Error++
 					return
 				}
@@ -121,7 +123,7 @@ func main() {
 				console.Generated++
 
 				if err := worker.Websocket(); err != nil {
-					log.Println(err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
 				}
@@ -131,10 +133,10 @@ func main() {
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-					Bio:       bio,
+					Bio:       fmt.Sprintf("%s - my fav num: %s", bio, utils.RandomString(3)),
 					Pronouns:  "he/him",
 				}); err != nil {
-					log.Println(err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
 				}
@@ -142,13 +144,13 @@ func main() {
 				time.Sleep(time.Second * time.Duration(Config.Discord.CheckSleep))
 
 				if err := worker.Check(); err != nil {
-					log.Println("sleep: ", err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
 				}
 
 				if err := utils.AppendFile("output/unlocked.txt", worker.Client.Config.Token); err != nil {
-					log.Println(err.Error())
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					return
 				}
 
@@ -159,7 +161,7 @@ func main() {
 				}
 
 				console.Unlocked++
-				console.Log(fmt.Sprintf("<fg=fc95a3>Unlocked</> (%.2fs): <fg=fc95a3>%s</>", time.Since(st).Seconds(), worker.Client.Config.Token))
+				console.Log(fmt.Sprintf("%dms | <fg=3eed44>Unlock</>: <fg=3eed44>%s</>", time.Since(st).Milliseconds(), worker.Client.Config.Token))
 			}(capKey, "http://"+proxy, username, avatars, bio, St)
 		}()
 	}

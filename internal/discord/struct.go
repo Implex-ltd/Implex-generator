@@ -7,9 +7,9 @@ import (
 )
 
 type Config struct {
-	HcaptchaKey, Proxy, Invite, Username string
-	Fingerprint                          *fpclient.Fingerprint
-	Build                                int
+	HcaptchaKey, Proxy, Invite, Username, Token string
+	Fingerprint                                 *fpclient.Fingerprint
+	Build                                       int
 }
 
 type Worker struct {

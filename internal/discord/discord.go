@@ -18,7 +18,7 @@ func NewWorker(c *Config) (*Worker, error) {
 		return nil, err
 	}
 
-	ws, err := ucdiscord.NewWebsocket("x", &ucdiscord.XProp{
+	ws, err := ucdiscord.NewWebsocket(c.Token, &ucdiscord.XProp{
 		BrowserVersion:    client.BaseHeader.UaInfo.BrowserVersion,
 		Browser:           client.BaseHeader.UaInfo.BrowserName,
 		OsVersion:         client.BaseHeader.UaInfo.OSVersion,
@@ -35,6 +35,7 @@ func NewWorker(c *Config) (*Worker, error) {
 	}
 
 	discord, err := ucdiscord.NewClient(&ucdiscord.Config{
+		Token:      c.Token,
 		Build:      c.Build,
 		Http:       client,
 		GetCookies: true,

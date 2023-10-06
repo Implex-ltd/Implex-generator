@@ -7,8 +7,18 @@ import (
 )
 
 var (
+	charset      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	BasePath = "../../assets"
 )
+
+func RandomString(length int) string {
+	result := make([]byte, length)
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(result)
+}
 
 func AppendFile(filePath string, line string) error {
 	f, err := os.OpenFile(fmt.Sprintf("%s/%s", BasePath, filePath), os.O_APPEND|os.O_WRONLY, 0644)
