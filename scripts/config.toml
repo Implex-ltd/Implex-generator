@@ -1,7 +1,7 @@
 [discord]
-invite = "v6HMAG5n"
+invite = "cngVxQvz"
 build = 233458
-check_sleep = 15
+check_sleep = 11
 
 [solver]
 text = true
@@ -10,7 +10,7 @@ tubo_st = 3200
 task_type = 0
 
 [performances]
-threads = 250
+threads = 75
 
 [bridge]
 enable = false
