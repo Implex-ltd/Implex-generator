@@ -46,7 +46,7 @@ func main() {
 		go func() {
 			defer c.Done()
 			F := Fp
-			//=F.Navigator.UserAgent = fmt.Sprintf("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%d.0.0.0 Safari/537.36", utils.RandomNumber(30, 118))
+			//F.Navigator.UserAgent = fmt.Sprintf("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%d.0.0.0 Safari/537.36", utils.RandomNumber(117, 118))
 
 			Crap := crapsolver.NewSolver()
 			Crap.SetWaitTime(time.Millisecond * 3000)
@@ -133,12 +133,18 @@ func main() {
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-					Bio:       bio, //fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(1, 5))),
+					Bio:       bio, //fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
 					Pronouns:  "he/him",
 				}); err != nil {
 					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
+				}
+
+				if Config.Bridge.Enable {
+					if err := bridgeClient.PushData(fmt.Sprintf("%s", worker.Client.Config.Token)); err != nil {
+						log.Println(err)
+					}
 				}
 
 				time.Sleep(time.Second * time.Duration(Config.Discord.CheckSleep))
@@ -151,11 +157,7 @@ func main() {
 
 				console.Unlocked++
 
-				if Config.Bridge.Enable {
-					if err := bridgeClient.PushData(fmt.Sprintf("%s", worker.Client.Config.Token)); err != nil {
-						log.Println(err)
-					}
-				} else {
+				if !Config.Bridge.Enable {
 					if err := utils.AppendFile("output/unlocked.txt", worker.Client.Config.Token); err != nil {
 						console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 						return
