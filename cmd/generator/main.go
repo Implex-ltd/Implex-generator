@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/Implex-ltd/generator/internal/console"
 	"github.com/Implex-ltd/generator/internal/discord"
 	"github.com/Implex-ltd/generator/internal/utils"
+	mailslurp "github.com/mailslurp/mailslurp-client-go"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -48,7 +50,7 @@ func main() {
 			F := Fp
 			//F.Navigator.UserAgent = fmt.Sprintf("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%d.0.0.0 Safari/537.36", utils.RandomNumber(117, 118))
 
-			Crap := crapsolver.NewSolver()
+			Crap, _ := crapsolver.NewSolver("user:ggxl9uip42bnq0tgs4ch")
 			Crap.SetWaitTime(time.Millisecond * 3000)
 
 			proxy, err := Assets["proxies"].Next()
@@ -73,7 +75,7 @@ func main() {
 
 			St := time.Now()
 
-			capKey, err := Crap.Solve(&crapsolver.TaskConfig{
+			capKey, ua, err := Crap.Solve(&crapsolver.TaskConfig{
 				UserAgent: F.Navigator.UserAgent,
 				Proxy:     "http://" + proxy,
 				SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
@@ -88,6 +90,8 @@ func main() {
 				//log.Println(err)
 				return
 			}
+
+			F.Navigator.UserAgent = ua
 
 			console.Log(fmt.Sprintf("%dms  | <fg=fccb42>Solved</>: <fg=fccb42>%s</>", time.Since(St).Milliseconds(), capKey[:62]))
 
@@ -109,13 +113,13 @@ func main() {
 				})
 
 				if err != nil {
-					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error-a</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Error++
 					return
 				}
 
 				if err := worker.Generate(); err != nil {
-					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error-b</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Error++
 					return
 				}
@@ -123,23 +127,23 @@ func main() {
 				console.Generated++
 
 				if err := worker.Websocket(); err != nil {
-					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error-c</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
 				}
 
-				if err := worker.Humanize(&discord.HumanizeConfig{
+				/*if err := worker.Humanize(&discord.HumanizeConfig{
 					Tutorial:  true,
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-					Bio:       bio, //fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
+					Bio:       fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
 					Pronouns:  "he/him",
 				}); err != nil {
 					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
-				}
+				}*/
 
 				if Config.Bridge.Enable {
 					if err := bridgeClient.PushData(fmt.Sprintf("%s", worker.Client.Config.Token)); err != nil {
@@ -165,6 +169,24 @@ func main() {
 				}
 
 				console.Log(fmt.Sprintf("%dms | <fg=3eed44>Unlock</>: <fg=3eed44>%s</>", time.Since(st).Milliseconds(), worker.Client.Config.Token))
+
+				if Config.Verifications.Email {
+					apikey, err := Assets["email_apis"].Next()
+					if err != nil {
+						return
+					}
+
+					ctx := context.WithValue(context.Background(), mailslurp.ContextAPIKey, mailslurp.APIKey{Key: apikey})
+
+					// create mailslurp client
+					client := mailslurp.NewAPIClient(mailslurp.NewConfiguration())
+
+					// create an inbox
+					inbox, _, err := client.InboxControllerApi.CreateInbox(ctx, &mailslurp.CreateInboxOpts{})
+
+					fmt.Println("email", inbox.EmailAddress)
+
+				}
 			}(capKey, "http://"+proxy, username, avatars, bio, St)
 		}()
 	}

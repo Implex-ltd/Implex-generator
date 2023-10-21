@@ -1,16 +1,19 @@
 [discord]
-invite = "dHrrBfXr"
-build = 236850
+invite = "D9FafxDt"
+build = 238110
 check_sleep = 11
+
+[verifications]
+email = false
 
 [solver]
 text = true
 turbo = true
-tubo_st = 4500
+tubo_st = 3500
 task_type = 0
 
 [performances]
-threads = 100
+threads = 10
 
 [bridge]
 enable = false

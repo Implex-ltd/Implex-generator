@@ -22,4 +22,7 @@ type Cfg struct {
 		Port    int    `toml:"port"`
 		Address string `toml:"address"`
 	} `toml:"bridge"`
+	Verifications struct {
+		Email bool `toml:"email"`
+	} `toml:"verifications"`
 }

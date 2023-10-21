@@ -2,15 +2,17 @@ package discord
 
 import (
 	"fmt"
+
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
-	"github.com/Implex-ltd/generator/internal/utils"
 	"github.com/Implex-ltd/ucdiscord/ucdiscord"
+
+	"github.com/Implex-ltd/generator/internal/utils"
 )
 
 func NewWorker(c *Config) (*Worker, error) {
 	client, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
-		Proxy:     c.Proxy,
-		Log:       false,
+		Proxy: c.Proxy,
+		//Log:       true,
 		BrowserFp: c.Fingerprint,
 	})
 
@@ -57,6 +59,24 @@ func NewWorker(c *Config) (*Worker, error) {
 }
 
 func (w *Worker) Generate() error {
+	_, data, err := w.Client.Register(&ucdiscord.Config{
+		Username:   w.Username,
+		Invite:     w.Invite,
+		CaptchaKey: w.HcaptchaKey,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if data.Token == "" {
+		return fmt.Errorf("registration failed")
+	}
+
+	return nil
+}
+
+func (w *Worker) Verify(code string) error {
 	_, data, err := w.Client.Register(&ucdiscord.Config{
 		Username:   w.Username,
 		Invite:     w.Invite,
