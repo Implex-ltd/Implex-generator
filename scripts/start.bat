@@ -1,4 +1,4 @@
 @echo off
 cls
-cd ../cmd/implex/ && go run .
+cd ../cmd/generator/ && go run .
 pause
