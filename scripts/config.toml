@@ -1,7 +1,7 @@
-[discord]
-invite = "D9FafxDt"
-build = 238110
-check_sleep = 11
+[discord] 
+invite = "4bHdkURM"
+build = 243588
+check_sleep = 0
 
 [verifications]
 email = false
@@ -9,13 +9,13 @@ email = false
 [solver]
 text = true
 turbo = true
-tubo_st = 3500
+tubo_st = 3200
 task_type = 0
 
 [performances]
-threads = 10
+threads = 50
 
 [bridge]
-enable = false
+enable = true
 port = 1337
 address ="localhost"

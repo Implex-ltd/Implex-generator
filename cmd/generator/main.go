@@ -1,9 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Implex-ltd/bridge/bridge"
@@ -12,7 +12,6 @@ import (
 	"github.com/Implex-ltd/generator/internal/console"
 	"github.com/Implex-ltd/generator/internal/discord"
 	"github.com/Implex-ltd/generator/internal/utils"
-	mailslurp "github.com/mailslurp/mailslurp-client-go"
 	"github.com/zenthangplus/goccm"
 )
 
@@ -20,6 +19,7 @@ var (
 	Fp, _ = fpclient.LoadFingerprint(&fpclient.LoadingConfig{
 		FilePath: "../../assets/input/chrome.json",
 	})
+
 	bridgeClient = &bridge.Client{}
 )
 
@@ -48,7 +48,6 @@ func main() {
 		go func() {
 			defer c.Done()
 			F := Fp
-			//F.Navigator.UserAgent = fmt.Sprintf("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%d.0.0.0 Safari/537.36", utils.RandomNumber(117, 118))
 
 			Crap, _ := crapsolver.NewSolver("user:ggxl9uip42bnq0tgs4ch")
 			Crap.SetWaitTime(time.Millisecond * 3000)
@@ -57,6 +56,8 @@ func main() {
 			if err != nil {
 				return
 			}
+
+			proxy = strings.ReplaceAll(proxy, "xxxxxxxx", utils.RandomString(8))
 
 			username, err := Assets["username"].Next()
 			if err != nil {
@@ -75,7 +76,7 @@ func main() {
 
 			St := time.Now()
 
-			capKey, ua, err := Crap.Solve(&crapsolver.TaskConfig{
+			resp, err := Crap.Solve(&crapsolver.TaskConfig{
 				UserAgent: F.Navigator.UserAgent,
 				Proxy:     "http://" + proxy,
 				SiteKey:   "4c672d35-0701-42b2-88c3-78380b0db560",
@@ -84,16 +85,16 @@ func main() {
 				Turbo:     Config.Solver.Turbo,
 				TurboSt:   Config.Solver.TuboSt,
 				TaskType:  Config.Solver.TaskType,
+				Href:      fmt.Sprintf("https://discord.com/invite/%s", Config.Discord.Invite),
 			})
 			if err != nil {
 				console.Error++
-				//log.Println(err)
 				return
 			}
 
-			F.Navigator.UserAgent = ua
+			F.Navigator.UserAgent = resp.Data.UserAgent
 
-			console.Log(fmt.Sprintf("%dms  | <fg=fccb42>Solved</>: <fg=fccb42>%s</>", time.Since(St).Milliseconds(), capKey[:62]))
+			console.Log(fmt.Sprintf("%dms  | <fg=fccb42>Solved</>: <fg=fccb42>%s</>", time.Since(St).Milliseconds(), resp.Data.Token[:62]))
 
 			console.StMut.Lock()
 			console.SolveTime = append(console.SolveTime, time.Since(St))
@@ -132,21 +133,21 @@ func main() {
 					return
 				}
 
-				/*if err := worker.Humanize(&discord.HumanizeConfig{
+				if err := worker.Humanize(&discord.HumanizeConfig{
 					Tutorial:  true,
 					Hypesquad: true,
 					Date:      fmt.Sprintf("200%d-0%d-0%d", utils.RandomNumber(1, 5), utils.RandomNumber(1, 9), utils.RandomNumber(1, 9)),
 					Avatar:    fmt.Sprintf("../../assets/input/avatars/%s", avatar),
-					Bio:       fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
+					Bio:       bio, //fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
 					Pronouns:  "he/him",
 				}); err != nil {
 					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
 					console.Locked++
 					return
-				}*/
+				}
 
 				if Config.Bridge.Enable {
-					if err := bridgeClient.PushData(fmt.Sprintf("%s", worker.Client.Config.Token)); err != nil {
+					if err := bridgeClient.PushData(worker.Client.Config.Token); err != nil {
 						log.Println(err)
 					}
 				}
@@ -169,27 +170,7 @@ func main() {
 				}
 
 				console.Log(fmt.Sprintf("%dms | <fg=3eed44>Unlock</>: <fg=3eed44>%s</>", time.Since(st).Milliseconds(), worker.Client.Config.Token))
-
-				if Config.Verifications.Email {
-					apikey, err := Assets["email_apis"].Next()
-					if err != nil {
-						return
-					}
-
-					ctx := context.WithValue(context.Background(), mailslurp.ContextAPIKey, mailslurp.APIKey{Key: apikey})
-
-					// create mailslurp client
-					client := mailslurp.NewAPIClient(mailslurp.NewConfiguration())
-
-					// create an inbox
-					inbox, _, err := client.InboxControllerApi.CreateInbox(ctx, &mailslurp.CreateInboxOpts{})
-
-					fmt.Println("email", inbox.EmailAddress)
-
-				}
-			}(capKey, "http://"+proxy, username, avatars, bio, St)
+			}(resp.Data.Token, "http://"+proxy, username, avatars, bio, St)
 		}()
 	}
-
-	c.WaitAllDone()
 }

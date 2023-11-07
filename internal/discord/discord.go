@@ -4,15 +4,14 @@ import (
 	"fmt"
 
 	"github.com/Implex-ltd/cleanhttp/cleanhttp"
-	"github.com/Implex-ltd/ucdiscord/ucdiscord"
-
 	"github.com/Implex-ltd/generator/internal/utils"
+	"github.com/Implex-ltd/ucdiscord/ucdiscord"
 )
 
 func NewWorker(c *Config) (*Worker, error) {
 	client, err := cleanhttp.NewCleanHttpClient(&cleanhttp.Config{
-		Proxy: c.Proxy,
-		//Log:       true,
+		Proxy:     c.Proxy,
+		Log:       false,
 		BrowserFp: c.Fingerprint,
 	})
 
@@ -77,7 +76,7 @@ func (w *Worker) Generate() error {
 }
 
 func (w *Worker) Verify(code string) error {
-	_, data, err := w.Client.Register(&ucdiscord.Config{
+	_, data, err := w.Client.Register( &ucdiscord.Config{
 		Username:   w.Username,
 		Invite:     w.Invite,
 		CaptchaKey: w.HcaptchaKey,
