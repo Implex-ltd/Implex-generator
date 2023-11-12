@@ -1,7 +1,7 @@
 [discord] 
-invite = "4bHdkURM"
-build = 243588
-check_sleep = 0
+invite = "fBtEegUp"
+build = 244358
+check_sleep = 9
 
 [verifications]
 email = false
@@ -9,13 +9,13 @@ email = false
 [solver]
 text = true
 turbo = true
-tubo_st = 3200
+tubo_st = 3400
 task_type = 0
 
 [performances]
-threads = 50
+threads = 20
 
 [bridge]
-enable = true
+enable = false
 port = 1337
 address ="localhost"

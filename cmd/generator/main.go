@@ -63,6 +63,7 @@ func main() {
 			if err != nil {
 				return
 			}
+			username = utils.RandomString(8)
 
 			avatars, err := Assets["avatars"].Next()
 			if err != nil {
@@ -141,7 +142,7 @@ func main() {
 					Bio:       bio, //fmt.Sprintf("%s %s", bio, utils.RandomString(utils.RandomNumber(3, 10))),
 					Pronouns:  "he/him",
 				}); err != nil {
-					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</> (%s)", time.Since(st).Milliseconds(), err.Error(), worker.Client.Config.Token))
 					console.Locked++
 					return
 				}
@@ -155,7 +156,7 @@ func main() {
 				time.Sleep(time.Second * time.Duration(Config.Discord.CheckSleep))
 
 				if err := worker.Check(); err != nil {
-					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+					console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</> (%s)", time.Since(st).Milliseconds(), err.Error(), worker.Client.Config.Token))
 					console.Locked++
 					return
 				}
@@ -164,7 +165,7 @@ func main() {
 
 				if !Config.Bridge.Enable {
 					if err := utils.AppendFile("output/unlocked.txt", worker.Client.Config.Token); err != nil {
-						console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</>", time.Since(st).Milliseconds(), err.Error()))
+						console.Log(fmt.Sprintf("%dms | <fg=f5382f>Error</>: <fg=f5382f>%s</> (%s)", time.Since(st).Milliseconds(), err.Error(), worker.Client.Config.Token))
 						return
 					}
 				}
